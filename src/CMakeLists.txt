@@ -2,13 +2,13 @@
 find_package(Vala REQUIRED)
 # pkgconfig, real C code
 find_package(PkgConfig)
-pkg_check_modules(DEPS REQUIRED gtk+-3.0 glib-2.0 gio-2.0 gee-1.0 indicator3 x11 gdk-x11-3.0)
+pkg_check_modules(DEPS REQUIRED gtk+-3.0 glib-2.0 gio-2.0 gee-1.0 indicator3-0.4 x11 gdk-x11-3.0)
 
 include(ValaVersion)
 ensure_vala_version("0.12" MINIMUM)
 include(ValaPrecompile)
 
-execute_process (COMMAND ${PKG_CONFIG_EXECUTABLE} indicator3 --variable indicatordir OUTPUT_VARIABLE _indicatordir OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process (COMMAND ${PKG_CONFIG_EXECUTABLE} indicator3-0.4 --variable indicatordir OUTPUT_VARIABLE _indicatordir OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 # Base bits
 
