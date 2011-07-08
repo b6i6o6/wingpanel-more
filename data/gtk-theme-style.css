@@ -1,0 +1,16 @@
+@define-color panel_fg_color #ddddde;
+/*@define-color np_bg_color #333;*/
+
+* {
+    -GtkMenu-horizontal-padding: 0;
+	-GtkMenu-vertical-padding: 0;
+}
+
+.wingpanel-menubar {
+    border-width: 0;
+    border-style: none;
+    padding: 4;
+
+    -GtkMenuBar-internal-padding: 0;
+}
+

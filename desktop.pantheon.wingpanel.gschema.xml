@@ -1,0 +1,14 @@
+<schemalist>	
+	<schema path="/desktop/pantheon/wingpanel/" id="desktop.pantheon.wingpanel" gettext-domain="wingpanel">
+		<key type="as" name="blacklist">
+			<default>[ 'libappmenu.so' ]</default>
+			<summary>List of indicators.</summary>
+			<description>These indicators will not be displayed in Wingpanel.</description>
+		</key>
+		<key type="b" name="use-gtk-theme">
+			<default>false</default>
+			<summary>Use gtk theme.</summary>
+			<description>Use gtk theme defined by gnome-panel-menu-bar css entry.</description>
+		</key>
+	</schema>
+</schemalist>
