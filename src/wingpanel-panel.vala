@@ -130,16 +130,6 @@ namespace Wingpanel {
             // Add default widgets
             add_defaults();
 
-            /* FIXME waiting for deletion */
-            /*Gtk.rc_parse_string ("""
-                style "wingpanel-menuitem"
-                {
-                     GtkMenuItem::horizontal-padding = 2
-                }
-                widget_class "*.<GtkMenuItem>" style "wingpanel-menuitem"
-                """
-            );*/
-
             model = IndicatorsModel.get_default ();
             var indicators_list = model.get_indicators ();
 
@@ -382,7 +372,7 @@ namespace Wingpanel {
 
             //amtest
             //var display = x11_drawable_get_xdisplay (get_window ());
-            var display = X11Display.get_xdisplay (get_window ().get_display ());
+            unowned X.Display display = X11Display.get_xdisplay (get_window ().get_display ());
             //var xid = x11_drawable_get_xid (get_window ());
             var xid = X11Window.get_xid (get_window ());
             //var xid = get_xid (get_window ());
