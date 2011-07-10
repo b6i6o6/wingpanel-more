@@ -67,7 +67,6 @@ namespace Wingpanel {
 
         private void key_changed (string key) {
             if (key == "use-gtk-theme") {
-                stdout.printf ("hummmmmmmmmmmmm\n");
                 use_gtk_theme = settings.get_boolean ("use-gtk-theme");
                 if (provider != null)
                     Gtk.StyleContext.remove_provider_for_screen (Gdk.Screen.get_default(), provider);
