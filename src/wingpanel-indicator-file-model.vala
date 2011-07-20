@@ -65,12 +65,11 @@ namespace Wingpanel
              * indicator is the last one set in indicator_order.
              */
             //indicator_order.set ("libappmenu.so", 7);
-            indicator_order.set ("libapplication.so", 7);
-            indicator_order.set ("libnetworkmenu.so", 6);
-            indicator_order.set ("libsoundmenu.so", 5);
-            indicator_order.set ("libmessaging.so", 4);
-            indicator_order.set ("libme.so", 3);
-            indicator_order.set ("libdatetime.so", 2);
+            indicator_order.set ("libapplication.so", 6);
+            indicator_order.set ("libnetworkmenu.so", 5);
+            indicator_order.set ("libsoundmenu.so", 4);
+            indicator_order.set ("libmessaging.so", 3);
+            indicator_order.set ("libpower.so", 2);
             indicator_order.set ("libsession.so", 1);
 
             /* Indicators we don't want to load */
