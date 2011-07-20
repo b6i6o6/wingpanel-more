@@ -110,8 +110,15 @@ namespace Wingpanel {
                 set_visual (screen.get_rgba_visual());
             //set_opacity (0.8);
 
-            screen.get_monitor_geometry(this.screen.get_primary_monitor(), out this.monitor_dimensions);
-            set_size_request (monitor_dimensions.width, -1);
+            panel_resize (false);
+            /* update the panel size on screen size or monitor changes */
+            screen.size_changed.connect (() => {
+                panel_resize (true);
+            });
+            screen.monitors_changed.connect (() => {
+                panel_resize (true);
+            });
+
             menuhash = new Gee.HashMap<string, Gtk.MenuItem> ();
 
             // Window properties
@@ -138,7 +145,7 @@ namespace Wingpanel {
             }
 
             // Signals
-            realize.connect (() => {this.set_struts();});
+            realize.connect (() => { set_struts();});
             destroy.connect (Gtk.main_quit);
 
             //Check if Carpadio is installed
@@ -150,6 +157,15 @@ namespace Wingpanel {
             } catch {
                 GLib.log("wingpanel", LogLevelFlags.LEVEL_CRITICAL, "Cardapio not installed!");
             }
+        }
+
+        private void panel_resize (bool redraw) 
+        {
+                screen.get_monitor_geometry(this.screen.get_primary_monitor(), out this.monitor_dimensions);
+                set_size_request (monitor_dimensions.width, -1);
+                set_struts ();
+                if (redraw)
+                    queue_draw ();
         }
 
         private void create_entry (Indicator.ObjectEntry entry,
