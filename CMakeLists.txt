@@ -1,41 +1,77 @@
-# Check http://elementaryos.org/docs/developer-guide/cmake for documentation
+# Check http://webdev.elementaryos.org/docs/developer-guide/cmake for documentation
 
 cmake_minimum_required (VERSION 2.6)
-cmake_policy(VERSION 2.6)
+cmake_policy (VERSION 2.6)
+list (APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
-project(wingpanel)
+project (wingpanel)
 
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/vala )
+set (DATADIR "${CMAKE_INSTALL_PREFIX}/share")
+set (PKGDATADIR "${DATADIR}/wingpanel")
+set (GETTEXT_PACKAGE "wingpanel")
+set (RELEASE_NAME "A super sexy space-saving top panel.")
+set (VERSION "0.3.0")
+set (VERSION_INFO "Testing")
+set (CMAKE_C_FLAGS "-ggdb")
 
-add_subdirectory (src)
-add_subdirectory (data)
+# Files
 
-# GSettings schema
+file (GLOB stylesheets "${CMAKE_CURRENT_SOURCE_DIR}/data/style/*.css")
+file (GLOB desktop_entry "${CMAKE_CURRENT_SOURCE_DIR}/data/wingpanel.desktop")
 
-SET (SCHEMAS_NAME "desktop.pantheon.wingpanel.gschema.xml")
-# Have an option to not install the schema into where GLib is
+# Indicators
 
-option (GSETTINGS_LOCALINSTALL "Install GSettings Schemas locally instead of to the GLib prefix" OFF)
+execute_process (COMMAND ${PKG_CONFIG_EXECUTABLE} indicator3-0.4 --variable indicatordir OUTPUT_VARIABLE _indicatordir OUTPUT_STRIP_TRAILING_WHITESPACE)
+set (INDICATORDIR "${_indicatordir}")
 
-if (GSETTINGS_LOCALINSTALL)
-    SET (GSETTINGS_DIR "${CMAKE_INSTALL_PREFIX}/share/glib-2.0/schemas/")
-else (GSETTINGS_LOCALINSTALL)
-    execute_process (COMMAND ${PKG_CONFIG_EXECUTABLE} glib-2.0 --variable prefix OUTPUT_VARIABLE _glib_prefix OUTPUT_STRIP_TRAILING_WHITESPACE)
-    set (GSETTINGS_DIR "${_glib_prefix}/share/glib-2.0/schemas/")
-endif (GSETTINGS_LOCALINSTALL)
-# Run the validator and error if it fails
+# Configure file
 
-execute_process (COMMAND ${PKG_CONFIG_EXECUTABLE} gio-2.0 --variable glib_compile_schemas  OUTPUT_VARIABLE _glib_comple_schemas OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process (COMMAND ${_glib_comple_schemas} --dry-run --schema-file=${CMAKE_CURRENT_SOURCE_DIR}/${SCHEMAS_NAME} ERROR_VARIABLE _schemas_invalid OUTPUT_STRIP_TRAILING_WHITESPACE)
+configure_file (${CMAKE_SOURCE_DIR}/config.h.cmake ${CMAKE_BINARY_DIR}/config.h)
 
-if (_schemas_invalid)
-    message (SEND_ERROR "Schema validation error: ${_schemas_invalid}")
-endif (_schemas_invalid)
+# Slingshot
 
-# Actually install and recomple schemas
+set (WINGPANEL_DEPS "gobject-2.0;glib-2.0;gio-2.0;gee-1.0;gdk-x11-3.0;x11;gtk+-3.0;granite")
 
-message (STATUS "GSettings schemas will be installed into ${GSETTINGS_DIR}")
+find_package (PkgConfig)
+pkg_check_modules (DEPS REQUIRED ${WINGPANEL_DEPS})
+pkg_check_modules (INDICATOR REQUIRED indicator3-0.4)
 
-install (FILES ${SCHEMAS_NAME} DESTINATION ${GSETTINGS_DIR} OPTIONAL)
-install (CODE "message (STATUS \"Compiling GSettings schemas\")")
-install (CODE "execute_process (COMMAND ${_glib_comple_schemas} ${GSETTINGS_DIR})")
+find_package (Vala REQUIRED)
+include (ValaVersion)
+ensure_vala_version ("0.12.0" MINIMUM)
+
+include (ValaPrecompile)
+vala_precompile (VALA_C
+    src/WingpanelApp.vala
+    src/Panel.vala
+    src/Settings.vala
+    src/WingpanelObjectEntry.vala
+    src/IndicatorFileModel.vala
+PACKAGES
+	${WINGPANEL_DEPS}
+CUSTOM_VAPIS
+    vapi/config.vapi
+    vapi/indicator.vapi
+    vapi/indicators-gtk.vapi
+OPTIONS
+	--thread
+    -g
+)
+
+add_definitions (${DEPS_CFLAGS} ${INDICATOR_CFLAGS} -include config.h)
+link_libraries (${DEPS_LIBRARIES} ${INDICATOR_LIBRARIES})
+link_directories (${DEPS_LIBRARY_DIRS} ${INDICATOR_LIBRARY_DIRS})
+
+add_executable (wingpanel ${VALA_C})
+
+# Installation
+install (TARGETS wingpanel RUNTIME DESTINATION bin)
+install (FILES ${stylesheets} DESTINATION ${PKGDATADIR}/style)
+install (FILES ${desktop_entry} DESTINATION ${DATADIR}/applications)
+
+# GSettings Schema
+include (GSettings)
+add_schema ("org.elementary.wingpanel.gschema.xml")
+
+# Translations
+# add_subdirectory (po)

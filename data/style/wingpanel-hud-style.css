@@ -1,0 +1,48 @@
+@define-color panel_fg_color #ddddde;
+@define-color transparent rgba (0, 0, 0, 0.0);
+/*@define-color np_bg_color #333;*/
+
+* {
+    -GtkMenu-horizontal-padding: 0;
+	-GtkMenu-vertical-padding: 0;
+}
+
+.gnome-panel-menu-bar {
+    background-color: @transparent;
+}
+
+.apps-button {
+    engine: none;
+    border-width: 0;
+    padding: 0;
+    background-color: @transparent;
+    background-image: none;
+}
+
+.apps-button GtkLabel {
+    font-weight: bold;
+}
+
+.apps-button:hover, .apps-button:active {
+    transition: 200ms linear;    
+    background-image: -gtk-gradient (radial,
+        center center, 0,
+        center center, 0.5,
+        color-stop (0, alpha (@selected_bg_color, 0.9)),
+        color-stop (0.5, alpha (@selected_bg_color, 0.4)),
+        color-stop (1, alpha (@transparent, 0.0)));
+    background-color: @transparent;
+}
+
+.wingpanel-menubar {
+    border-width: 0;
+    border-style: none;
+    padding: 2;
+    color: @panel_fg_color;
+    background-color: alpha(#000, 0.75);
+    /* needed to play well with rgba otherwise it perform an uneeded draw_background */
+    -GtkMenuBar-shadow-type : none;
+
+    -GtkMenuBar-internal-padding: 0;
+}
+
