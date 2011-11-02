@@ -41,19 +41,15 @@ namespace Wingpanel {
     public class Panel : Gtk.Window {
 
         public const int panel_height = 24;
-        public const int stroke_width = 2;
+        public const int stroke_width = 0;
         public uint animation_timer = 0;
-        public int panel_displacement = (-1) * panel_height;
+        public int panel_displacement = -panel_height;
 
         private HBox container;
         private HBox left_wrapper;
         private HBox right_wrapper;
         private MenuBar menubar;
         private MenuBar clock;
-
-        private StyleContext ctx_apps_label;
-        private StyleContext ctx_clock;
-        private StyleContext ctx_menubar;
 
         private IndicatorsModel model;
         private Gee.HashMap<string, Gtk.MenuItem> menuhash;
@@ -65,16 +61,12 @@ namespace Wingpanel {
 
             this.app = app;
             set_application (app as Gtk.Application);
+
             //Window properties
             skip_taskbar_hint = true; // no taskbar
             decorated = false; // no window decoration
             app_paintable = true;
-
-            if (!app.settings.use_gtk_theme)
-                set_visual (screen.get_rgba_visual());
-            //set_opacity (0.8);
-
-            get_style_context ().add_provider_for_screen (get_screen (), app.style_provider, 600);
+            //set_visual (get_screen ().get_rgba_visual ());
 
             panel_resize (false);
             /* update the panel size on screen size or monitor changes */
@@ -92,21 +84,21 @@ namespace Wingpanel {
             move (0, panel_displacement);
 
             // HBox container
-            container = new HBox(false, 0);
-            left_wrapper = new HBox(false, 0);
-            right_wrapper = new HBox(false, 0);
+            container = new HBox (false, 0);
+            left_wrapper = new HBox (false, 0);
+            right_wrapper = new HBox (false, 0);
             resizable = false;
 
             add (container);
 
             // Add default widgets
-            add_defaults();
+            add_defaults ();
 
             model = IndicatorsModel.get_default ();
             var indicators_list = model.get_indicators ();
 
             foreach (Indicator.Object o in indicators_list) {
-                 load_indicator(o);
+                 load_indicator (o);
             }
 
             // Signals
@@ -144,7 +136,7 @@ namespace Wingpanel {
         
         }
 
-        private void delete_entry(Indicator.ObjectEntry entry,
+        private void delete_entry (Indicator.ObjectEntry entry,
                                    Indicator.Object     object) {
 
             if (menuhash.has_key(model.get_indicator_name(object))) {
@@ -186,80 +178,37 @@ namespace Wingpanel {
             }
         }
 
-        private void add_defaults() {
-            // Apps button
-            var apps = new Button.with_label (_("Applications"));
-            apps.can_focus = false;
-            apps.get_style_context ().add_class ("apps-button");
-            apps.button_press_event.connect(launch_launcher);
-            
-            ctx_apps_label = apps.get_style_context ();
-            //ctx_apps_label.add_class ("gnome-panel-menu-bar");
-            /* FIXME:Ambiance got a missing context (missing text color), 
-               we have to fallback to menubar */
-            ctx_apps_label.add_class ("menubar");
-            if (app.settings.use_gtk_theme)
-                ctx_apps_label.add_class ("gnome-panel-menu-bar");
-            ctx_apps_label.add_class ("wingpanel-menubar");
+        private void add_defaults () {
 
-            left_wrapper.pack_start(apps, false, true, 5);
-            container.pack_start(left_wrapper);
+            // Apps button
+            var apps = new Widgets.AppsButton ();
+            apps.button_press_event.connect (launch_launcher);
+
+            left_wrapper.pack_start (apps, false, true, 0);
+            container.pack_start (left_wrapper);
 
             clock = new Gtk.MenuBar ();
             clock.can_focus = true;
             clock.border_width = 0;
-            ctx_clock = clock.get_style_context ();
-            if (app.settings.use_gtk_theme)
-                ctx_clock.add_class ("gnome-panel-menu-bar");
-            ctx_clock.add_class ("wingpanel-menubar");
-            container.pack_start(clock, false, false, 0);
+            clock.get_style_context ().add_class ("gnome-panel-menu-bar");
+            container.pack_start (clock, false, false, 0);
 
             // Menubar for storing indicators
             menubar = new Gtk.MenuBar ();
             menubar.can_focus = true;
             menubar.border_width = 0;
-            //menubar.set_name ("indicator-applet-menubar");
-            ctx_menubar = menubar.get_style_context ();
-            if (app.settings.use_gtk_theme)
-               ctx_menubar.add_class ("gnome-panel-menu-bar");
-            ctx_menubar.add_class ("wingpanel-menubar");
+            menubar.get_style_context ().add_class ("gnome-panel-menu-bar");
             
-            get_style_context ().add_class ("wingpanel-menubar");
+            right_wrapper.pack_end (menubar, false, false, 0);
+            container.pack_end (right_wrapper);
 
-            right_wrapper.pack_end(menubar, false, false, 0);
-            container.pack_start(right_wrapper);
+            get_style_context ().add_class ("menubar");
+            get_style_context ().add_class ("gnome-panel-menu-bar");
             
-            SizeGroup gpr = new SizeGroup(SizeGroupMode.HORIZONTAL);
+            SizeGroup gpr = new SizeGroup (SizeGroupMode.HORIZONTAL);
             gpr.add_widget (left_wrapper);
             gpr.add_widget (right_wrapper);
 
-        }
-
-        public void update_use_gtk_theme () {
-            /* Add and remove class styles */
-            if (!app.settings.use_gtk_theme) {
-                set_visual (screen.get_rgba_visual());
-                //ctx_apps_label.remove_class ("gnome-panel-menu-bar");
-                ctx_clock.remove_class ("gnome-panel-menu-bar");
-                ctx_menubar.remove_class ("gnome-panel-menu-bar");
-            } else {
-                set_visual (null);
-                //ctx_apps_label.add_class ("gnome-panel-menu-bar");
-                ctx_clock.add_class ("gnome-panel-menu-bar");
-                ctx_menubar.add_class ("gnome-panel-menu-bar");
-            }
-                
-            /* make sure to remove the style before readding it, order matter */
-            //ctx_apps_label.remove_class ("wingpanel-menubar");
-            ctx_clock.remove_class ("wingpanel-menubar");
-            ctx_menubar.remove_class ("wingpanel-menubar");
-            
-            ctx_apps_label.add_class ("wingpanel-menubar");
-            ctx_clock.add_class ("wingpanel-menubar");
-            ctx_menubar.add_class ("wingpanel-menubar");
-                
-            clock.reset_style ();
-            menubar.reset_style ();
         }
 
         private bool launch_launcher (Gtk.Widget widget, Gdk.EventButton event) {
@@ -282,24 +231,14 @@ namespace Wingpanel {
 
         protected override bool draw (Context cr) {
 
-            Gtk.Allocation size;
+            Allocation size;
             get_allocation (out size);
 
-            // Draw shadow
-            /*var linear_shadow = new Cairo.Pattern.linear(size.x, size.y + this.panel_height, size.x, size.y + this.panel_height + this.stroke_width);
-            linear_shadow.add_color_stop_rgba(0.0,  0.0, 0.0, 0.0, 0.4);
-            linear_shadow.add_color_stop_rgba(0.8,  0.0, 0.0, 0.0, 0.1);
-            linear_shadow.add_color_stop_rgba(1.0,  0.0, 0.0, 0.0, 0.0);
-            context.set_source(linear_shadow);
-            context.fill();*/
-
-            if (app.settings.use_gtk_theme) {
-                int border = 0;
-                var ctx = menubar.get_style_context ();
-                render_background (ctx, cr,
-                                   size.x - border, size.y - border, 
-                                   size.width + 2 * border, size.height + 2 * border);
-            }
+            int border = 0;
+            var ctx = menubar.get_style_context ();
+            render_background (ctx, cr,
+                               size.x - border, size.y - border, 
+                               size.width + 2 * border, size.height + 2 * border);
 
             // Slide in
             if (animation_timer == 0) {
@@ -331,7 +270,7 @@ namespace Wingpanel {
             // we have to allocate 4 times as much and do bit-masking
             ulong[] struts = new ulong [Struts.N_VALUES];
 
-            struts [Struts.TOP] = this.panel_height + 3;
+            struts [Struts.TOP] = this.panel_height;
             struts [Struts.TOP_START] = monitor_dimensions.x;
             struts [Struts.TOP_END] = monitor_dimensions.x + monitor_dimensions.width - 1;
 

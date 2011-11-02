@@ -5,11 +5,6 @@
 			<summary>List of indicators.</summary>
 			<description>These indicators will not be displayed in Wingpanel.</description>
 		</key>
-		<key type="b" name="use-gtk-theme">
-			<default>false</default>
-			<summary>Use gtk theme.</summary>
-			<description>Use gtk theme defined by gnome-panel-menu-bar css entry.</description>
-		</key>
         <key type="s" name="default-launcher">
             <default>"slingshot"</default>
             <summary>The default program to use as App launcher.</summary>

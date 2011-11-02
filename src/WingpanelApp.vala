@@ -26,7 +26,6 @@ namespace Wingpanel {
         private Panel panel = null;
 
         public Settings settings { get; private set; default = null; }
-        public CssProvider style_provider { get; private set; default = null; }
 
         construct {
 
@@ -57,19 +56,8 @@ namespace Wingpanel {
             debug ("In WingpanelApp");
 
             settings = new Settings ();
-            style_provider = new CssProvider ();
 
-            try {
-                if (settings.use_gtk_theme)
-                    style_provider.load_from_path (Build.PKGDATADIR + "/style/gtk-theme-style.css");
-                else
-                    style_provider.load_from_path (Build.PKGDATADIR + "/style/wingpanel-hud-style.css");
-            } catch (Error e) {
-                warning ("Could not add css provider. Wingpanel won't look as intended. %s", e.message);
-            }
-
-            //Services.Logger.initialize ("Wingpanel");
-            //Services.Logger.DisplayLevel = Services.LogLevel.DEBUG;
+            DEBUG = false;
 
         }
 

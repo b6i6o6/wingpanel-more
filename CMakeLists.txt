@@ -14,15 +14,15 @@ set (VERSION "0.3.0")
 set (VERSION_INFO "Testing")
 set (CMAKE_C_FLAGS "-ggdb")
 
-# Files
-
-file (GLOB stylesheets "${CMAKE_CURRENT_SOURCE_DIR}/data/style/*.css")
-file (GLOB desktop_entry "${CMAKE_CURRENT_SOURCE_DIR}/data/wingpanel.desktop")
-
 # Indicators
 
 execute_process (COMMAND ${PKG_CONFIG_EXECUTABLE} indicator3-0.4 --variable indicatordir OUTPUT_VARIABLE _indicatordir OUTPUT_STRIP_TRAILING_WHITESPACE)
 set (INDICATORDIR "${_indicatordir}")
+
+# Files
+
+file (GLOB stylesheets "${CMAKE_CURRENT_SOURCE_DIR}/data/style/*.css")
+file (GLOB desktop_entry "${CMAKE_CURRENT_SOURCE_DIR}/data/wingpanel.desktop")
 
 # Configure file
 
@@ -43,10 +43,11 @@ ensure_vala_version ("0.12.0" MINIMUM)
 include (ValaPrecompile)
 vala_precompile (VALA_C
     src/WingpanelApp.vala
-    src/Panel.vala
     src/Settings.vala
-    src/WingpanelObjectEntry.vala
-    src/IndicatorFileModel.vala
+    src/Widgets/Panel.vala
+    src/Widgets/AppsButton.vala
+    src/Services/WingpanelObjectEntry.vala
+    src/Services/IndicatorFileModel.vala
 PACKAGES
 	${WINGPANEL_DEPS}
 CUSTOM_VAPIS

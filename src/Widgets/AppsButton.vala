@@ -16,16 +16,34 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-using Granite.Services;
+using Gtk;
+using Gdk;
+using Cairo;
 
-namespace Wingpanel {
+namespace Wingpanel.Widgets {
 
-    public class Settings : Granite.Services.Settings {
+    public class AppsButton : EventBox {
 
-        public string default_launcher { get; set; }
+        private Label app_label;
 
-        public Settings () {
-            base ("desktop.pantheon.wingpanel");
+        construct {
+
+            can_focus = false;
+
+        }
+
+        public AppsButton () {
+
+            app_label = new Label (_("<b>Applications</b>"));
+            app_label.use_markup = true;
+
+            width_request = 100;
+            add (app_label);
+
+            get_style_context ().add_class ("wingpanel-app-button");
+            get_style_context ().add_class ("menubar");
+            get_style_context ().add_class ("gnome-panel-menu-bar");
+
         }
 
     }
