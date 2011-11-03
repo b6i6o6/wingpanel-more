@@ -1,0 +1,53 @@
+/*
+ * Copyright (C) 2011 Giulio Collura
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+@define-color shadow_color rgba (1, 1, 1, 0.6);
+
+.gnome-panel-menu-bar {
+
+    color: @tooltip_fg_color;
+    text-shadow: 0 1 shade (@theme_text_color, 0.7);
+    background-color: none;
+    background-image: -gtk-gradient (linear,
+			         left top,
+			         left bottom,
+			         from (alpha (#3c3c3c, 0.8)),
+			         to (alpha (#2d2d2d, 0.7)));
+
+}
+
+.wingpanel-app-button:active {
+    background-color: red;
+    background-image: none;
+    color: green;
+}
+
+.gnome-panel-menu-bar *:active, .gnome-panel-menu-bar *:selected {
+    background-image: -gtk-gradient (linear,
+			         left top,
+			         left bottom,
+			         from (#2d2d2d),
+			         to (#3c3c3c));
+}
+
+.shadow {
+    background-color: rgba (0, 0, 0, 0);
+    background-image: -gtk-gradient (linear,
+                     left top, left bottom,
+                     from (@shadow_color),
+                     to (alpha (@shadow_color, 0.0)));
+}

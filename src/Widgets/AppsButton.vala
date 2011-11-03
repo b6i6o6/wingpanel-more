@@ -28,8 +28,7 @@ namespace Wingpanel.Widgets {
 
         construct {
 
-            can_focus = false;
-
+            can_focus = true;
         }
 
         public AppsButton () {

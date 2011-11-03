@@ -38,6 +38,39 @@ namespace Wingpanel {
         N_VALUES
     }
 
+    private class Shadow : Granite.Widgets.CompositedWindow {
+
+        private MenuBar menubar;
+
+        public Shadow () {
+
+            menubar = new MenuBar ();
+
+            skip_taskbar_hint = true; // no taskbar
+            height_request = 24;
+            menubar.get_style_context ().add_class ("shadow");
+            set_type_hint (WindowTypeHint.DESKTOP);
+
+        }
+
+        protected override bool draw (Context cr) {
+
+            Allocation size;
+            get_allocation (out size);
+            
+            int border = 0;
+
+            var ctx = menubar.get_style_context ();
+            render_background (ctx, cr,
+                               size.x - border, size.y - border, 
+                               size.width + 2 * border, size.height + 2 * border);
+
+            return true;
+
+        }
+
+    }
+
     public class Panel : Gtk.Window {
 
         public const int panel_height = 24;
@@ -50,6 +83,8 @@ namespace Wingpanel {
         private HBox right_wrapper;
         private MenuBar menubar;
         private MenuBar clock;
+
+        private Shadow shadow;
 
         private IndicatorsModel model;
         private Gee.HashMap<string, Gtk.MenuItem> menuhash;
@@ -66,7 +101,10 @@ namespace Wingpanel {
             skip_taskbar_hint = true; // no taskbar
             decorated = false; // no window decoration
             app_paintable = true;
-            //set_visual (get_screen ().get_rgba_visual ());
+            set_visual (get_screen ().get_rgba_visual ());
+
+            shadow = new Shadow ();
+            shadow.move (0, panel_height);
 
             panel_resize (false);
             /* update the panel size on screen size or monitor changes */
@@ -82,6 +120,7 @@ namespace Wingpanel {
             // Window properties
             set_type_hint (WindowTypeHint.DOCK);
             move (0, panel_displacement);
+            get_style_context ().add_provider_for_screen (get_screen (), app.provider, 600);
 
             // HBox container
             container = new HBox (false, 0);
@@ -105,12 +144,15 @@ namespace Wingpanel {
             realize.connect (() => { set_struts ();});
             destroy.connect (Gtk.main_quit);
 
+
         }
 
         private void panel_resize (bool redraw)  {
 
             screen.get_monitor_geometry (this.screen.get_primary_monitor(), out this.monitor_dimensions);
             set_size_request (monitor_dimensions.width, -1);
+            shadow.set_size_request (monitor_dimensions.width, 24);
+
             set_struts ();
             if (redraw)
                 queue_draw ();
@@ -215,7 +257,7 @@ namespace Wingpanel {
 
             debug ("Starting launcher!");
             try {
-                string? launcher = Environment.find_program_in_path(app.settings.default_launcher);
+                string? launcher = Environment.find_program_in_path (app.settings.default_launcher);
                 if (launcher != null)
                     GLib.Process.spawn_command_line_async (launcher);
             } catch {
@@ -244,7 +286,8 @@ namespace Wingpanel {
             if (animation_timer == 0) {
                 animation_timer = GLib.Timeout.add (250/panel_height, () => {
                     if (panel_displacement >= 0 ) {
-                           return false;
+                        shadow.show_all ();
+                        return false;
                     } else {
                         panel_displacement += 1;
                         move (0, panel_displacement);
