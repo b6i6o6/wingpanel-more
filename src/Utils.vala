@@ -17,32 +17,20 @@
 //
 
 using Gtk;
-using Gdk;
-using Cairo;
 
-namespace Wingpanel.Widgets {
+namespace Wingpanel.Utils {
 
-    public class AppsButton : EventBox {
+    public static Alignment set_padding (Gtk.Widget widget, int top, int right, 
+                                         int bottom, int left) {
 
-        private Label app_label;
-
-        construct {
-
-            can_focus = true;
-        }
-
-        public AppsButton () {
-
-            app_label = new Label (_("<b>Applications</b>"));
-            app_label.use_markup = true;
-
-            add (Utils.set_padding (app_label, 0, 14, 0, 14));
-
-            get_style_context ().add_class ("menubar");
-            get_style_context ().add_class ("gnome-panel-menu-bar");
-            get_style_context ().add_class ("wingpanel-app-button");
-
-        }
+        var alignment = new Alignment (0.0f, 0.0f, 1.0f, 1.0f);
+        alignment.top_padding = top;
+        alignment.right_padding = right;
+        alignment.bottom_padding = bottom;
+        alignment.left_padding = left;
+    
+        alignment.add (widget);
+        return alignment;
 
     }
 

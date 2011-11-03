@@ -44,6 +44,7 @@ include (ValaPrecompile)
 vala_precompile (VALA_C
     src/WingpanelApp.vala
     src/Settings.vala
+    src/Utils.vala
     src/Widgets/Panel.vala
     src/Widgets/AppsButton.vala
     src/Services/WingpanelObjectEntry.vala
@@ -75,4 +76,4 @@ include (GSettings)
 add_schema ("org.elementary.wingpanel.gschema.xml")
 
 # Translations
-# add_subdirectory (po)
+add_subdirectory (po)

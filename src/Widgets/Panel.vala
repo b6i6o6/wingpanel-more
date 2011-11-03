@@ -20,6 +20,9 @@ using Gtk;
 using Gdk;
 using Cairo;
 
+using Granite;
+using Granite.Services;
+
 namespace Wingpanel {
 
     public enum Struts {
@@ -47,9 +50,11 @@ namespace Wingpanel {
             menubar = new MenuBar ();
 
             skip_taskbar_hint = true; // no taskbar
-            height_request = 24;
+            height_request = 20;
             menubar.get_style_context ().add_class ("shadow");
-            set_type_hint (WindowTypeHint.DESKTOP);
+            set_type_hint (WindowTypeHint.DOCK);
+            set_keep_below (true);
+            stick ();
 
         }
 
@@ -256,19 +261,15 @@ namespace Wingpanel {
         private bool launch_launcher (Gtk.Widget widget, Gdk.EventButton event) {
 
             debug ("Starting launcher!");
-            try {
-                string? launcher = Environment.find_program_in_path (app.settings.default_launcher);
-                if (launcher != null)
-                    GLib.Process.spawn_command_line_async (launcher);
-            } catch {
-                try {
-                    Gtk.show_uri (get_screen (), "file:///usr/share/applications",
-                                 Gtk.get_current_event_time ());
-                } catch {
-                    warning ("Failed to open launcher");
-                }
-            }
+        
+            string? launcher = Environment.find_program_in_path (app.settings.default_launcher);
+            if (launcher != null)
+                System.execute_command (launcher);
+            else
+                System.open_uri ("file:///usr/share/applications");
+
             return true;
+        
         }
 
         protected override bool draw (Context cr) {
@@ -321,17 +322,13 @@ namespace Wingpanel {
             for (var i = 0; i < first_struts.length; i++)
                 first_struts [i] = struts [i];
 
-            //amtest
-            //var display = x11_drawable_get_xdisplay (get_window ());
             unowned X.Display display = X11Display.get_xdisplay (get_window ().get_display ());
-            //var xid = x11_drawable_get_xid (get_window ());
             var xid = X11Window.get_xid (get_window ());
-            //var xid = get_xid (get_window ());
 
             display.change_property (xid, display.intern_atom ("_NET_WM_STRUT_PARTIAL", false), X.XA_CARDINAL,
-                                  32, X.PropMode.Replace, (uchar[])struts, struts.length);
+                                  32, X.PropMode.Replace, (uchar[]) struts, struts.length);
             display.change_property (xid, display.intern_atom ("_NET_WM_STRUT", false), X.XA_CARDINAL,
-                                  32, X.PropMode.Replace, (uchar[])first_struts, first_struts.length);
+                                  32, X.PropMode.Replace, (uchar[]) first_struts, first_struts.length);
         }
     }
 }
