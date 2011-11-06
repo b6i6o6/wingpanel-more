@@ -17,6 +17,10 @@
 
 @define-color shadow_color rgba (0, 0, 0, 0.4);
 
+.gnome-panel-menu-bar {
+    padding: 0;
+}
+
 .shadow {
     background-color: @shadow_color;
     background-image: -gtk-gradient (linear,

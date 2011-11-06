@@ -50,7 +50,9 @@ namespace Wingpanel {
             menubar = new MenuBar ();
 
             skip_taskbar_hint = true; // no taskbar
+            //skip_pager_hint = true;
             menubar.get_style_context ().add_class ("shadow");
+            set_type_hint (WindowTypeHint.DROPDOWN_MENU);
             set_keep_below (true);
             stick ();
             set_accept_focus (false);
@@ -62,12 +64,9 @@ namespace Wingpanel {
             Allocation size;
             get_allocation (out size);
             
-            int border = 0;
-
             var ctx = menubar.get_style_context ();
-            render_background (ctx, cr,
-                               size.x - border, size.y - border, 
-                               size.width + 2 * border, size.height + 2 * border);
+            render_background (ctx, cr, size.x, size.y, 
+                               size.width, size.height);
 
             return true;
 
@@ -89,6 +88,7 @@ namespace Wingpanel {
         private MenuBar clock;
 
         private Shadow shadow;
+        private int shadow_size = 16;
 
         private IndicatorsModel model;
         private Gee.HashMap<string, Gtk.MenuItem> menuhash;
@@ -148,14 +148,13 @@ namespace Wingpanel {
             realize.connect (() => { set_struts ();});
             destroy.connect (Gtk.main_quit);
 
-
         }
 
         private void panel_resize (bool redraw)  {
 
             screen.get_monitor_geometry (this.screen.get_primary_monitor(), out this.monitor_dimensions);
             set_size_request (monitor_dimensions.width, -1);
-            shadow.set_size_request (monitor_dimensions.width, 16);
+            shadow.set_size_request (monitor_dimensions.width, shadow_size);
 
             set_struts ();
             if (redraw)
@@ -200,7 +199,7 @@ namespace Wingpanel {
         }
 
         private void on_entry_removed (Indicator.Object      object,
-                                      Indicator.ObjectEntry entry) {
+                                       Indicator.ObjectEntry entry) {
 
             delete_entry (entry, object);
         }
@@ -218,9 +217,9 @@ namespace Wingpanel {
                     unowned Indicator.ObjectEntry entry = (Indicator.ObjectEntry) list.nth_data (i);
                     this.create_entry (entry, indicator);
                 }
-                message ("Loaded indicator %s\n", model.get_indicator_name(indicator));
+                message ("Loaded indicator %s", model.get_indicator_name(indicator));
             } else {
-                //Log.printf(Log.Level.ERROR, "Unable to load %s\n", model.get_indicator_name(indicator));
+                warning ("Unable to load %s", model.get_indicator_name(indicator));
             }
         }
 
@@ -276,17 +275,14 @@ namespace Wingpanel {
             Allocation size;
             get_allocation (out size);
 
-            int border = 0;
             var ctx = menubar.get_style_context ();
-            render_background (ctx, cr,
-                               size.x - border, size.y - border, 
-                               size.width + 2 * border, size.height + 2 * border);
+            render_background (ctx, cr, size.x, size.y, 
+                               size.width, size.height);
 
             // Slide in
             if (animation_timer == 0) {
-                animation_timer = GLib.Timeout.add (250/panel_height, () => {
+                animation_timer = GLib.Timeout.add (300/panel_height, () => {
                     if (panel_displacement >= 0 ) {
-                        shadow.show_all ();
                         return false;
                     } else {
                         panel_displacement += 1;
@@ -296,6 +292,9 @@ namespace Wingpanel {
                 });
             }
             propagate_draw (container, cr);
+
+            if (!shadow.visible)
+                shadow.show_all ();
 
             return true;
         }
