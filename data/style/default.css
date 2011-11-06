@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-@define-color shadow_color rgba (1, 1, 1, 0.5);
+@define-color shadow_color rgba (0, 0, 0, 0.4);
 
 .shadow {
     background-color: @shadow_color;

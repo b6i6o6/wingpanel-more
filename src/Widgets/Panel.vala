@@ -50,11 +50,10 @@ namespace Wingpanel {
             menubar = new MenuBar ();
 
             skip_taskbar_hint = true; // no taskbar
-            height_request = 20;
             menubar.get_style_context ().add_class ("shadow");
-            set_type_hint (WindowTypeHint.DOCK);
             set_keep_below (true);
             stick ();
+            set_accept_focus (false);
 
         }
 
@@ -156,7 +155,7 @@ namespace Wingpanel {
 
             screen.get_monitor_geometry (this.screen.get_primary_monitor(), out this.monitor_dimensions);
             set_size_request (monitor_dimensions.width, -1);
-            shadow.set_size_request (monitor_dimensions.width, 24);
+            shadow.set_size_request (monitor_dimensions.width, 16);
 
             set_struts ();
             if (redraw)
