@@ -20,24 +20,22 @@
 
 using Gee;
 
-namespace Wingpanel
-{
-    public abstract class IndicatorsModel : GLib.Object
-    {
+namespace Wingpanel {
+
+    public abstract class IndicatorsModel : GLib.Object {
+
         private static IndicatorsModel _global_model = null;
 
-        public static IndicatorsModel get_default ()
-        {
-            if (_global_model == null)
-            {
+        public static IndicatorsModel get_default () {
+
+            if (_global_model == null) {
                 _global_model = new IndicatorsFileModel ();
             }
 
             return _global_model;
         }
 
-        public static void set_default (IndicatorsModel model)
-        {
+        public static void set_default (IndicatorsModel model) {
             _global_model = model;
         }
 
@@ -45,14 +43,14 @@ namespace Wingpanel
         public abstract string get_indicator_name (Indicator.Object o);
     }
 
-    public class IndicatorsFileModel : IndicatorsModel
-    {
+    public class IndicatorsFileModel : IndicatorsModel {
+
         public static HashMap<string, int> indicator_order = null;
         public HashMap<GLib.Object, string> indicator_map;
         public ArrayList<GLib.Object> indicator_list;
 
-        public IndicatorsFileModel ()
-        {
+        public IndicatorsFileModel () {
+
             string skip_list;
 
             //indicator_map = new Gee.HashMap<Indicator.Object, string> ();
@@ -77,8 +75,7 @@ namespace Wingpanel
             if (skip_list == null)
                 skip_list = "";
 
-            if (skip_list == "all")
-            {
+            if (skip_list == "all") {
                 log("wingpanel", LogLevelFlags.LEVEL_WARNING, "Skipping all indicator loading");
                 return;
             }
@@ -90,8 +87,7 @@ namespace Wingpanel
             //Gtk.IconTheme.get_default ().append_search_path (Wingpanel.Config.INDICATORICONSDIR);
 
             File dir = File.new_for_path (Build.INDICATORDIR);
-            try
-            {
+            try {
                 var e = dir.enumerate_children (FILE_ATTRIBUTE_STANDARD_NAME, 0, null);
                 ArrayList<string> sos = new ArrayList<string> ();
 
