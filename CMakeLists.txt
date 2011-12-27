@@ -14,27 +14,27 @@ set (VERSION "0.3.0")
 set (VERSION_INFO "Testing")
 set (CMAKE_C_FLAGS "-ggdb")
 
-# Indicators
+# Set dependencies
+set (WINGPANEL_DEPS "gobject-2.0;glib-2.0;gio-2.0;gee-1.0;gdk-x11-3.0;x11;gtk+-3.0;granite")
 
-execute_process (COMMAND ${PKG_CONFIG_EXECUTABLE} indicator3-0.4 --variable indicatordir OUTPUT_VARIABLE _indicatordir OUTPUT_STRIP_TRAILING_WHITESPACE)
-set (INDICATORDIR "${_indicatordir}")
+find_package (PkgConfig)
+pkg_check_modules (DEPS REQUIRED ${WINGPANEL_DEPS})
+pkg_check_modules (INDICATOR REQUIRED indicator3-0.4)
 
 # Files
 
 file (GLOB stylesheets "${CMAKE_CURRENT_SOURCE_DIR}/data/style/*.css")
 file (GLOB desktop_entry "${CMAKE_CURRENT_SOURCE_DIR}/data/wingpanel.desktop")
 
+# Get the Indicator Directory
+
+execute_process (COMMAND ${PKG_CONFIG_EXECUTABLE} indicator3-0.4 --variable=indicatordir OUTPUT_VARIABLE current_indicatordir OUTPUT_STRIP_TRAILING_WHITESPACE)
+set (INDICATORDIR ${current_indicatordir})
+
 # Configure file
 
 configure_file (${CMAKE_SOURCE_DIR}/config.h.cmake ${CMAKE_BINARY_DIR}/config.h)
 
-# Slingshot
-
-set (WINGPANEL_DEPS "gobject-2.0;glib-2.0;gio-2.0;gee-1.0;gdk-x11-3.0;x11;gtk+-3.0;granite")
-
-find_package (PkgConfig)
-pkg_check_modules (DEPS REQUIRED ${WINGPANEL_DEPS})
-pkg_check_modules (INDICATOR REQUIRED indicator3-0.4)
 
 find_package (Vala REQUIRED)
 include (ValaVersion)
