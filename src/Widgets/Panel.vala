@@ -76,10 +76,14 @@ namespace Wingpanel {
 
     public class Panel : Gtk.Window {
 
-        public const int panel_height = 24;
-        public const int stroke_width = 0;
-        public uint animation_timer = 0;
-        public int panel_displacement = -panel_height;
+        private const int panel_height = 24;
+        private const int shadow_size = 16;
+
+        private int panel_x = 0;
+        private int panel_y = 0;
+        private int panel_width = 0;
+        private uint animation_timer = 0;
+        private int panel_displacement = -panel_height;
 
         private HBox container;
         private HBox left_wrapper;
@@ -88,16 +92,13 @@ namespace Wingpanel {
         private MenuBar clock;
 
         private Shadow shadow;
-        private int shadow_size = 16;
-
         private IndicatorsModel model;
         private Gee.HashMap<string, Gtk.MenuItem> menuhash;
-        private Gdk.Rectangle monitor_dimensions;
 
         private WingpanelApp app;
 
         public Panel (WingpanelApp app) {
-
+            //TODO: Clean Up Code and add the this reference where used
             this.app = app;
             set_application (app as Gtk.Application);
 
@@ -106,9 +107,10 @@ namespace Wingpanel {
             decorated = false; // no window decoration
             app_paintable = true;
             set_visual (get_screen ().get_rgba_visual ());
+            set_type_hint (WindowTypeHint.DOCK);
+            get_style_context ().add_provider_for_screen (this.get_screen (), app.provider, 600);
 
             shadow = new Shadow ();
-            shadow.move (0, panel_height);
 
             panel_resize (false);
             /* update the panel size on screen size or monitor changes */
@@ -120,11 +122,6 @@ namespace Wingpanel {
             });
 
             menuhash = new Gee.HashMap<string, Gtk.MenuItem> ();
-
-            // Window properties
-            set_type_hint (WindowTypeHint.DOCK);
-            move (0, panel_displacement);
-            get_style_context ().add_provider_for_screen (get_screen (), app.provider, 600);
 
             // HBox container
             container = new HBox (false, 0);
@@ -145,16 +142,26 @@ namespace Wingpanel {
             }
 
             // Signals
-            realize.connect (() => { set_struts ();});
+            realize.connect (() => { panel_resize(false);});
             destroy.connect (Gtk.main_quit);
 
         }
 
         private void panel_resize (bool redraw)  {
 
-            screen.get_monitor_geometry (this.screen.get_primary_monitor(), out this.monitor_dimensions);
-            set_size_request (monitor_dimensions.width, -1);
-            shadow.set_size_request (monitor_dimensions.width, shadow_size);
+            Gdk.Rectangle monitor_dimensions;
+            
+            screen.get_monitor_geometry (this.screen.get_primary_monitor(), out monitor_dimensions);
+            
+            this.panel_x     = monitor_dimensions.x;
+            this.panel_y     = monitor_dimensions.y;
+            this.panel_width = monitor_dimensions.width;
+
+            this.move (panel_x, panel_y + panel_displacement);
+            shadow.move (panel_x, panel_y + panel_height + panel_displacement);
+
+            this.set_size_request (this.panel_width, -1);
+            shadow.set_size_request (this.panel_width, this.shadow_size);
 
             set_struts ();
             if (redraw)
@@ -281,12 +288,12 @@ namespace Wingpanel {
 
             // Slide in
             if (animation_timer == 0) {
-                animation_timer = GLib.Timeout.add (300/panel_height, () => {
-                    if (panel_displacement >= 0 ) {
+                animation_timer = GLib.Timeout.add (300/this.panel_height, () => {
+                    if (this.panel_displacement >= 0 ) {
                         return false;
                     } else {
-                        panel_displacement += 1;
-                        move (0, panel_displacement);
+                        this.panel_displacement += 1;
+                        this.move (this.panel_x, this.panel_y + this.panel_displacement);
                         return true;
                     }
                 });
@@ -301,27 +308,25 @@ namespace Wingpanel {
 
         private void set_struts () {
 
-            if (!get_realized ()) {
+            if (!get_realized()) {
                 return;
             }
 
-            int x, y;
-            this.get_position (out x, out y);
-
             // since uchar is 8 bits in vala but the struts are 32 bits
             // we have to allocate 4 times as much and do bit-masking
-            ulong[] struts = new ulong [Struts.N_VALUES];
+            var struts = new ulong [Struts.N_VALUES];
 
-            struts [Struts.TOP] = this.panel_height;
-            struts [Struts.TOP_START] = monitor_dimensions.x;
-            struts [Struts.TOP_END] = monitor_dimensions.x + monitor_dimensions.width - 1;
+            struts [Struts.TOP]         = this.panel_height + this.panel_y;
+            struts [Struts.TOP_START]   = this.panel_x;
+            struts [Struts.TOP_END]     = this.panel_x + this.panel_width;
 
             var first_struts = new ulong [Struts.BOTTOM + 1];
-            for (var i = 0; i < first_struts.length; i++)
+            for (var i = 0; i < first_struts.length; i++) {
                 first_struts [i] = struts [i];
+            }
 
-            unowned X.Display display = X11Display.get_xdisplay (get_window ().get_display ());
-            var xid = X11Window.get_xid (get_window ());
+            unowned X.Display display = X11Display.get_xdisplay(get_display());
+            var xid = X11Window.get_xid(get_window());
 
             display.change_property (xid, display.intern_atom ("_NET_WM_STRUT_PARTIAL", false), X.XA_CARDINAL,
                                   32, X.PropMode.Replace, (uchar[]) struts, struts.length);
