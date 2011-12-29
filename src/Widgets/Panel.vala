@@ -75,15 +75,14 @@ namespace Wingpanel {
     }
 
     public class Panel : Gtk.Window {
-
-        private const int panel_height = 24;
         private const int shadow_size = 16;
 
-        private int panel_x = 0;
-        private int panel_y = 0;
-        private int panel_width = 0;
+        private int panel_height = 24;
+        private int panel_x;
+        private int panel_y;
+        private int panel_width;
         private uint animation_timer = 0;
-        private int panel_displacement = -panel_height;
+        private int panel_displacement = -40;
 
         private HBox container;
         private HBox left_wrapper;
@@ -150,7 +149,7 @@ namespace Wingpanel {
         private void panel_resize (bool redraw)  {
 
             Gdk.Rectangle monitor_dimensions;
-            
+
             screen.get_monitor_geometry (this.screen.get_primary_monitor(), out monitor_dimensions);
             
             this.panel_x     = monitor_dimensions.x;
@@ -280,7 +279,14 @@ namespace Wingpanel {
         protected override bool draw (Context cr) {
 
             Allocation size;
-            get_allocation (out size);
+            this.get_allocation (out size);
+
+            if(this.panel_height != size.height) {
+                this.panel_height = size.height;
+                warning("Panel Height: "+size.height.to_string());
+                shadow.move (this.panel_x, this.panel_y + this.panel_height + this.panel_displacement);
+                set_struts();
+            }
 
             var ctx = menubar.get_style_context ();
             render_background (ctx, cr, size.x, size.y, 
@@ -288,12 +294,15 @@ namespace Wingpanel {
 
             // Slide in
             if (animation_timer == 0) {
+                this.panel_displacement = -this.panel_height;
+
                 animation_timer = GLib.Timeout.add (300/this.panel_height, () => {
                     if (this.panel_displacement >= 0 ) {
                         return false;
                     } else {
                         this.panel_displacement += 1;
                         this.move (this.panel_x, this.panel_y + this.panel_displacement);
+                        shadow.move (this.panel_x, this.panel_y + this.panel_height + this.panel_displacement);
                         return true;
                     }
                 });
