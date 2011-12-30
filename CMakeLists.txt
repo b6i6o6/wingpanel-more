@@ -19,7 +19,7 @@ set (WINGPANEL_DEPS "gobject-2.0;glib-2.0;gio-2.0;gee-1.0;gdk-x11-3.0;x11;gtk+-3
 
 find_package (PkgConfig)
 pkg_check_modules (DEPS REQUIRED ${WINGPANEL_DEPS})
-pkg_check_modules (DEPS REQUIRED gthread-2.0)
+pkg_check_modules (THREADS REQUIRED gthread-2.0)
 pkg_check_modules (INDICATOR REQUIRED indicator3-0.4)
 
 # Files
@@ -61,9 +61,9 @@ OPTIONS
     -g
 )
 
-add_definitions (${DEPS_CFLAGS} ${INDICATOR_CFLAGS} -include config.h)
-link_libraries (${DEPS_LIBRARIES} ${INDICATOR_LIBRARIES})
-link_directories (${DEPS_LIBRARY_DIRS} ${INDICATOR_LIBRARY_DIRS})
+add_definitions (${DEPS_CFLAGS} ${THREADS_CFLAGS} ${INDICATOR_CFLAGS} -include config.h)
+link_libraries (${DEPS_LIBRARIES} ${THREADS_LIBRARIES} ${INDICATOR_LIBRARIES})
+link_directories (${DEPS_LIBRARY_DIRS} ${THREADS_LIBRARY_DIRS} ${INDICATOR_LIBRARY_DIRS})
 
 add_executable (wingpanel ${VALA_C})
 
