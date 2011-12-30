@@ -19,6 +19,7 @@ set (WINGPANEL_DEPS "gobject-2.0;glib-2.0;gio-2.0;gee-1.0;gdk-x11-3.0;x11;gtk+-3
 
 find_package (PkgConfig)
 pkg_check_modules (DEPS REQUIRED ${WINGPANEL_DEPS})
+pkg_check_modules (DEPS REQUIRED gthread-2.0)
 pkg_check_modules (INDICATOR REQUIRED indicator3-0.4)
 
 # Files
