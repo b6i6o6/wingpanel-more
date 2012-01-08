@@ -75,7 +75,7 @@ namespace Wingpanel {
     }
 
     public class Panel : Gtk.Window {
-        private const int shadow_size = 16;
+        private const int shadow_size = 4;
 
         private int panel_height = 24;
         private int panel_x;
