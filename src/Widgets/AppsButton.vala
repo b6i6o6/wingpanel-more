@@ -33,14 +33,14 @@ namespace Wingpanel.Widgets {
 
         public AppsButton () {
 
-            app_label = new Label (_("<b>Applications</b>"));
+            app_label = new Label ("<b>%s</b>".printf(_("Applications")));
             app_label.use_markup = true;
 
             add (Utils.set_padding (app_label, 0, 14, 0, 14));
 
-            get_style_context ().add_class ("menubar");
+            /*get_style_context ().add_class ("menubar");*/
             get_style_context ().add_class ("gnome-panel-menu-bar");
-            get_style_context ().add_class ("wingpanel-app-button");
+            app_label.get_style_context ().add_class ("wingpanel-app-button");
 
         }
 

@@ -17,16 +17,26 @@
 
 @define-color shadow_color rgba (0, 0, 0, 0.3);
 
-.gnome-panel-menu-bar {
+.gnome-panel-menu-bar, .gnome-panel-menu-bar .menuitem, .gnome-panel-menu-bar .menuitem {
     padding: 0;
     background-color: rgba(0, 0, 0, 0.4);
     color: #FFFFFF;
 }
 
 .shadow {
-    background-color: @shadow_color;
+    background-color: alpha (@shadow_color, 0.0);
     background-image: -gtk-gradient (linear,
                      left top, left bottom,
                      from (@shadow_color),
                      to (alpha (@shadow_color, 0.0)));
 }
+
+.composited-indicator {
+    background-color: rgba (0, 0, 0, 0.0);
+    color: #fff;
+}
+
+.wingpanel-app-button, .wingpanel-indicator-button {
+    color: alpha (#fff, 1.0);
+}
+

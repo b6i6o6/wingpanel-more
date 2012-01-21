@@ -241,14 +241,14 @@ namespace Wingpanel {
             clock = new Gtk.MenuBar ();
             clock.can_focus = true;
             clock.border_width = 0;
-            clock.get_style_context ().add_class ("gnome-panel-menu-bar");
+            clock.get_style_context ().add_class ("composited-indicator");
             container.pack_start (clock, false, false, 0);
 
             // Menubar for storing indicators
             menubar = new Gtk.MenuBar ();
             menubar.can_focus = true;
             menubar.border_width = 0;
-            menubar.get_style_context ().add_class ("gnome-panel-menu-bar");
+            menubar.get_style_context ().add_class ("composited-indicator");
             
             right_wrapper.pack_end (menubar, false, false, 0);
             container.pack_end (right_wrapper);

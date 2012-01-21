@@ -30,7 +30,7 @@ namespace Indicator {
 		public virtual signal void entry_added (Indicator.ObjectEntry entry);
 		public virtual signal void entry_moved (Indicator.ObjectEntry entry, uint old_pos, uint new_pos);
 		public virtual signal void entry_removed (Indicator.ObjectEntry entry);
-		public virtual signal void scroll (uint delta, Indicator.ScrollDirection direction);
+		public virtual signal void entry_scrolled (Indicator.ObjectEntry entry, uint delta, Indicator.ScrollDirection direction);
 	}
 	[Compact]
 	[CCode (cheader_filename = "gtk/gtk.h,libindicator/indicator.h,libindicator/indicator-object.h,libindicator/indicator-service.h,libindicator/indicator-service-manager.h")]
