@@ -55,7 +55,6 @@ namespace Wingpanel {
             set_type_hint (WindowTypeHint.DROPDOWN_MENU);
             set_keep_below (true);
             stick ();
-            set_accept_focus (false);
 
         }
 
