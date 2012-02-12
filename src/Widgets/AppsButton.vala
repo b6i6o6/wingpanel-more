@@ -39,7 +39,7 @@ namespace Wingpanel.Widgets {
             add (Utils.set_padding (app_label, 0, 14, 0, 14));
 
             /*get_style_context ().add_class ("menubar");*/
-            get_style_context ().add_class ("gnome-panel-menu-bar");
+            get_style_context ().add_class ("composited-indicator");
             app_label.get_style_context ().add_class ("wingpanel-app-button");
 
         }
