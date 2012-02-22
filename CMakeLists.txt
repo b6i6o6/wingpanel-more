@@ -26,6 +26,7 @@ pkg_check_modules (INDICATOR REQUIRED indicator3-0.4)
 
 file (GLOB stylesheets "${CMAKE_CURRENT_SOURCE_DIR}/data/style/*.css")
 file (GLOB desktop_entry "${CMAKE_CURRENT_SOURCE_DIR}/data/wingpanel.desktop")
+file (GLOB icon "${CMAKE_CURRENT_SOURCE_DIR}/data/wingpanel.svg")
 
 # Get the Indicator Directory
 
@@ -71,6 +72,7 @@ add_executable (wingpanel ${VALA_C})
 install (TARGETS wingpanel RUNTIME DESTINATION bin)
 install (FILES ${stylesheets} DESTINATION ${PKGDATADIR}/style)
 install (FILES ${desktop_entry} DESTINATION ${DATADIR}/applications)
+install (FILES ${icon} DESTINATION ${DATADIR}/icons/hicolor/scalable/apps)
 
 # GSettings Schema
 include (GSettings)
