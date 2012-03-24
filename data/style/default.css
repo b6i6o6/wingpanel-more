@@ -34,12 +34,7 @@
 
 .composited-indicator,
 .wingpanel-app-button, 
-.wingpanel-indicator-button,
-GtkImage {
+.wingpanel-indicator-button {
     background-color: @transparent;
     color: #fff;
-}
-
-.menu* {
-    color: @text_color;
 }
