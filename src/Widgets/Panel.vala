@@ -24,7 +24,7 @@ using Granite;
 using Granite.Services;
 
 namespace Wingpanel {
-
+    
     public enum Struts {
         LEFT,
         RIGHT,
@@ -230,11 +230,13 @@ namespace Wingpanel {
 
         private void add_defaults () {
 
-            // Apps button
-            var apps = new Widgets.AppsButton ();
-            apps.button_press_event.connect (launch_launcher);
+            // Only show Apps button if enabled in the settings
+            if(this.app.settings.show_launcher) {
+                var apps = new Widgets.AppsButton ();
+                apps.button_press_event.connect (launch_launcher);
 
-            left_wrapper.pack_start (apps, false, true, 0);
+                left_wrapper.pack_start (apps, false, true, 0);
+            }
             container.pack_start (left_wrapper);
 
             clock = new Gtk.MenuBar ();

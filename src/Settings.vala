@@ -22,8 +22,10 @@ namespace Wingpanel {
 
     public class Settings : Granite.Services.Settings {
 
+        public string[] blacklist { get; set; }
+        public bool show_launcher { get; set; }
         public string default_launcher { get; set; }
-
+        
         public Settings () {
             base ("desktop.pantheon.wingpanel");
         }
