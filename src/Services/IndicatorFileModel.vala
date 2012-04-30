@@ -81,7 +81,11 @@ namespace Wingpanel {
             }
 
             /* Don't load appmenu-gtk */
-            skip_list += ",libappmenu.so";
+            foreach(string blocked_indicator in Wingpanel.app.settings.blacklist) {
+                skip_list += "," + blocked_indicator;
+                log("wingpanel", LogLevelFlags.LEVEL_DEBUG, "Blacklisting %s", blocked_indicator);
+            }
+            log("wingpanel", LogLevelFlags.LEVEL_DEBUG, "Blacklisted Indicators: %s", skip_list);
 
             /* We need to look for icons in an specific location */
             //Gtk.IconTheme.get_default ().append_search_path (Wingpanel.Config.INDICATORICONSDIR);

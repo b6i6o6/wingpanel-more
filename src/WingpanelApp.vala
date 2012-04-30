@@ -21,6 +21,8 @@ using Granite;
 
 namespace Wingpanel {
 
+    public WingpanelApp app;
+    
     public class WingpanelApp : Granite.Application {
 
         private Panel panel = null;
@@ -37,18 +39,18 @@ namespace Wingpanel {
             build_version_info = Build.VERSION_INFO;
             
             program_name = "Wingpanel";
-		    exec_name = "wingpanel";
-		    app_copyright = "GPLv3";
-		    app_icon = "";
-		    app_launcher = "";
+            exec_name = "wingpanel";
+            app_copyright = "GPLv3";
+            app_icon = "";
+            app_launcher = "";
             application_id = "net.launchpad.wingpanel";
-		    main_url = "https://launchpad.net/wingpanel";
-		    bug_url = "https://bugs.launchpad.net/wingpanel";
-		    help_url = "https://answers.launchpad.net/wingpanel";
-		    translate_url = "https://translations.launchpad.net/wingpanel";
+            main_url = "https://launchpad.net/wingpanel";
+            bug_url = "https://bugs.launchpad.net/wingpanel";
+            help_url = "https://answers.launchpad.net/wingpanel";
+            translate_url = "https://translations.launchpad.net/wingpanel";
 
-		    about_authors = {"Giulio Collura <random.cpp@gmail.com>"};
-		    about_artists = {"Daniel Foré <bunny@go-docky.com>"};
+            about_authors = {"Giulio Collura <random.cpp@gmail.com>"};
+            about_artists = {"Daniel Foré <bunny@go-docky.com>"};
 
         }
 
@@ -83,8 +85,8 @@ namespace Wingpanel {
         }
 
         public static int main (string[] args) {
-
-            return new WingpanelApp ().run (args);
+            Wingpanel.app = new WingpanelApp ();
+            return Wingpanel.app.run (args);
 
         }
 
