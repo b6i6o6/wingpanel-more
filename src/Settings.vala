@@ -27,7 +27,7 @@ namespace Wingpanel {
         public string default_launcher { get; set; }
         
         public Settings () {
-            base ("desktop.pantheon.wingpanel");
+            base ("org.pantheon.desktop.wingpanel");
         }
 
     }
