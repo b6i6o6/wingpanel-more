@@ -76,7 +76,7 @@ install (FILES ${icon} DESTINATION ${DATADIR}/icons/hicolor/scalable/apps)
 
 # GSettings Schema
 include (GSettings)
-add_schema ("org.elementary.wingpanel.gschema.xml")
+add_schema ("org.pantheon.desktop.wingpanel.gschema.xml")
 
 # Translations
 add_subdirectory (po)
