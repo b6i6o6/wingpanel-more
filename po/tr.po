@@ -20,7 +20,4 @@ msgstr ""
 #: /home/fabian/dev/wingpanel/po/../src/Widgets/AppsButton.vala:36
 #, c-format
 msgid "Applications"
-msgstr ""
-
-#~ msgid "<b>Applications</b>"
-#~ msgstr "<b>Uygulamalar</b>"
+msgstr "Uygulamalar"
