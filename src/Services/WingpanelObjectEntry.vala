@@ -78,6 +78,14 @@ namespace  Wingpanel
                 
                 buffer.context.set_source_rgb (0.98, 0.98, 0.98);
                 buffer.context.fill ();
+                
+                /*entry.menu.margin_left = 10;
+                entry.menu.margin_right = 9; 
+                FIXME => This is what we want to get, but to solve spacing issues we do this:*/
+                entry.menu.get_children ().foreach ( (c) => {
+                    c.margin_left = 10;
+                    c.margin_right = 9;
+                }); //make sure it is always right
             });
             entry.menu.get_parent ().draw.connect ( (ctx) => {
                 ctx.set_operator (Cairo.Operator.SOURCE);
@@ -92,14 +100,6 @@ namespace  Wingpanel
             
             entry.menu.margin_top = 25;
             entry.menu.margin_bottom = 20;
-            /*entry.menu.margin_left = 10;
-            entry.menu.margin_right = 9; 
-            FIXME => This is what we want to get, but to solve spacing issues we do this:*/
-            entry.menu.get_children ().foreach ( (c) => {
-                c.margin_left = 10;
-                c.margin_right = 9;
-            });
-            
             
             var transp_css = new Gtk.CssProvider ();
             try {
