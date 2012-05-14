@@ -71,6 +71,8 @@ namespace  Wingpanel
                 offs = (p_x+alloc.x) - w_x + this.get_allocated_width () / 4;
                 if (offs+50 > w)
                     offs = w - 15 - arrow_width;
+                if (offs < 10)
+                    offs = 17;
                 
                 // Draw arrow
                 buffer.context.move_to (offs, y + arrow_height);
