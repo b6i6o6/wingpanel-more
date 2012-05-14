@@ -43,7 +43,8 @@ namespace  Wingpanel
             var w = -1; var h = -1;
             var arrow_height = 10; var arrow_width = 20;var x = 10.5;var y = 10.5; var radius = 5;
             entry.menu.get_parent ().size_allocate.connect ( (ctx) => {
-                if (w == this.get_parent ().get_allocated_width () && h == this.get_parent ().get_allocated_height ())
+                if (w == this.get_parent ().get_allocated_width () && 
+                    h == this.get_parent ().get_allocated_height ())
                     return;
                 
                 w  = entry.menu.get_parent ().get_allocated_width ();
@@ -58,7 +59,7 @@ namespace  Wingpanel
                 var list = (this.get_parent () as Gtk.Container).get_children ();
                 list.reverse ();
                 var i = list.index (this);
-                var offs = (w-50)-i*30;
+                var offs = (w-50)-i*22;
                 if (offs < arrow_width || list.length () < 2) offs = 60;
                 
                 // Draw arrow
@@ -89,10 +90,16 @@ namespace  Wingpanel
                 return false;
             });
             
-            entry.menu.margin = 20;
-            entry.menu.margin_left = 10;
-            entry.menu.margin_right = 9;
             entry.menu.margin_top = 25;
+            entry.menu.margin_bottom = 20;
+            /*entry.menu.margin_left = 10;
+            entry.menu.margin_right = 9; 
+            FIXME => This is what we want to get, but to solve spacing issues we do this:*/
+            entry.menu.get_children ().foreach ( (c) => {
+                c.margin_left = 10;
+                c.margin_right = 9;
+            });
+            
             
             var transp_css = new Gtk.CssProvider ();
             try {
