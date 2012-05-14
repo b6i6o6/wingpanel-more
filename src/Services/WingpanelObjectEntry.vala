@@ -56,11 +56,24 @@ namespace  Wingpanel
                                                                    w-20, h - 20 - arrow_height, radius);
                 
                 //get some nice pos for the arrow
-                var list = (this.get_parent () as Gtk.Container).get_children ();
-                list.reverse ();
-                var i = list.index (this);
-                var offs = (w-50)-i*22;
+                var offs = 30;
+                entry.menu.realize ();
+                if (entry.menu.visible) {
+                    int p_x; int w_x; Gtk.Allocation alloc;
+                    this.get_window ().get_origin (out p_x, null);
+                    this.get_allocation (out alloc);
+                    
+                    entry.menu.get_window ().get_origin (out w_x, null);
+                    
+                    offs = (p_x+alloc.x) - w_x + this.get_allocated_width () / 4;
+                    if (offs+50 > w)
+                        offs = w - 15 - arrow_width;
+                    print ("X: %i, OX: %i, OFFS: %i\n", p_x+alloc.x, w_x, offs);
+                }
+                /*var offs = (w-50)-i*22;
                 if (offs < arrow_width || list.length () < 2) offs = 60;
+                */
+                
                 
                 // Draw arrow
                 buffer.context.move_to (offs, y + arrow_height);
