@@ -40,13 +40,18 @@ namespace  Wingpanel
             entry.menu.get_parent ().app_paintable = true;
             entry.menu.get_parent ().set_visual (Gdk.Screen.get_default ().get_rgba_visual ());
             
+            entry.menu.get_parent ().size_allocate.connect ( () => {
+                /*entry.menu.margin_left = 10;
+                entry.menu.margin_right = 9; 
+                FIXME => This is what we want to get, but to solve spacing issues we do this:*/
+                entry.menu.get_children ().foreach ( (c) => {
+                    c.margin_left = 10;
+                    c.margin_right = 9;
+                }); //make sure it is always right
+            });
             var w = -1; var h = -1;
             var arrow_height = 10; var arrow_width = 20;var x = 10.5;var y = 10.5; var radius = 5;
-            entry.menu.get_parent ().size_allocate.connect ( (ctx) => {
-                if (w == this.get_parent ().get_allocated_width () && 
-                    h == this.get_parent ().get_allocated_height ())
-                    return;
-                
+            entry.menu.get_parent ().draw.connect ( (ctx) => {
                 w  = entry.menu.get_parent ().get_allocated_width ();
                 h = entry.menu.get_parent ().get_allocated_height ();
                 
@@ -57,23 +62,15 @@ namespace  Wingpanel
                 
                 //get some nice pos for the arrow
                 var offs = 30;
-                entry.menu.realize ();
-                if (entry.menu.visible) {
-                    int p_x; int w_x; Gtk.Allocation alloc;
-                    this.get_window ().get_origin (out p_x, null);
-                    this.get_allocation (out alloc);
-                    
-                    entry.menu.get_window ().get_origin (out w_x, null);
-                    
-                    offs = (p_x+alloc.x) - w_x + this.get_allocated_width () / 4;
-                    if (offs+50 > w)
-                        offs = w - 15 - arrow_width;
-                    print ("X: %i, OX: %i, OFFS: %i\n", p_x+alloc.x, w_x, offs);
-                }
-                /*var offs = (w-50)-i*22;
-                if (offs < arrow_width || list.length () < 2) offs = 60;
-                */
+                int p_x; int w_x; Gtk.Allocation alloc;
+                this.get_window ().get_origin (out p_x, null);
+                this.get_allocation (out alloc);
                 
+                entry.menu.get_window ().get_origin (out w_x, null);
+                
+                offs = (p_x+alloc.x) - w_x + this.get_allocated_width () / 4;
+                if (offs+50 > w)
+                    offs = w - 15 - arrow_width;
                 
                 // Draw arrow
                 buffer.context.move_to (offs, y + arrow_height);
@@ -92,15 +89,6 @@ namespace  Wingpanel
                 buffer.context.set_source_rgb (0.98, 0.98, 0.98);
                 buffer.context.fill ();
                 
-                /*entry.menu.margin_left = 10;
-                entry.menu.margin_right = 9; 
-                FIXME => This is what we want to get, but to solve spacing issues we do this:*/
-                entry.menu.get_children ().foreach ( (c) => {
-                    c.margin_left = 10;
-                    c.margin_right = 9;
-                }); //make sure it is always right
-            });
-            entry.menu.get_parent ().draw.connect ( (ctx) => {
                 ctx.set_operator (Cairo.Operator.SOURCE);
                 ctx.rectangle (0, 0, w, h);
                 ctx.set_source_rgba (0, 0, 0, 0);
