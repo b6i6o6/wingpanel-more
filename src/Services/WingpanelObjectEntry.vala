@@ -74,6 +74,12 @@ namespace  Wingpanel
                 if (offs < 10)
                     offs = 17;
                 
+                var grad = new Cairo.Pattern.linear (0, 0, 0, h);
+                grad.add_color_stop_rgba (0.0, 0.976, 0.976, 0.976, 0.97);
+                grad.add_color_stop_rgba (0.8, 0.976, 0.976, 0.976, 0.97);
+                grad.add_color_stop_rgba (1.0, 0.941, 0.941, 0.941, 0.97);
+                //grad.add_color_stop_rgba (1, 1, 0, 0, 1);
+                
                 // Draw arrow
                 buffer.context.move_to (offs, y + arrow_height);
                 buffer.context.rel_line_to (arrow_width / 2.0, -arrow_height);
@@ -85,10 +91,10 @@ namespace  Wingpanel
                 buffer.exponential_blur (6);
                 
                 buffer.context.set_line_width (1);
-                buffer.context.set_source_rgba (0, 0, 0, 0.9);
+                buffer.context.set_source_rgba (0, 0, 0, 0.4);
                 buffer.context.stroke_preserve ();
                 
-                buffer.context.set_source_rgb (0.98, 0.98, 0.98);
+                buffer.context.set_source (grad);
                 buffer.context.fill ();
                 
                 ctx.set_operator (Cairo.Operator.SOURCE);
