@@ -101,8 +101,8 @@ namespace  Wingpanel
                 return false;
             });
             
-            entry.menu.margin_top = 25;
-            entry.menu.margin_bottom = 20;
+            entry.menu.margin_top = 28;
+            entry.menu.margin_bottom = 18;
             
             var transp_css = new Gtk.CssProvider ();
             try {
