@@ -71,7 +71,7 @@ namespace  Wingpanel
                 offs = (p_x+alloc.x) - w_x + this.get_allocated_width () / 4;
                 if (offs+50 > w)
                     offs = w - 15 - arrow_width;
-                if (offs < 10)
+                if (offs < 17)
                     offs = 17;
                 
                 var grad = new Cairo.Pattern.linear (0, 0, 0, h);
