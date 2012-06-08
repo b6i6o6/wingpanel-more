@@ -52,7 +52,7 @@ namespace Wingpanel {
             skip_taskbar_hint = true; // no taskbar
             //skip_pager_hint = true;
             menubar.get_style_context ().add_class ("shadow");
-            set_type_hint (WindowTypeHint.DROPDOWN_MENU);
+            set_type_hint (WindowTypeHint.DOCK);
             set_keep_below (true);
             stick ();
 
