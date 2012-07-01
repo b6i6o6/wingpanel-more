@@ -216,7 +216,7 @@ namespace Wingpanel {
                 indicator.entry_removed.connect (this.on_entry_removed);
                 indicator.ref();
 
-                unowned GLib.List<Indicator.ObjectEntry> list = indicator.get_entries ();
+                GLib.List<Indicator.ObjectEntry> list = indicator.get_entries ();
 
                 for (int i = 0; i < list.length (); i++) {
                     unowned Indicator.ObjectEntry entry = (Indicator.ObjectEntry) list.nth_data (i);

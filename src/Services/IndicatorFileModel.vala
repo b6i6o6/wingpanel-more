@@ -89,7 +89,8 @@ namespace Wingpanel {
 
             /* We need to look for icons in an specific location */
             //Gtk.IconTheme.get_default ().append_search_path (Wingpanel.Config.INDICATORICONSDIR);
-
+            
+            log("wingpanel", LogLevelFlags.LEVEL_DEBUG, "Indicatordir: %s", Build.INDICATORDIR);
             File dir = File.new_for_path (Build.INDICATORDIR);
             try {
                 var e = dir.enumerate_children (FILE_ATTRIBUTE_STANDARD_NAME, 0, null);
@@ -98,7 +99,9 @@ namespace Wingpanel {
                 FileInfo file_info;
                 while ((file_info = e.next_file (null)) != null)
                 {
+                    
                     string leaf = file_info.get_name ();
+
 
                     if (leaf in skip_list)
                     {
@@ -116,8 +119,13 @@ namespace Wingpanel {
                 /* Order the so's before we load them */
                 sos.sort ((CompareFunc)indicator_sort_func);
 
-                foreach (string leaf in sos)
-                    this.load_indicator (dir.get_path() + "/" + leaf, leaf);
+                foreach (string leaf in sos) {
+                    try {
+                        this.load_indicator (dir.get_path() + "/" + leaf, leaf);
+                    } catch (Error error) {
+                        log("wingpanel",LogLevelFlags.LEVEL_ERROR, "Unable to read indicator \"%s\": %s\n", leaf, error.message);
+                    }
+                }
             }
             catch (Error error)
             {
