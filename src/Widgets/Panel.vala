@@ -216,12 +216,9 @@ namespace Wingpanel {
                 indicator.entry_removed.connect (this.on_entry_removed);
                 indicator.ref();
 
-                GLib.List<Indicator.ObjectEntry> list = indicator.get_entries ();
+                GLib.List<unowned Indicator.ObjectEntry> list = indicator.get_entries ();
+                list.foreach ((entry) => create_entry (entry, indicator));
 
-                for (int i = 0; i < list.length (); i++) {
-                    unowned Indicator.ObjectEntry entry = (Indicator.ObjectEntry) list.nth_data (i);
-                    this.create_entry (entry, indicator);
-                }
                 message ("Loaded indicator %s", model.get_indicator_name(indicator));
             } else {
                 warning ("Unable to load %s", model.get_indicator_name(indicator));

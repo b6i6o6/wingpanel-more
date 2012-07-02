@@ -66,7 +66,7 @@ namespace Indicator {
 		public virtual signal void secondary_activate (Indicator.ObjectEntry entry, uint timestamp);
 		public virtual signal void show_now_changed (Indicator.ObjectEntry entry, bool show_now_state);
 	}
-	[CCode (cheader_filename = "libindicator/indicator-object.h", free_function = "")]
+	[CCode (cheader_filename = "libindicator/indicator-object.h")]
 	[Compact]
 	public class ObjectEntry {
 		public weak string accessible_desc;
