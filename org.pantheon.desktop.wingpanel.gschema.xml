@@ -11,7 +11,7 @@
 			<description>Wheather to show the Applications Launcher or not.</description>
 		</key>
 		<key type="s" name="default-launcher">
-			<default>"slingshot"</default>
+			<default>"slingshot-launcher"</default>
 			<summary>The default program to use as App launcher.</summary>
 			<description>Description</description>
 		</key>
