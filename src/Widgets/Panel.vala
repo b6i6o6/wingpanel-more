@@ -168,7 +168,6 @@ namespace Wingpanel {
 
         private void create_entry (Indicator.ObjectEntry entry,
                                    Indicator.Object      object) {
-
             //delete_entry(entry, object);
             Gtk.MenuItem menuitem = new IndicatorObjectEntry (entry, object);
             menuhash[model.get_indicator_name(object)] = menuitem;

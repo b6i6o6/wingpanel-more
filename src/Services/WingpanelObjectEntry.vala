@@ -11,6 +11,8 @@ namespace  Wingpanel
         {
             object = iobject;
             this.entry = entry;
+
+            set_events( get_events() | Gdk.EventMask.SCROLL_MASK );
             
             IndicatorsModel model = IndicatorsModel.get_default ();
 
@@ -125,7 +127,7 @@ namespace  Wingpanel
 
         private bool on_scroll_event (EventScroll event)
         {
-            //Signal.emit_by_name (object, "scroll", 1, event.direction);
+            //Signal.emit_by_name (object, "-event", 1, event.direction);
             object.entry_scrolled (entry, 1, (Indicator.ScrollDirection)event.direction);
             
             return false;
