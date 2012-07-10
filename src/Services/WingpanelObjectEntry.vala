@@ -12,7 +12,7 @@ namespace  Wingpanel
             object = iobject;
             this.entry = entry;
 
-            set_events( get_events() | Gdk.EventMask.SCROLL_MASK );
+            add_events (Gdk.EventMask.SCROLL_MASK);
             
             IndicatorsModel model = IndicatorsModel.get_default ();
 
