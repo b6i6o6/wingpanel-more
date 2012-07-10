@@ -14,7 +14,8 @@ namespace  Wingpanel
             
             IndicatorsModel model = IndicatorsModel.get_default ();
 
-            Gtk.HBox box = new Gtk.HBox (false, 0);
+            Gtk.Box box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+            box.set_homogeneous (false);
             box.spacing = 2;
             if (entry.image != null && entry.image is Gtk.Image) {
                 GLib.log("wingpanel", LogLevelFlags.LEVEL_DEBUG, "Indicator: %s has attribute image", model.get_indicator_name(object));
