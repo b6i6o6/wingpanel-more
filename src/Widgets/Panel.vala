@@ -252,7 +252,7 @@ namespace Wingpanel {
             container.pack_end (right_wrapper);
 
             get_style_context ().add_class ("menubar");
-            get_style_context ().add_class ("gnome-panel-menu-bar");
+            get_style_context ().add_class ("panel");
             
             SizeGroup gpr = new SizeGroup (SizeGroupMode.HORIZONTAL);
             gpr.add_widget (left_wrapper);

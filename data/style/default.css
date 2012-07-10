@@ -18,7 +18,7 @@
 @define-color shadow_color rgba (0, 0, 0, 0.3);
 @define-color panel_background rgba (0, 0, 0, 0.7);
 
-.gnome-panel-menu-bar {
+.panel {
     padding: 0;
     background-color: @panel_background;
     color: #fff;
