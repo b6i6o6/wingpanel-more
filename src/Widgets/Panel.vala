@@ -83,9 +83,9 @@ namespace Wingpanel {
         private uint animation_timer = 0;
         private int panel_displacement = -40;
 
-        private HBox container;
-        private HBox left_wrapper;
-        private HBox right_wrapper;
+        private Box container;
+        private Box left_wrapper;
+        private Box right_wrapper;
         private MenuBar menubar;
         private MenuBar clock;
 
@@ -122,9 +122,12 @@ namespace Wingpanel {
             menuhash = new Gee.HashMap<string, Gtk.MenuItem> ();
 
             // HBox container
-            container = new HBox (false, 0);
-            left_wrapper = new HBox (false, 0);
-            right_wrapper = new HBox (false, 0);
+            container = new Box (Orientation.HORIZONTAL, 0);
+            left_wrapper = new Box (Orientation.HORIZONTAL, 0);
+            right_wrapper = new Box (Orientation.HORIZONTAL, 0);
+            container.set_homogeneous (false);
+            left_wrapper.set_homogeneous (false);
+            right_wrapper.set_homogeneous (false);
             resizable = false;
 
             add (container);
