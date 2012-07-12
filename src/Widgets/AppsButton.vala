@@ -77,7 +77,7 @@ namespace Wingpanel.Widgets {
                 warning ("Not passing any args to %s : %s", Wingpanel.app.settings.default_launcher, error.message);
                 argvp = {Wingpanel.app.settings.default_launcher, null}; // fix value in case it's corrupted
             }
-            // Check if the programm is actually there
+            // Check if the program is actually there
             string? launcher = Environment.find_program_in_path (argvp[0]);
             if (launcher != null) {
                 // Spawn process asynchronously
@@ -91,7 +91,7 @@ namespace Wingpanel.Widgets {
             } else {
                 Granite.Services.System.open_uri ("file:///usr/share/applications");
             }
-            
+
             return true;
         
         }
