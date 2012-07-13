@@ -16,34 +16,68 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-using Gtk;
-using Gdk;
-using Cairo;
-
 namespace Wingpanel.Widgets {
 
-    public class AppsButton : EventBox {
+    public class AppsButton : IndicatorButton {
 
-        private Label app_label;
-
-        construct {
-
-            can_focus = true;
+        private bool _active = false;
+        public bool active {
+            get {
+                return _active;
+            }
+            set {
+                _active = value;
+                update_state_flags ();
+            }
         }
+
+        private Gtk.Label app_label;
+        private AppLauncherService? launcher_service = null;
 
         public AppsButton () {
+            this.can_focus = true;
 
-            app_label = new Label ("<b>%s</b>".printf(_("Applications")));
+            app_label = new Gtk.Label ("<b>%s</b>".printf (_("Applications")));
             app_label.use_markup = true;
+            app_label.get_style_context().add_class (INDICATOR_BUTTON_STYLE_CLASS);
 
-            add (Utils.set_padding (app_label, 0, 14, 0, 14));
+            app_label.halign = Gtk.Align.CENTER;
+            app_label.margin_left = app_label.margin_right = 6;
+            this.add (app_label);
 
-            /*get_style_context ().add_class ("menubar");*/
-            get_style_context ().add_class ("composited-indicator");
-            app_label.get_style_context ().add_class ("wingpanel-app-button");
+            this.active = false;
 
+            launcher_service = new AppLauncherService ();
+            launcher_service.launcher_state_changed.connect (on_launcher_state_changed);
+
+            this.button_press_event.connect ( () => {
+                launcher_service.launch_launcher ();
+                return false;
+            });
         }
 
+        private void on_launcher_state_changed (bool visible) {
+            debug ("Launcher visibility changed to %s", visible.to_string ());
+            this.active = visible;
+        }
+
+        /**
+         * Make sure the menuitem appears to be selected even if the focus moves
+         * to the client launcher app being displayed.
+         */
+
+        public override void state_flags_changed (Gtk.StateFlags flags) {
+            update_state_flags ();
+        }
+
+        private void update_state_flags () {
+            const Gtk.StateFlags ACTIVE_FLAGS = Gtk.StateFlags.PRELIGHT;
+
+            if (this.active)
+                set_state_flags (ACTIVE_FLAGS, true);
+            else
+                unset_state_flags (ACTIVE_FLAGS);
+        }
     }
 
 }

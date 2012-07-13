@@ -75,19 +75,15 @@ namespace Wingpanel {
 
             debug ("Activating");
 
-            if (get_windows () == null) {
+            if (get_windows () == null)
                 panel = new Panel (this);
-                panel.show_all ();
-            } else {
-                panel.show_all ();
-            }
-        
+
+            panel.show_all ();
         }
 
         public static int main (string[] args) {
             Wingpanel.app = new WingpanelApp ();
             return Wingpanel.app.run (args);
-
         }
 
     }
