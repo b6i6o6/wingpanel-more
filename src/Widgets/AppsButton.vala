@@ -39,10 +39,9 @@ namespace Wingpanel.Widgets {
 
             app_label = new Gtk.Label ("<b>%s</b>".printf (_("Applications")));
             app_label.use_markup = true;
-            app_label.get_style_context().add_class (INDICATOR_BUTTON_STYLE_CLASS);
-
             app_label.halign = Gtk.Align.CENTER;
             app_label.margin_left = app_label.margin_right = 6;
+            app_label.get_style_context().add_class (INDICATOR_BUTTON_STYLE_CLASS);
             this.add (app_label);
 
             this.active = false;
@@ -54,6 +53,9 @@ namespace Wingpanel.Widgets {
                 launcher_service.launch_launcher ();
                 return false;
             });
+
+            on_settings_update ();
+            Wingpanel.app.settings.changed.connect (on_settings_update);
         }
 
         private void on_launcher_state_changed (bool visible) {
@@ -78,6 +80,14 @@ namespace Wingpanel.Widgets {
             else
                 unset_state_flags (ACTIVE_FLAGS);
         }
-    }
 
+        private void on_settings_update () {
+            bool visible = Wingpanel.app.settings.show_launcher;
+            this.set_no_show_all (!visible);
+            if (visible)
+                this.show_all ();
+            else
+                this.hide ();
+        }
+    }
 }

@@ -44,14 +44,32 @@ namespace Wingpanel {
         }
 
         private bool spawn_launcher_process () {
-            debug ("Starting launcher");
+            debug ("Starting launcher!");
 
-            string? launcher = Environment.find_program_in_path (app.settings.default_launcher);
+            // Parse Arguments
+            string[] argvp = null;
+            string launcher_command = Wingpanel.app.settings.default_launcher;
 
+            try {
+                Shell.parse_argv (launcher_command, out argvp);
+            }
+            catch (ShellError error) {
+                warning ("Not passing any args to %s : %s", launcher_command, error.message);
+                argvp = {launcher_command, null}; // fix value in case it's corrupted
+            }
+
+            // Check if the program is actually there
+            string? launcher = Environment.find_program_in_path (argvp[0]);
             if (launcher != null) {
+                // Spawn process asynchronously
                 try {
-                    Process.spawn_command_line_async (launcher);
-                } catch (SpawnError err) {
+                    var flags =  SpawnFlags.SEARCH_PATH |
+                                 SpawnFlags.DO_NOT_REAP_CHILD |
+                                 SpawnFlags.STDOUT_TO_DEV_NULL;
+                    Pid process_id;
+                    Process.spawn_async (null, argvp, null, flags, null, out process_id);
+                }
+                catch (SpawnError err) {
                     warning ("Couldn't spawn launcher: %s", err.message);
                     return_val_if_reached (false);
                 }

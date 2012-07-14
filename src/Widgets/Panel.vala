@@ -231,14 +231,11 @@ namespace Wingpanel {
 
         private void add_defaults () {
 
-            // Only show Apps button if enabled in the settings
-            if(this.app.settings.show_launcher) {
-                var apps = new Widgets.AppsButton ();
-                apps_menubar = new Gtk.MenuBar ();
-                apps_menubar.get_style_context ().add_class (COMPOSITED_INDICATOR_STYLE_CLASS);
-                apps_menubar.append (apps);
-                left_wrapper.pack_start (apps_menubar, false, false, 0);
-            }
+            // Add Apps button
+            apps_menubar = new Gtk.MenuBar ();
+            apps_menubar.get_style_context ().add_class (COMPOSITED_INDICATOR_STYLE_CLASS);
+            apps_menubar.append (new Widgets.AppsButton ());
+            left_wrapper.pack_start (apps_menubar, false, true, 0);
             container.pack_start (left_wrapper);
 
             clock = new Gtk.MenuBar ();
@@ -263,20 +260,6 @@ namespace Wingpanel {
             gpr.add_widget (left_wrapper);
             gpr.add_widget (right_wrapper);
 
-        }
-
-        private bool launch_launcher (Gtk.Widget widget, Gdk.EventButton event) {
-
-            debug ("Starting launcher!");
-        
-            string? launcher = Environment.find_program_in_path (app.settings.default_launcher);
-            if (launcher != null)
-                System.execute_command (launcher);
-            else
-                System.open_uri ("file:///usr/share/applications");
-
-            return true;
-        
         }
 
         protected override bool draw (Context cr) {
