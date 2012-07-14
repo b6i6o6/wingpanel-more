@@ -68,6 +68,10 @@ namespace Wingpanel {
                                  SpawnFlags.STDOUT_TO_DEV_NULL;
                     Pid process_id;
                     Process.spawn_async (null, argvp, null, flags, null, out process_id);
+                    // Add watch or otherwise the process will become a zombie
+                    ChildWatch.add (process_id, (pid, status) => {
+                        Process.close_pid (pid);
+                    });
                 }
                 catch (SpawnError err) {
                     warning ("Couldn't spawn launcher: %s", err.message);
