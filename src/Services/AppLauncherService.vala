@@ -24,15 +24,32 @@ namespace Wingpanel {
     }
 
     public class AppLauncherService : Object {
+        const string SERVICE_NAME = "org.pantheon.desktop.AppLauncherService";
+        const string SERVICE_PATH = "/org/pantheon/desktop/AppLauncherService";
 
         public signal void launcher_state_changed (bool active);
         public bool launcher_active { get; private set; default = false; }
 
         private bool connected = false;
         private AppLauncherIface? launcher_proxy = null;
+        uint watch = -1;
 
         public AppLauncherService () {
+            // Add watch
+            watch = Bus.watch_name (BusType.SESSION,
+                                    SERVICE_NAME,
+                                    BusNameWatcherFlags.NONE,
+                                    on_name_appeared,
+                                    on_name_vanished);
+        }
+
+        private void on_name_appeared (DBusConnection conn, string name) {
             connect_to_server ();
+        }
+
+        private void on_name_vanished (DBusConnection conn, string name) {
+            disconnect_server ();
+            launcher_state_changed (false);
         }
 
         public void launch_launcher () {
@@ -91,9 +108,7 @@ namespace Wingpanel {
             // Connect to the server
             if (launcher_proxy == null) {
                 try {
-                    launcher_proxy = Bus.get_proxy_sync (BusType.SESSION,
-                                                         "org.pantheon.desktop.AppLauncherService",
-                                                         "/org/pantheon/desktop/AppLauncherService");
+                    launcher_proxy = Bus.get_proxy_sync (BusType.SESSION, SERVICE_NAME, SERVICE_PATH);
                 } catch (IOError e) {
                     critical ("Could not connect to AppLauncherService: %s", e.message);
                     launcher_proxy = null;
@@ -109,6 +124,11 @@ namespace Wingpanel {
             launcher_proxy.visibility_changed.connect (on_launcher_visibility_change);
 
             return true;
+        }
+
+        private void disconnect_server () {
+            connected = false;
+            launcher_proxy = null;
         }
 
         private void on_launcher_visibility_change (AppLauncherIface proxy, bool visible) {
