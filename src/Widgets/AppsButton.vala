@@ -44,18 +44,26 @@ namespace Wingpanel.Widgets {
 
             this.button_press_event.connect (launch_launcher);
 
-            Wingpanel.app.settings.changed.connect(on_settings_update);
+            Wingpanel.app.settings.changed.connect (on_settings_update);
 
-            this.show.connect(on_settings_update);
+        }
+
+        public override void show () {
+
+            var show_launcher = Wingpanel.app.settings.show_launcher;
+            if (show_launcher)
+                base.show ();
+
         }
 
         private void on_settings_update () {
-            if (this.visible && !(Wingpanel.app.settings.show_launcher)) {
-                this.hide();
-            }
-            if (!(this.visible) && Wingpanel.app.settings.show_launcher) {
-                this.show();
-            }
+
+            var show_launcher = Wingpanel.app.settings.show_launcher;
+            if (visible && !show_launcher)
+                base.hide ();
+            else if (!visible && show_launcher)
+                base.show ();
+
         }
 
         private bool launch_launcher (Gtk.Widget widget, Gdk.EventButton event) {
