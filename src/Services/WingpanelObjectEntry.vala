@@ -22,7 +22,7 @@ using Gdk;
 
 namespace  Wingpanel {
 
-    public class IndicatorObjectEntry: Gtk.MenuItem {
+    public class IndicatorObjectEntry : Gtk.MenuItem {
 
         Indicator.Object object;
         unowned Indicator.ObjectEntry entry;
@@ -101,7 +101,7 @@ namespace  Wingpanel {
                 entry.menu.get_window ().get_origin (out w_x, null);
 
                 offs = (p_x + alloc.x) - w_x + this.get_allocated_width () / 4;
-                if (offs+50 > w)
+                if (offs + 50 > w)
                     offs = w - 15 - arrow_width;
                 if (offs < 17)
                     offs = 17;
@@ -123,8 +123,8 @@ namespace  Wingpanel {
                 buffer.context.clip ();
 
                 var cr = new Gtk.StyleContext ();
-                cr.set_path(entry.menu.get_path ());
-                Gtk.render_background(cr, buffer.context, 0, 0, entry.menu.get_allocated_width (), entry.menu.get_allocated_height ());
+                cr.set_path (entry.menu.get_path ());
+                Gtk.render_background (cr, buffer.context, 0, 0, entry.menu.get_allocated_width (), entry.menu.get_allocated_height ());
                 buffer.context.restore ();
 
                 ctx.set_operator (Cairo.Operator.SOURCE);
@@ -142,12 +142,11 @@ namespace  Wingpanel {
 
             var transp_css = new Gtk.CssProvider ();
             try {
-                transp_css.load_from_data ("
-                    * {
-                        background-color:@transparent;
-                        border-color:@transparent;
-                        -unico-inner-stroke-width: 0;
-                    }", -1);
+                transp_css.load_from_data (""" * {
+                           background-color:@transparent;
+                           border-color:@transparent;
+                           -unico-inner-stroke-width: 0;
+                           }""", -1);
             } catch (Error e) {
                 warning (e.message);
             }
@@ -157,7 +156,7 @@ namespace  Wingpanel {
 
         private bool on_scroll_event (EventScroll event) {
             //Signal.emit_by_name (object, "scroll", 1, event.direction);
-            object.entry_scrolled (entry, 1, (Indicator.ScrollDirection)event.direction);
+            object.entry_scrolled (entry, 1, (Indicator.ScrollDirection) event.direction);
 
             return false;
         }
