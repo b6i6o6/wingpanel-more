@@ -47,7 +47,7 @@ namespace  Wingpanel {
             if (entry.label != null && entry.label is Gtk.Label) {
                 GLib.log("wingpanel", LogLevelFlags.LEVEL_DEBUG, "Indicator: %s has attribute label", model.get_indicator_name (object));
                 box.pack_end (entry.label, false, false, 0);
-		entry.label.get_style_context ().add_class ("wingpanel-indicator-button");
+                entry.label.get_style_context ().add_class ("wingpanel-indicator-button");
             }
 
             add (box);
