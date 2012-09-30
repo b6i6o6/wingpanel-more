@@ -40,12 +40,12 @@ namespace  Wingpanel {
             box.spacing = 2;
 
             if (entry.image != null && entry.image is Gtk.Image) {
-                GLib.log("wingpanel", LogLevelFlags.LEVEL_DEBUG, "Indicator: %s has attribute image", model.get_indicator_name(object));
+                log ("wingpanel", LogLevelFlags.LEVEL_DEBUG, "Indicator: %s has attribute image", model.get_indicator_name(object));
                 box.pack_start (entry.image, false, false, 0);
             }
 
             if (entry.label != null && entry.label is Gtk.Label) {
-                GLib.log("wingpanel", LogLevelFlags.LEVEL_DEBUG, "Indicator: %s has attribute label", model.get_indicator_name (object));
+                log ("wingpanel", LogLevelFlags.LEVEL_DEBUG, "Indicator: %s has attribute label", model.get_indicator_name (object));
                 box.pack_end (entry.label, false, false, 0);
                 entry.label.get_style_context ().add_class ("wingpanel-indicator-button");
             }
