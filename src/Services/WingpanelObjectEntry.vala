@@ -73,9 +73,10 @@ namespace  Wingpanel {
                 }); //make sure it is always right
             });
 
-            var w = -1; var h = -1;
+            var w = -1;
+            var h = -1;
             var arrow_height = 10;
-            var arrow_width = 20
+            var arrow_width = 20;
             var x = 10.5;
             var y = 10.5;
             var radius = 5;
