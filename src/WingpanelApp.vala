@@ -1,20 +1,22 @@
 // -*- Mode: vala; indent-tabs-mode: nil; tab-width: 4 -*-
-//  
-//  Copyright (C) 2011-2012 Wingpanel Developers
-// 
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-// 
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-// 
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+/***
+  BEGIN LICENSE
+
+  Copyright (C) 2011-2012 Wingpanel Developers
+  This program is free software: you can redistribute it and/or modify it
+  under the terms of the GNU Lesser General Public License version 3, as published
+  by the Free Software Foundation.
+
+  This program is distributed in the hope that it will be useful, but
+  WITHOUT ANY WARRANTY; without even the implied warranties of
+  MERCHANTABILITY, SATISFACTORY QUALITY, or FITNESS FOR A PARTICULAR
+  PURPOSE.  See the GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License along
+  with this program.  If not, see <http://www.gnu.org/licenses/>
+
+  END LICENSE
+***/
 
 using Gtk;
 using Granite;
@@ -31,7 +33,6 @@ namespace Wingpanel {
         public CssProvider provider { get; private set; default = null; }
 
         construct {
-
             build_data_dir = Build.DATADIR;
             build_pkg_data_dir = Build.PKGDATADIR;
             build_release_name = Build.RELEASE_NAME;
@@ -51,11 +52,9 @@ namespace Wingpanel {
 
             about_authors = {"Giulio Collura <random.cpp@gmail.com>"};
             about_artists = {"Daniel Foré <bunny@go-docky.com>"};
-
         }
 
         public WingpanelApp () {
-
             debug ("In wingpanel");
 
             settings = new Settings ();
@@ -68,11 +67,9 @@ namespace Wingpanel {
             }
 
             DEBUG = false;
-
         }
 
         protected override void activate () {
-
             debug ("Activating");
 
             if (get_windows () == null) {
@@ -87,7 +84,6 @@ namespace Wingpanel {
         public static int main (string[] args) {
             Wingpanel.app = new WingpanelApp ();
             return Wingpanel.app.run (args);
-
         }
 
     }

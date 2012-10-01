@@ -1,20 +1,22 @@
 // -*- Mode: vala; indent-tabs-mode: nil; tab-width: 4 -*-
-//  
-//  Copyright (C) 2011-2012 Wingpanel Developers
-// 
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-// 
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-// 
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+/***
+  BEGIN LICENSE
+
+  Copyright (C) 2011-2012 Wingpanel Developers
+  This program is free software: you can redistribute it and/or modify it
+  under the terms of the GNU Lesser General Public License version 3, as published
+  by the Free Software Foundation.
+
+  This program is distributed in the hope that it will be useful, but
+  WITHOUT ANY WARRANTY; without even the implied warranties of
+  MERCHANTABILITY, SATISFACTORY QUALITY, or FITNESS FOR A PARTICULAR
+  PURPOSE.  See the GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License along
+  with this program.  If not, see <http://www.gnu.org/licenses/>
+
+  END LICENSE
+***/
 
 using Gtk;
 using Gdk;
@@ -24,7 +26,7 @@ using Granite;
 using Granite.Services;
 
 namespace Wingpanel {
-    
+
     public enum Struts {
         LEFT,
         RIGHT,
@@ -46,7 +48,6 @@ namespace Wingpanel {
         private MenuBar menubar;
 
         public Shadow () {
-
             menubar = new MenuBar ();
 
             skip_taskbar_hint = true; // no taskbar
@@ -59,21 +60,20 @@ namespace Wingpanel {
         }
 
         protected override bool draw (Context cr) {
-
             Allocation size;
             get_allocation (out size);
-            
+
             var ctx = menubar.get_style_context ();
-            render_background (ctx, cr, size.x, size.y, 
+            render_background (ctx, cr, size.x, size.y,
                                size.width, size.height);
 
             return true;
-
         }
 
     }
 
     public class Panel : Gtk.Window {
+
         private const int shadow_size = 4;
 
         private int panel_height = 24;
@@ -96,7 +96,7 @@ namespace Wingpanel {
         private WingpanelApp app;
 
         public Panel (WingpanelApp app) {
-            //TODO: Clean Up Code and add the this reference where used
+            /* TODO: Clean Up Code and add the this reference where used */
             this.app = app;
             set_application (app as Gtk.Application);
 
@@ -153,9 +153,9 @@ namespace Wingpanel {
             Gdk.Rectangle monitor_dimensions;
 
             screen.get_monitor_geometry (this.screen.get_primary_monitor(), out monitor_dimensions);
-            
-            this.panel_x     = monitor_dimensions.x;
-            this.panel_y     = monitor_dimensions.y;
+
+            this.panel_x = monitor_dimensions.x;
+            this.panel_y = monitor_dimensions.y;
             this.panel_width = monitor_dimensions.width;
 
             this.move (panel_x, panel_y + panel_displacement);
@@ -186,14 +186,13 @@ namespace Wingpanel {
             } else {
                 menubar.prepend (menuitem);
             }
-        
+
         }
 
         private void delete_entry (Indicator.ObjectEntry entry,
                                    Indicator.Object     object) {
 
             if (menuhash.has_key(model.get_indicator_name(object))) {
-
                 var menuitem = menuhash[model.get_indicator_name(object)];
                 this.menubar.remove (menuitem);
 
@@ -213,7 +212,6 @@ namespace Wingpanel {
         }
 
         public void load_indicator (Indicator.Object indicator) {
-
             if (indicator is Indicator.Object) {
                 indicator.entry_added.connect (this.on_entry_added);
                 indicator.entry_removed.connect (this.on_entry_removed);
@@ -222,15 +220,14 @@ namespace Wingpanel {
                 GLib.List<unowned Indicator.ObjectEntry> list = indicator.get_entries ();
                 list.foreach ((entry) => create_entry (entry, indicator));
 
-                message ("Loaded indicator %s", model.get_indicator_name(indicator));
+                message ("Loaded indicator %s", model.get_indicator_name (indicator));
             } else {
-                warning ("Unable to load %s", model.get_indicator_name(indicator));
+                warning ("Unable to load %s", model.get_indicator_name (indicator));
             }
         }
 
         private void add_defaults () {
-
-            // Add Apps button
+            /* Add Apps button */
             var apps = new Widgets.AppsButton ();
             left_wrapper.pack_start (apps, false, true, 0);
             container.pack_start (left_wrapper);
@@ -241,26 +238,24 @@ namespace Wingpanel {
             clock.get_style_context ().add_class ("composited-indicator");
             container.pack_start (clock, false, false, 0);
 
-            // Menubar for storing indicators
+            /* Menubar for storing indicators */
             menubar = new Gtk.MenuBar ();
             menubar.can_focus = true;
             menubar.border_width = 0;
             menubar.get_style_context ().add_class ("composited-indicator");
-            
+
             right_wrapper.pack_end (menubar, false, false, 0);
             container.pack_end (right_wrapper);
 
             get_style_context ().add_class ("menubar");
             get_style_context ().add_class ("panel");
-            
+
             SizeGroup gpr = new SizeGroup (SizeGroupMode.HORIZONTAL);
             gpr.add_widget (left_wrapper);
             gpr.add_widget (right_wrapper);
-
         }
 
         protected override bool draw (Context cr) {
-
             Allocation size;
             this.get_allocation (out size);
 
@@ -272,14 +267,14 @@ namespace Wingpanel {
             }
 
             var ctx = menubar.get_style_context ();
-            render_background (ctx, cr, size.x, size.y, 
+            render_background (ctx, cr, size.x, size.y,
                                size.width, size.height);
 
             // Slide in
             if (animation_timer == 0) {
                 this.panel_displacement = -this.panel_height;
 
-                animation_timer = GLib.Timeout.add (300/this.panel_height, () => {
+                animation_timer = GLib.Timeout.add (300 / this.panel_height, () => {
                     if (this.panel_displacement >= 0 ) {
                         return false;
                     } else {
@@ -290,6 +285,7 @@ namespace Wingpanel {
                     }
                 });
             }
+
             propagate_draw (container, cr);
 
             if (!shadow.visible)
@@ -299,31 +295,30 @@ namespace Wingpanel {
         }
 
         private void set_struts () {
-
-            if (!get_realized()) {
+            if (!get_realized ()) {
                 return;
             }
 
             // since uchar is 8 bits in vala but the struts are 32 bits
             // we have to allocate 4 times as much and do bit-masking
-            var struts = new ulong [Struts.N_VALUES];
+            var struts = new ulong[Struts.N_VALUES];
 
-            struts [Struts.TOP]         = this.panel_height + this.panel_y;
-            struts [Struts.TOP_START]   = this.panel_x;
-            struts [Struts.TOP_END]     = this.panel_x + this.panel_width;
+            struts[Struts.TOP] = this.panel_height + this.panel_y;
+            struts[Struts.TOP_START] = this.panel_x;
+            struts[Struts.TOP_END] = this.panel_x + this.panel_width;
 
             var first_struts = new ulong [Struts.BOTTOM + 1];
             for (var i = 0; i < first_struts.length; i++) {
                 first_struts [i] = struts [i];
             }
 
-            unowned X.Display display = X11Display.get_xdisplay(get_display());
-            var xid = X11Window.get_xid(get_window());
+            unowned X.Display display = X11Display.get_xdisplay (get_display ());
+            var xid = X11Window.get_xid(get_window ());
 
             display.change_property (xid, display.intern_atom ("_NET_WM_STRUT_PARTIAL", false), X.XA_CARDINAL,
-                                  32, X.PropMode.Replace, (uchar[]) struts, struts.length);
+                                     32, X.PropMode.Replace, (uchar[]) struts, struts.length);
             display.change_property (xid, display.intern_atom ("_NET_WM_STRUT", false), X.XA_CARDINAL,
-                                  32, X.PropMode.Replace, (uchar[]) first_struts, first_struts.length);
+                                      32, X.PropMode.Replace, (uchar[]) first_struts, first_struts.length);
         }
     }
 }

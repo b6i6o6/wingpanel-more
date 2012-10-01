@@ -1,22 +1,24 @@
-/* -*- Mode: vala; indent-tabs-mode: nil; c-basic-offset: 2; tab-width: 2 -*- */
-/*
- * Copyright (C) 2010-2012 Canonical Ltd
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 3 as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- * Authored by canonical.com
- *
- */
+// -*- Mode: vala; indent-tabs-mode: nil; tab-width: 4 -*-
+/***
+  BEGIN LICENSE
+
+  Copyright (C) 2010-2012 Canonical Ltd
+  This program is free software: you can redistribute it and/or modify it
+  under the terms of the GNU Lesser General Public License version 3, as published
+  by the Free Software Foundation.
+
+  This program is distributed in the hope that it will be useful, but
+  WITHOUT ANY WARRANTY; without even the implied warranties of
+  MERCHANTABILITY, SATISFACTORY QUALITY, or FITNESS FOR A PARTICULAR
+  PURPOSE.  See the GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License along
+  with this program.  If not, see <http://www.gnu.org/licenses/>
+
+  END LICENSE
+
+  Authored by canonical.com
+***/
 
 using Gee;
 
@@ -27,7 +29,6 @@ namespace Wingpanel {
         private static IndicatorsModel _global_model = null;
 
         public static IndicatorsModel get_default () {
-
             if (_global_model == null) {
                 _global_model = new IndicatorsFileModel ();
             }
@@ -50,7 +51,6 @@ namespace Wingpanel {
         public ArrayList<GLib.Object> indicator_list;
 
         public IndicatorsFileModel () {
-
             string skip_list;
 
             //indicator_map = new Gee.HashMap<Indicator.Object, string> ();
@@ -76,7 +76,7 @@ namespace Wingpanel {
                 skip_list = "";
 
             if (skip_list == "all") {
-                log("wingpanel", LogLevelFlags.LEVEL_WARNING, "Skipping all indicator loading");
+                log ("wingpanel", LogLevelFlags.LEVEL_WARNING, "Skipping all indicator loading");
                 return;
             }
 
@@ -85,32 +85,28 @@ namespace Wingpanel {
                 skip_list += "," + blocked_indicator;
                 log("wingpanel", LogLevelFlags.LEVEL_DEBUG, "Blacklisting %s", blocked_indicator);
             }
-            log("wingpanel", LogLevelFlags.LEVEL_DEBUG, "Blacklisted Indicators: %s", skip_list);
+
+            log ("wingpanel", LogLevelFlags.LEVEL_DEBUG, "Blacklisted Indicators: %s", skip_list);
 
             /* We need to look for icons in an specific location */
             //Gtk.IconTheme.get_default ().append_search_path (Wingpanel.Config.INDICATORICONSDIR);
-            
-            log("wingpanel", LogLevelFlags.LEVEL_DEBUG, "Indicatordir: %s", Build.INDICATORDIR);
+
+            log ("wingpanel", LogLevelFlags.LEVEL_DEBUG, "Indicatordir: %s", Build.INDICATORDIR);
             File dir = File.new_for_path (Build.INDICATORDIR);
             try {
                 var e = dir.enumerate_children (FILE_ATTRIBUTE_STANDARD_NAME, 0, null);
                 ArrayList<string> sos = new ArrayList<string> ();
 
                 FileInfo file_info;
-                while ((file_info = e.next_file (null)) != null)
-                {
-                    
+                while ((file_info = e.next_file (null)) != null) {
                     string leaf = file_info.get_name ();
 
-
-                    if (leaf in skip_list)
-                    {
+                    if (leaf in skip_list) {
                         log("wingpanel", LogLevelFlags.LEVEL_WARNING, "SKIP LOADING: %s", leaf);
                         continue;
                     }
 
-                    if (leaf.has_suffix (".so"))
-                    {
+                    if (leaf.has_suffix (".so")) {
                         sos.add (leaf);
                         log("wingpanel", LogLevelFlags.LEVEL_DEBUG, "LOADING: %s", leaf);
                     }
@@ -123,48 +119,39 @@ namespace Wingpanel {
                     try {
                         this.load_indicator (dir.get_path() + "/" + leaf, leaf);
                     } catch (Error error) {
-                        log("wingpanel",LogLevelFlags.LEVEL_ERROR, "Unable to read indicator \"%s\": %s\n", leaf, error.message);
+                        log("wingpanel", LogLevelFlags.LEVEL_ERROR, "Unable to read indicator \"%s\": %s\n", leaf, error.message);
                     }
                 }
             }
-            catch (Error error)
-            {
+            catch (Error error) {
                 log("wingpanel",LogLevelFlags.LEVEL_ERROR, "Unable to read indicators: %s\n", error.message);
             }
         }
 
-        public static int indicator_sort_func (string a, string b)
-        {
+        public static int indicator_sort_func (string a, string b) {
             return indicator_order[a] - indicator_order[b];
         }
 
-        private void load_indicator (string filename, string leaf)
-        {
+        private void load_indicator (string filename, string leaf) {
             Indicator.Object o;
 
             o = new Indicator.Object.from_file (filename);
 
-            if (o is Indicator.Object)
-            {
+            if (o is Indicator.Object) {
                 this.indicator_map[o] = leaf;
                 indicator_list.add (o);
-            }
-            else
-            {
+            } else {
                 log("wingpanel", LogLevelFlags.LEVEL_ERROR, "Unable to load %s\n", filename);
             }
         }
 
         //public override ArrayList<Indicator.Object> get_indicators ()
-        public override ArrayList<GLib.Object> get_indicators ()
-        {
+        public override ArrayList<GLib.Object> get_indicators () {
             return indicator_list;
         }
 
-        public override string get_indicator_name (Indicator.Object o)
-        {
+        public override string get_indicator_name (Indicator.Object o) {
             return indicator_map[o];
         }
     }
 }
-
