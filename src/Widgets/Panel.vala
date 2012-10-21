@@ -88,6 +88,7 @@ namespace Wingpanel {
         private Box right_wrapper;
         private MenuBar menubar;
         private MenuBar clock;
+        private MenuBar apps_menubar;
 
         private Shadow shadow;
         private IndicatorsModel model;
@@ -227,23 +228,25 @@ namespace Wingpanel {
         }
 
         private void add_defaults () {
-            /* Add Apps button */
-            var apps = new Widgets.AppsButton ();
-            left_wrapper.pack_start (apps, false, true, 0);
+            // Add Apps button
+            apps_menubar = new Gtk.MenuBar ();
+            apps_menubar.get_style_context ().add_class (COMPOSITED_INDICATOR_STYLE_CLASS);
+            apps_menubar.append (new Widgets.AppsButton ());
+            left_wrapper.pack_start (apps_menubar, false, true, 0);
+
             container.pack_start (left_wrapper);
 
             clock = new Gtk.MenuBar ();
             clock.can_focus = true;
             clock.border_width = 0;
-            clock.get_style_context ().add_class ("composited-indicator");
+            clock.get_style_context ().add_class (COMPOSITED_INDICATOR_STYLE_CLASS);
             container.pack_start (clock, false, false, 0);
 
             /* Menubar for storing indicators */
             menubar = new Gtk.MenuBar ();
             menubar.can_focus = true;
             menubar.border_width = 0;
-            menubar.get_style_context ().add_class ("composited-indicator");
-
+            menubar.get_style_context ().add_class (COMPOSITED_INDICATOR_STYLE_CLASS);
             right_wrapper.pack_end (menubar, false, false, 0);
             container.pack_end (right_wrapper);
 

@@ -20,18 +20,16 @@
 
 using Gdk;
 
-namespace  Wingpanel {
-
-    public class IndicatorObjectEntry : Gtk.MenuItem {
-
+namespace  Wingpanel 
+{
+    public class IndicatorObjectEntry: Widgets.IndicatorButton
+    {
         Indicator.Object object;
         unowned Indicator.ObjectEntry entry;
 
         public IndicatorObjectEntry (Indicator.ObjectEntry entry, Indicator.Object iobject) {
             object = iobject;
             this.entry = entry;
-
-            add_events (Gdk.EventMask.SCROLL_MASK);
 
             IndicatorsModel model = IndicatorsModel.get_default ();
 
@@ -47,7 +45,7 @@ namespace  Wingpanel {
             if (entry.label != null && entry.label is Gtk.Label) {
                 log ("wingpanel", LogLevelFlags.LEVEL_DEBUG, "Indicator: %s has attribute label", model.get_indicator_name (object));
                 box.pack_end (entry.label, false, false, 0);
-                entry.label.get_style_context ().add_class ("wingpanel-indicator-button");
+                entry.label.get_style_context().add_class(INDICATOR_BUTTON_STYLE_CLASS);
             }
 
             add (box);

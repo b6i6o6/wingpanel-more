@@ -1,102 +1,93 @@
 // -*- Mode: vala; indent-tabs-mode: nil; tab-width: 4 -*-
-/***
-  BEGIN LICENSE
-
-  Copyright (C) 2011-2012 Wingpanel Developers
-  This program is free software: you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License version 3, as published
-  by the Free Software Foundation.
-
-  This program is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranties of
-  MERCHANTABILITY, SATISFACTORY QUALITY, or FITNESS FOR A PARTICULAR
-  PURPOSE.  See the GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License along
-  with this program.  If not, see <http://www.gnu.org/licenses/>
-
-  END LICENSE
-***/
-
-using Gtk;
-using Gdk;
-using Cairo;
+//  
+//  Copyright (C) 2011-2012 Wingpanel Developers
+// 
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+// 
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+// 
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
 
 namespace Wingpanel.Widgets {
 
-    public class AppsButton : EventBox {
+    public class AppsButton : IndicatorButton {
 
-        private Label app_label;
-
-        construct {
-
-            can_focus = true;
+        private bool _active = false;
+        public bool active {
+            get {
+                return _active;
+            }
+            set {
+                _active = value;
+                update_state_flags ();
+            }
         }
 
+        private Gtk.Label app_label;
+        private AppLauncherService? launcher_service = null;
+
         public AppsButton () {
-            app_label = new Label ("<b>%s</b>".printf (_("Applications")));
+            this.can_focus = true;
+
+            app_label = new Gtk.Label ("<b>%s</b>".printf (_("Applications")));
             app_label.use_markup = true;
+            app_label.halign = Gtk.Align.CENTER;
+            app_label.margin_left = app_label.margin_right = 6;
+            app_label.get_style_context().add_class (INDICATOR_BUTTON_STYLE_CLASS);
+            this.add (app_label);
 
-            add (Utils.set_padding (app_label, 0, 14, 0, 14));
+            this.active = false;
 
-            /*get_style_context ().add_class ("menubar");*/
-            get_style_context ().add_class ("composited-indicator");
-            app_label.get_style_context ().add_class ("wingpanel-app-button");
+            launcher_service = new AppLauncherService ();
+            launcher_service.launcher_state_changed.connect (on_launcher_state_changed);
 
-            this.button_press_event.connect (launch_launcher);
+            this.button_press_event.connect ( () => {
+                launcher_service.launch_launcher ();
+                return false;
+            });
 
+            on_settings_update ();
             Wingpanel.app.settings.changed.connect (on_settings_update);
         }
 
-        public override void show () {
-            var show_launcher = Wingpanel.app.settings.show_launcher;
-            if (show_launcher)
-                base.show ();
+        private void on_launcher_state_changed (bool visible) {
+            debug ("Launcher visibility changed to %s", visible.to_string ());
+            this.active = visible;
+        }
+
+        /**
+         * Make sure the menuitem appears to be selected even if the focus moves
+         * to the client launcher app being displayed.
+         */
+
+        public override void state_flags_changed (Gtk.StateFlags flags) {
+            update_state_flags ();
+        }
+
+        private void update_state_flags () {
+            const Gtk.StateFlags ACTIVE_FLAGS = Gtk.StateFlags.PRELIGHT;
+
+            if (this.active)
+                set_state_flags (ACTIVE_FLAGS, true);
+            else
+                unset_state_flags (ACTIVE_FLAGS);
         }
 
         private void on_settings_update () {
-            var show_launcher = Wingpanel.app.settings.show_launcher;
-            if (visible && !show_launcher)
-                base.hide ();
-            else if (!visible && show_launcher)
-                base.show ();
+            bool visible = Wingpanel.app.settings.show_launcher;
+            this.set_no_show_all (!visible);
+            if (visible)
+                this.show_all ();
+            else
+                this.hide ();
         }
-
-        private bool launch_launcher (Gtk.Widget widget, Gdk.EventButton event) {
-            debug ("Starting launcher!");
-
-            var flags = GLib.SpawnFlags.SEARCH_PATH |
-                        GLib.SpawnFlags.DO_NOT_REAP_CHILD |
-                        GLib.SpawnFlags.STDOUT_TO_DEV_NULL;
-
-            GLib.Pid process_id;
-
-            // Parse Arguments
-            string[] argvp = null;
-            try {
-                GLib.Shell.parse_argv (Wingpanel.app.settings.default_launcher, out argvp);
-            } catch (GLib.ShellError error) {
-                warning ("Not passing any args to %s : %s", Wingpanel.app.settings.default_launcher, error.message);
-                argvp = {Wingpanel.app.settings.default_launcher, null}; // fix value in case it's corrupted
-            }
-
-            // Check if the program is actually there
-            string? launcher = Environment.find_program_in_path (argvp[0]);
-            if (launcher != null) {
-                // Spawn process asynchronously
-                try {
-                    GLib.Process.spawn_async (null, argvp, null, flags, null, out process_id);
-                } catch (GLib.Error err) {
-                    warning (err.message);
-                    return false;
-                }
-            } else {
-                Granite.Services.System.open_uri ("file:///usr/share/applications");
-            }
-
-            return true;
-        }
-
     }
-
 }
