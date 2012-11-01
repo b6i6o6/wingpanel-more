@@ -107,7 +107,7 @@ namespace Wingpanel {
             app_paintable = true;
             set_visual (get_screen ().get_rgba_visual ());
             set_type_hint (WindowTypeHint.DOCK);
-            get_style_context ().add_provider_for_screen (this.get_screen (), app.provider, 600);
+            get_style_context ().add_provider_for_screen (this.get_screen (), app.provider, Gtk.STYLE_PROVIDER_PRIORITY_FALLBACK);
 
             shadow = new Shadow ();
 
