@@ -26,6 +26,17 @@ namespace  Wingpanel
     {
         Indicator.Object object;
         unowned Indicator.ObjectEntry entry;
+        
+        //used for drawing
+        Gtk.Window menu;
+        Granite.Drawing.BufferSurface buffer;
+        int w = -1;
+        int h = -1;
+        int arrow_height = 10;
+        int arrow_width = 20;
+        double x = 10.5;
+        double y = 10.5;
+        int radius = 5;
 
         public IndicatorObjectEntry (Indicator.ObjectEntry entry, Indicator.Object iobject) {
             object = iobject;
@@ -56,7 +67,7 @@ namespace  Wingpanel
             show ();
             scroll_event.connect (on_scroll_event);
 
-            var buffer = new Granite.Drawing.BufferSurface (100, 100);
+            buffer = new Granite.Drawing.BufferSurface (100, 100);
 
             entry.menu.get_parent ().app_paintable = true;
             entry.menu.get_parent ().set_visual (Gdk.Screen.get_default ().get_rgba_visual ());
@@ -71,67 +82,42 @@ namespace  Wingpanel
                 }); //make sure it is always right
             });
 
-            var w = -1;
-            var h = -1;
-            var arrow_height = 10;
-            var arrow_width = 20;
-            var x = 10.5;
-            var y = 10.5;
-            var radius = 5;
+            menu = new Granite.Widgets.PopOver ();
+            menu.get_style_context ().add_class ("popover_bg");
 
             entry.menu.get_parent ().draw.connect ((ctx) => {
                 w  = entry.menu.get_parent ().get_allocated_width ();
                 h = entry.menu.get_parent ().get_allocated_height ();
 
                 buffer = new Granite.Drawing.BufferSurface (w, h);
+                cairo_popover (w, h);
 
-                Granite.Drawing.Utilities.cairo_rounded_rectangle (buffer.context, x, y + arrow_height,
-                                                                   w - 20, h - 20 - arrow_height, radius);
-
-                /* Get some nice pos for the arrow */
-                var offs = 30;
-                int p_x;
-                int w_x;
-                Gtk.Allocation alloc;
-                this.get_window ().get_origin (out p_x, null);
-                this.get_allocation (out alloc);
-
-                entry.menu.get_window ().get_origin (out w_x, null);
-
-                offs = (p_x + alloc.x) - w_x + this.get_allocated_width () / 4;
-                if (offs + 50 > w)
-                    offs = w - 15 - arrow_width;
-                if (offs < 17)
-                    offs = 17;
-
-                // Draw arrow
-                buffer.context.move_to (offs, y + arrow_height);
-                buffer.context.rel_line_to (arrow_width / 2.0, -arrow_height);
-                buffer.context.rel_line_to (arrow_width / 2.0, arrow_height);
-                buffer.context.close_path ();
-
+                //shadow
                 buffer.context.set_source_rgba (0, 0, 0, 0.5);
                 buffer.context.fill_preserve ();
                 buffer.exponential_blur (6);
-
-                buffer.context.set_line_width (1);
-                buffer.context.set_source_rgba (0, 0, 0, 0.4);
-                buffer.context.stroke_preserve ();
-                buffer.context.save ();
                 buffer.context.clip ();
 
-                var cr = new Gtk.StyleContext ();
-                cr.set_path (entry.menu.get_path ());
-                Gtk.render_background (cr, buffer.context, 0, 0, entry.menu.get_allocated_width (), entry.menu.get_allocated_height ());
-                buffer.context.restore ();
+                //background
+                menu.get_style_context ().render_background (buffer.context, 0, 0, w, h);
+                buffer.context.reset_clip ();
 
+                //border
+                cairo_popover (w, h);
+                buffer.context.set_operator (Cairo.Operator.SOURCE);
+                buffer.context.set_line_width (1);
+                Gdk.cairo_set_source_rgba (buffer.context, menu.get_style_context ().get_border_color (Gtk.StateFlags.NORMAL));
+                buffer.context.stroke ();
+
+                //clear surface to transparent
                 ctx.set_operator (Cairo.Operator.SOURCE);
-                ctx.rectangle (0, 0, w, h);
                 ctx.set_source_rgba (0, 0, 0, 0);
-                ctx.fill ();
-
+                ctx.paint ();
+                
+                //now paint our buffer on
                 ctx.set_source_surface (buffer.surface, 0, 0);
                 ctx.paint ();
+                
                 return false;
             });
 
@@ -150,6 +136,38 @@ namespace  Wingpanel
             }
 
             entry.menu.get_style_context ().add_provider (transp_css, 20000);
+        }
+
+        void cairo_popover (int w, int h) {
+            w = w - 20;
+            h = h - 20;
+
+            // Get some nice pos for the arrow
+            var offs = 30;
+            int p_x;
+            int w_x;
+            Gtk.Allocation alloc;
+            this.get_window ().get_origin (out p_x, null);
+            this.get_allocation (out alloc);
+
+            entry.menu.get_window ().get_origin (out w_x, null);
+
+            offs = (p_x + alloc.x) - w_x + this.get_allocated_width () / 4;
+            if (offs + 50 > w)
+                offs = w - 15 - arrow_width;
+            if (offs < 17)
+                offs = 17;
+
+            buffer.context.arc (x + radius, y + arrow_height + radius, radius, Math.PI, Math.PI * 1.5);
+            buffer.context.line_to (offs, y + arrow_height);
+            buffer.context.rel_line_to (arrow_width / 2.0, -arrow_height);
+            buffer.context.rel_line_to (arrow_width / 2.0, arrow_height);
+            buffer.context.arc (x + w - radius, y + arrow_height + radius, radius, Math.PI * 1.5, Math.PI * 2.0);
+
+            buffer.context.arc (x + w - radius, y + h - radius, radius, 0, Math.PI * 0.5);
+            buffer.context.arc (x + radius, y + h - radius, radius, Math.PI * 0.5, Math.PI);
+            
+            buffer.context.close_path ();
         }
 
         private bool on_scroll_event (EventScroll event) {
