@@ -82,9 +82,6 @@ namespace  Wingpanel
                 }); //make sure it is always right
             });
 
-            menu = new Granite.Widgets.PopOver ();
-            menu.get_style_context ().add_class ("popover_bg");
-
             entry.menu.get_parent ().draw.connect ((ctx) => {
                 w  = entry.menu.get_parent ().get_allocated_width ();
                 h = entry.menu.get_parent ().get_allocated_height ();
@@ -126,16 +123,22 @@ namespace  Wingpanel
 
             var transp_css = new Gtk.CssProvider ();
             try {
-                transp_css.load_from_data (""" * {
+                transp_css.load_from_data (""" .menu {
                            background-color:@transparent;
                            border-color:@transparent;
                            -unico-inner-stroke-width: 0;
+                           }
+                           .popover_bg {
+                               background-color:#fff;
                            }""", -1);
             } catch (Error e) {
                 warning (e.message);
             }
 
             entry.menu.get_style_context ().add_provider (transp_css, 20000);
+            menu = new Granite.Widgets.PopOver ();
+            menu.get_style_context ().add_provider (transp_css, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+            menu.get_style_context ().add_class ("popover_bg");
         }
 
         void cairo_popover (int w, int h) {
@@ -153,8 +156,8 @@ namespace  Wingpanel
             entry.menu.get_window ().get_origin (out w_x, null);
 
             offs = (p_x + alloc.x) - w_x + this.get_allocated_width () / 4;
-            if (offs + 50 > w)
-                offs = w - 15 - arrow_width;
+            if (offs + 50 > (w + 20))
+                offs = (w + 20) - 15 - arrow_width;
             if (offs < 17)
                 offs = 17;
 
