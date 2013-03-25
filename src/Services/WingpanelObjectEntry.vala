@@ -83,35 +83,40 @@ namespace  Wingpanel
             });
 
             entry.menu.get_parent ().draw.connect ((ctx) => {
-                w  = entry.menu.get_parent ().get_allocated_width ();
-                h = entry.menu.get_parent ().get_allocated_height ();
+                var new_w  = entry.menu.get_parent ().get_allocated_width ();
+                var new_h = entry.menu.get_parent ().get_allocated_height ();
+		print  ("%i, %i\n", new_w, w);
+		if (new_w != w || new_h != h) {
+			w = new_w;
+			h = new_h;
 
-                buffer = new Granite.Drawing.BufferSurface (w, h);
-                cairo_popover (w, h);
+			buffer = new Granite.Drawing.BufferSurface (w, h);
+			cairo_popover (w, h);
 
-                //shadow
-                buffer.context.set_source_rgba (0, 0, 0, 0.5);
-                buffer.context.fill_preserve ();
-                buffer.exponential_blur (6);
-                buffer.context.clip ();
+			//shadow
+			buffer.context.set_source_rgba (0, 0, 0, 0.5);
+			buffer.context.fill_preserve ();
+			buffer.exponential_blur (6);
+			buffer.context.clip ();
 
-                //background
-                menu.get_style_context ().render_background (buffer.context, 0, 0, w, h);
-                buffer.context.reset_clip ();
+			//background
+			menu.get_style_context ().render_background (buffer.context, 0, 0, w, h);
+			buffer.context.reset_clip ();
 
-                //border
-                cairo_popover (w, h);
-                buffer.context.set_operator (Cairo.Operator.SOURCE);
-                buffer.context.set_line_width (1);
-                Gdk.cairo_set_source_rgba (buffer.context, menu.get_style_context ().get_border_color (Gtk.StateFlags.NORMAL));
-                buffer.context.stroke ();
+			//border
+			cairo_popover (w, h);
+			buffer.context.set_operator (Cairo.Operator.SOURCE);
+			buffer.context.set_line_width (1);
+			Gdk.cairo_set_source_rgba (buffer.context, menu.get_style_context ().get_border_color (Gtk.StateFlags.NORMAL));
+			buffer.context.stroke ();
+		}
 
-                //clear surface to transparent
-                ctx.set_operator (Cairo.Operator.SOURCE);
-                ctx.set_source_rgba (0, 0, 0, 0);
-                ctx.paint ();
-                
-                //now paint our buffer on
+		//clear surface to transparent
+		ctx.set_operator (Cairo.Operator.SOURCE);
+		ctx.set_source_rgba (0, 0, 0, 0);
+		ctx.paint ();
+		
+		//now paint our buffer on
                 ctx.set_source_surface (buffer.surface, 0, 0);
                 ctx.paint ();
                 
@@ -141,9 +146,9 @@ namespace  Wingpanel
             menu.get_style_context ().add_class ("popover_bg");
         }
 
-        void cairo_popover (int w, int h) {
-            w = w - 20;
-            h = h - 20;
+        void cairo_popover (int width, int height) {
+            width = width - 20;
+            height = height - 20;
 
             // Get some nice pos for the arrow
             var offs = 30;
@@ -156,8 +161,8 @@ namespace  Wingpanel
             entry.menu.get_window ().get_origin (out w_x, null);
 
             offs = (p_x + alloc.x) - w_x + this.get_allocated_width () / 4;
-            if (offs + 50 > (w + 20))
-                offs = (w + 20) - 15 - arrow_width;
+            if (offs + 50 > (width + 20))
+                offs = (width + 20) - 15 - arrow_width;
             if (offs < 17)
                 offs = 17;
 
@@ -165,10 +170,10 @@ namespace  Wingpanel
             buffer.context.line_to (offs, y + arrow_height);
             buffer.context.rel_line_to (arrow_width / 2.0, -arrow_height);
             buffer.context.rel_line_to (arrow_width / 2.0, arrow_height);
-            buffer.context.arc (x + w - radius, y + arrow_height + radius, radius, Math.PI * 1.5, Math.PI * 2.0);
+            buffer.context.arc (x + width - radius, y + arrow_height + radius, radius, Math.PI * 1.5, Math.PI * 2.0);
 
-            buffer.context.arc (x + w - radius, y + h - radius, radius, 0, Math.PI * 0.5);
-            buffer.context.arc (x + radius, y + h - radius, radius, Math.PI * 0.5, Math.PI);
+            buffer.context.arc (x + width - radius, y + height - radius, radius, 0, Math.PI * 0.5);
+            buffer.context.arc (x + radius, y + height - radius, radius, Math.PI * 0.5, Math.PI);
             
             buffer.context.close_path ();
         }
