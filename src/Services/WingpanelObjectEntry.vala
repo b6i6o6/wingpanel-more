@@ -101,7 +101,7 @@ namespace  Wingpanel
                     cr.clip ();
 
                     //background
-                    menu.get_style_context ().render_background (buffer.context, 0, 0, w, h);
+                    menu.get_style_context ().render_background (cr, 0, 0, w, h);
                     cr.reset_clip ();
 
                     //border
