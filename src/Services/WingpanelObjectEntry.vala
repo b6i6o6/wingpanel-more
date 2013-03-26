@@ -92,22 +92,24 @@ namespace  Wingpanel
                     buffer = new Granite.Drawing.BufferSurface (w, h);
                     cairo_popover (w, h);
 
+                    var cr = buffer.context;
+
                     //shadow
-                    buffer.context.set_source_rgba (0, 0, 0, 0.5);
-                    buffer.context.fill_preserve ();
+                    cr.set_source_rgba (0, 0, 0, 0.5);
+                    cr.fill_preserve ();
                     buffer.exponential_blur (6);
-                    buffer.context.clip ();
+                    cr.clip ();
 
                     //background
                     menu.get_style_context ().render_background (buffer.context, 0, 0, w, h);
-                    buffer.context.reset_clip ();
+                    cr.reset_clip ();
 
                     //border
                     cairo_popover (w, h);
-                    buffer.context.set_operator (Cairo.Operator.SOURCE);
-                    buffer.context.set_line_width (1);
-                    Gdk.cairo_set_source_rgba (buffer.context, menu.get_style_context ().get_border_color (Gtk.StateFlags.NORMAL));
-                    buffer.context.stroke ();
+                    cr.set_operator (Cairo.Operator.SOURCE);
+                    cr.set_line_width (1);
+                    Gdk.cairo_set_source_rgba (cr, menu.get_style_context ().get_border_color (Gtk.StateFlags.NORMAL));
+                    cr.stroke ();
                 }
 
                 //clear surface to transparent
