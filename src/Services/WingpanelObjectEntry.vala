@@ -83,34 +83,40 @@ namespace  Wingpanel
             });
 
             entry.menu.get_parent ().draw.connect ((ctx) => {
-                w  = entry.menu.get_parent ().get_allocated_width ();
-                h = entry.menu.get_parent ().get_allocated_height ();
+                var new_w  = entry.menu.get_parent ().get_allocated_width ();
+                var new_h = entry.menu.get_parent ().get_allocated_height ();
+                if (new_w != w || new_h != h) {
+                    w = new_w;
+                    h = new_h;
 
-                buffer = new Granite.Drawing.BufferSurface (w, h);
-                cairo_popover (w, h);
+                    buffer = new Granite.Drawing.BufferSurface (w, h);
+                    cairo_popover (w, h);
 
-                //shadow
-                buffer.context.set_source_rgba (0, 0, 0, 0.5);
-                buffer.context.fill_preserve ();
-                buffer.exponential_blur (6);
-                buffer.context.clip ();
+                    var cr = buffer.context;
 
-                //background
-                menu.get_style_context ().render_background (buffer.context, 0, 0, w, h);
-                buffer.context.reset_clip ();
+                    //shadow
+                    cr.set_source_rgba (0, 0, 0, 0.5);
+                    cr.fill_preserve ();
+                    buffer.exponential_blur (6);
+                    cr.clip ();
 
-                //border
-                cairo_popover (w, h);
-                buffer.context.set_operator (Cairo.Operator.SOURCE);
-                buffer.context.set_line_width (1);
-                Gdk.cairo_set_source_rgba (buffer.context, menu.get_style_context ().get_border_color (Gtk.StateFlags.NORMAL));
-                buffer.context.stroke ();
+                    //background
+                    menu.get_style_context ().render_background (cr, 0, 0, w, h);
+                    cr.reset_clip ();
+
+                    //border
+                    cairo_popover (w, h);
+                    cr.set_operator (Cairo.Operator.SOURCE);
+                    cr.set_line_width (1);
+                    Gdk.cairo_set_source_rgba (cr, menu.get_style_context ().get_border_color (Gtk.StateFlags.NORMAL));
+                    cr.stroke ();
+                }
 
                 //clear surface to transparent
                 ctx.set_operator (Cairo.Operator.SOURCE);
                 ctx.set_source_rgba (0, 0, 0, 0);
                 ctx.paint ();
-                
+
                 //now paint our buffer on
                 ctx.set_source_surface (buffer.surface, 0, 0);
                 ctx.paint ();
