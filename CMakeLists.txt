@@ -76,6 +76,7 @@ vala_precompile (VALA_C ${EXEC_NAME}
     src/Services/WingpanelObjectEntry.vala
     src/Services/IndicatorFileModel.vala
     src/Services/AppLauncherService.vala
+    src/Services/LauncherRunner.vala
 PACKAGES
 	${WINGPANEL_DEPS}
 CUSTOM_VAPIS

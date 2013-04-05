@@ -34,10 +34,14 @@ namespace Wingpanel {
         private AppLauncherIface? launcher_proxy = null;
         uint watch = -1;
 
+        private LauncherRunner launcher_runner;
+
         private Settings settings;
 
         public AppLauncherService (Settings settings) {
             this.settings = settings;
+
+            launcher_runner = new LauncherRunner (settings);
 
             // Add watch
             watch = Bus.watch_name (BusType.SESSION,
@@ -65,44 +69,7 @@ namespace Wingpanel {
         }
 
         private bool spawn_launcher_process () {
-            debug ("Starting launcher!");
-
-            // Parse Arguments
-            string[] argvp = null;
-            string launcher_command = settings.default_launcher;
-
-            try {
-                Shell.parse_argv (launcher_command, out argvp);
-            }
-            catch (ShellError error) {
-                warning ("Not passing any args to %s : %s", launcher_command, error.message);
-                argvp = {launcher_command, null}; // fix value in case it's corrupted
-            }
-
-            // Check if the program is actually there
-            string? launcher = Environment.find_program_in_path (argvp[0]);
-            if (launcher != null) {
-                // Spawn process asynchronously
-                try {
-                    var flags =  SpawnFlags.SEARCH_PATH |
-                                 SpawnFlags.DO_NOT_REAP_CHILD |
-                                 SpawnFlags.STDOUT_TO_DEV_NULL;
-                    Pid process_id;
-                    Process.spawn_async (null, argvp, null, flags, null, out process_id);
-                    // Add watch or otherwise the process will become a zombie
-                    ChildWatch.add (process_id, (pid, status) => {
-                        Process.close_pid (pid);
-                    });
-                }
-                catch (SpawnError err) {
-                    warning ("Couldn't spawn launcher: %s", err.message);
-                    return_val_if_reached (false);
-                }
-            } else {
-                Granite.Services.System.open_uri ("file:///usr/share/applications");
-            }
-
-            return true;
+            return launcher_runner.execute ();
         }
 
         private bool connect_to_server () {
