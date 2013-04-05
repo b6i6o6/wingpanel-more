@@ -34,33 +34,37 @@ namespace Wingpanel.Widgets {
         private Gtk.Label app_label;
         private AppLauncherService? launcher_service = null;
 
-        public AppsButton () {
+        private Settings settings;
+
+        public AppsButton (Settings settings) {
+            this.settings = settings;
             this.can_focus = true;
 
             app_label = new Gtk.Label ("<b>%s</b>".printf (_("Applications")));
             app_label.use_markup = true;
             app_label.halign = Gtk.Align.CENTER;
             app_label.margin_left = app_label.margin_right = 6;
-            app_label.get_style_context().add_class (INDICATOR_BUTTON_STYLE_CLASS);
-            this.add (app_label);
+            app_label.get_style_context ().add_class (INDICATOR_BUTTON_STYLE_CLASS);
 
-            this.active = false;
+            add (app_label);
 
-            launcher_service = new AppLauncherService ();
+            active = false;
+
+            launcher_service = new AppLauncherService (settings);
             launcher_service.launcher_state_changed.connect (on_launcher_state_changed);
 
-            this.button_press_event.connect ( () => {
+            this.button_press_event.connect (() => {
                 launcher_service.launch_launcher ();
                 return false;
             });
 
             on_settings_update ();
-            Wingpanel.app.settings.changed.connect (on_settings_update);
+            settings.changed.connect (on_settings_update);
         }
 
         private void on_launcher_state_changed (bool visible) {
             debug ("Launcher visibility changed to %s", visible.to_string ());
-            this.active = visible;
+            active = visible;
         }
 
         /**
@@ -75,19 +79,20 @@ namespace Wingpanel.Widgets {
         private void update_state_flags () {
             const Gtk.StateFlags ACTIVE_FLAGS = Gtk.StateFlags.PRELIGHT;
 
-            if (this.active)
+            if (active)
                 set_state_flags (ACTIVE_FLAGS, true);
             else
                 unset_state_flags (ACTIVE_FLAGS);
         }
 
         private void on_settings_update () {
-            bool visible = Wingpanel.app.settings.show_launcher;
-            this.set_no_show_all (!visible);
+            bool visible = settings.show_launcher;
+            set_no_show_all (!visible);
+
             if (visible)
-                this.show_all ();
+                show_all ();
             else
-                this.hide ();
+                hide ();
         }
     }
 }

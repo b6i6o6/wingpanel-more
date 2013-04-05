@@ -61,14 +61,17 @@ namespace Wingpanel {
         private MenuBar apps_menubar;
 
         private PanelShadow shadow;
-        private IndicatorsModel model;
+        private IndicatorsModel indicator_model;
         private Gee.HashMap<string, Gtk.MenuItem> menuhash;
 
         private WingpanelApp app;
+        private Settings settings;
 
         public Panel (WingpanelApp app) {
-            /* TODO: Clean Up Code and add the this reference where used */
             this.app = app;
+            settings = app.settings;
+            indicator_model = app.indicator_model;
+
             set_application (app as Gtk.Application);
 
             //Window properties
@@ -105,8 +108,7 @@ namespace Wingpanel {
             // Add default widgets
             add_defaults ();
 
-            model = IndicatorsModel.get_default ();
-            var indicators_list = model.get_indicators ();
+            var indicators_list = indicator_model.get_indicators ();
 
             foreach (Indicator.Object o in indicators_list) {
                  load_indicator (o);
@@ -115,7 +117,6 @@ namespace Wingpanel {
             // Signals
             realize.connect (() => { panel_resize(false);});
             destroy.connect (Gtk.main_quit);
-
         }
 
         private void panel_resize (bool redraw)  {
@@ -139,14 +140,12 @@ namespace Wingpanel {
                 queue_draw ();
         }
 
-        private void create_entry (Indicator.ObjectEntry entry,
-                                   Indicator.Object      object) {
-
+        private void create_entry (Indicator.ObjectEntry entry, Indicator.Object object) {
             //delete_entry(entry, object);
-            Gtk.MenuItem menuitem = new IndicatorObjectEntry (entry, object);
-            menuhash[model.get_indicator_name(object)] = menuitem;
+            Gtk.MenuItem menuitem = new IndicatorObjectEntry (indicator_model, entry, object);
+            menuhash[indicator_model.get_indicator_name(object)] = menuitem;
 
-            if (model.get_indicator_name(object) == "libdatetime.so") { // load libdatetime in center
+            if (indicator_model.get_indicator_name(object) == "libdatetime.so") { // load libdatetime in center
                 /* Bold clock label font */
                 var font = new Pango.FontDescription ();
                 font.set_weight (Pango.Weight.HEAVY);
@@ -156,28 +155,21 @@ namespace Wingpanel {
             } else {
                 menubar.prepend (menuitem);
             }
-
         }
 
-        private void delete_entry (Indicator.ObjectEntry entry,
-                                   Indicator.Object     object) {
-
-            if (menuhash.has_key(model.get_indicator_name(object))) {
-                var menuitem = menuhash[model.get_indicator_name(object)];
+        private void delete_entry (Indicator.ObjectEntry entry, Indicator.Object object) {
+            if (menuhash.has_key(indicator_model.get_indicator_name(object))) {
+                var menuitem = menuhash[indicator_model.get_indicator_name(object)];
                 this.menubar.remove (menuitem);
 
             }
         }
 
-        private void on_entry_added (Indicator.Object      object,
-                                     Indicator.ObjectEntry entry) {
-
+        private void on_entry_added (Indicator.Object object, Indicator.ObjectEntry entry) {
             create_entry (entry, object);
         }
 
-        private void on_entry_removed (Indicator.Object      object,
-                                       Indicator.ObjectEntry entry) {
-
+        private void on_entry_removed (Indicator.Object object, Indicator.ObjectEntry entry) {
             delete_entry (entry, object);
         }
 
@@ -190,9 +182,9 @@ namespace Wingpanel {
                 GLib.List<unowned Indicator.ObjectEntry> list = indicator.get_entries ();
                 list.foreach ((entry) => create_entry (entry, indicator));
 
-                message ("Loaded indicator %s", model.get_indicator_name (indicator));
+                message ("Loaded indicator %s", indicator_model.get_indicator_name (indicator));
             } else {
-                warning ("Unable to load %s", model.get_indicator_name (indicator));
+                warning ("Unable to load %s", indicator_model.get_indicator_name (indicator));
             }
         }
 
@@ -200,7 +192,7 @@ namespace Wingpanel {
             // Add Apps button
             apps_menubar = new Gtk.MenuBar ();
             apps_menubar.get_style_context ().add_class (COMPOSITED_INDICATOR_STYLE_CLASS);
-            apps_menubar.append (new Widgets.AppsButton ());
+            apps_menubar.append (new Widgets.AppsButton (settings));
             left_wrapper.pack_start (apps_menubar, false, true, 0);
 
             container.pack_start (left_wrapper);

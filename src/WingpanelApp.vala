@@ -18,18 +18,13 @@
   END LICENSE
 ***/
 
-using Gtk;
-using Granite;
-
 namespace Wingpanel {
 
-    public WingpanelApp app;
-    
     public class WingpanelApp : Granite.Application {
+        public Settings settings { get; private set; }
+        public IndicatorsModel indicator_model { get; private set; }
 
-        private Panel panel = null;
-
-        public Settings settings { get; private set; default = null; }
+        private Panel panel;
 
         construct {
             build_data_dir = Build.DATADIR;
@@ -43,25 +38,23 @@ namespace Wingpanel {
             application_id = "net.launchpad.wingpanel";
         }
 
-        public WingpanelApp () {
-            settings = new Settings ();
-            DEBUG = false;
-        }
-
         protected override void activate () {
             debug ("Activating");
 
             if (get_windows () == null)
-                panel = new Panel (this);
+                init ();
 
             panel.show_all ();
         }
 
-        public static int main (string[] args) {
-            Wingpanel.app = new WingpanelApp ();
-            return Wingpanel.app.run (args);
+        private void init () {
+            settings = new Settings ();
+            indicator_model = new IndicatorsFileModel (settings);
+            panel = new Panel (this);
         }
 
+        public static int main (string[] args) {
+            return new WingpanelApp ().run (args);
+        }
     }
-
 }

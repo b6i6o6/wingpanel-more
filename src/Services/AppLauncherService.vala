@@ -34,7 +34,11 @@ namespace Wingpanel {
         private AppLauncherIface? launcher_proxy = null;
         uint watch = -1;
 
-        public AppLauncherService () {
+        private Settings settings;
+
+        public AppLauncherService (Settings settings) {
+            this.settings = settings;
+
             // Add watch
             watch = Bus.watch_name (BusType.SESSION,
                                     SERVICE_NAME,
@@ -65,7 +69,7 @@ namespace Wingpanel {
 
             // Parse Arguments
             string[] argvp = null;
-            string launcher_command = Wingpanel.app.settings.default_launcher;
+            string launcher_command = settings.default_launcher;
 
             try {
                 Shell.parse_argv (launcher_command, out argvp);

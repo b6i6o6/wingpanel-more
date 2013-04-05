@@ -38,11 +38,9 @@ namespace  Wingpanel
         double y = 10.5;
         int radius = 5;
 
-        public IndicatorObjectEntry (Indicator.ObjectEntry entry, Indicator.Object iobject) {
+        public IndicatorObjectEntry (IndicatorsModel model, Indicator.ObjectEntry entry, Indicator.Object iobject) {
             object = iobject;
             this.entry = entry;
-
-            IndicatorsModel model = IndicatorsModel.get_default ();
 
             Gtk.Box box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
             box.set_homogeneous (false);

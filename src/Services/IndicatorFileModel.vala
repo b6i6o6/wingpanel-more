@@ -25,32 +25,20 @@ using Gee;
 namespace Wingpanel {
 
     public abstract class IndicatorsModel : GLib.Object {
-
-        private static IndicatorsModel _global_model = null;
-
-        public static IndicatorsModel get_default () {
-            if (_global_model == null) {
-                _global_model = new IndicatorsFileModel ();
-            }
-
-            return _global_model;
-        }
-
-        public static void set_default (IndicatorsModel model) {
-            _global_model = model;
-        }
-
         public abstract Gee.ArrayList<Indicator.Object> get_indicators ();
         public abstract string get_indicator_name (Indicator.Object o);
     }
 
     public class IndicatorsFileModel : IndicatorsModel {
-
         public static HashMap<string, int> indicator_order = null;
         public HashMap<GLib.Object, string> indicator_map;
         public ArrayList<GLib.Object> indicator_list;
 
-        public IndicatorsFileModel () {
+        private Settings settings;
+
+        public IndicatorsFileModel (Settings settings) {
+            this.settings = settings;
+
             string skip_list;
 
             //indicator_map = new Gee.HashMap<Indicator.Object, string> ();
@@ -81,7 +69,7 @@ namespace Wingpanel {
             }
 
             /* Don't load appmenu-gtk */
-            foreach(string blocked_indicator in Wingpanel.app.settings.blacklist) {
+            foreach(string blocked_indicator in settings.blacklist) {
                 skip_list += "," + blocked_indicator;
                 log("wingpanel", LogLevelFlags.LEVEL_DEBUG, "Blacklisting %s", blocked_indicator);
             }
