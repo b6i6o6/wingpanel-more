@@ -43,14 +43,14 @@ namespace Wingpanel {
 
             if (get_windows () == null)
                 init ();
-
-            panel.show_all ();
         }
 
         private void init () {
             settings = new Settings ();
             indicator_model = new IndicatorsFileModel (settings);
             panel = new Panel (this);
+
+            panel.show_all ();
         }
 
         public static int main (string[] args) {
