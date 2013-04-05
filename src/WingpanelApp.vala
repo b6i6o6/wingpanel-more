@@ -38,20 +38,10 @@ namespace Wingpanel {
             build_release_name = Build.RELEASE_NAME;
             build_version = Build.VERSION;
             build_version_info = Build.VERSION_INFO;
-            
+
             program_name = "Wingpanel";
             exec_name = "wingpanel";
-            app_copyright = "GPLv3";
-            app_icon = "";
-            app_launcher = "";
             application_id = "net.launchpad.wingpanel";
-            main_url = "https://launchpad.net/wingpanel";
-            bug_url = "https://bugs.launchpad.net/wingpanel";
-            help_url = "https://answers.launchpad.net/wingpanel";
-            translate_url = "https://translations.launchpad.net/wingpanel";
-
-            about_authors = {"Giulio Collura <random.cpp@gmail.com>"};
-            about_artists = {"Daniel Foré <bunny@go-docky.com>"};
         }
 
         public WingpanelApp () {
