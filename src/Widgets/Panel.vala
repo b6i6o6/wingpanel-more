@@ -43,38 +43,8 @@ namespace Wingpanel {
         N_VALUES
     }
 
-    private class Shadow : Granite.Widgets.CompositedWindow {
-
-        private MenuBar menubar;
-
-        public Shadow () {
-            menubar = new MenuBar ();
-
-            skip_taskbar_hint = true; // no taskbar
-            //skip_pager_hint = true;
-            menubar.get_style_context ().add_class ("shadow");
-            set_type_hint (WindowTypeHint.DOCK);
-            set_keep_below (true);
-            stick ();
-
-        }
-
-        protected override bool draw (Context cr) {
-            Allocation size;
-            get_allocation (out size);
-
-            var ctx = menubar.get_style_context ();
-            render_background (ctx, cr, size.x, size.y,
-                               size.width, size.height);
-
-            return true;
-        }
-
-    }
-
     public class Panel : Gtk.Window {
-
-        private const int shadow_size = 4;
+        private const int SHADOW_SIZE = 4;
 
         private int panel_height = 24;
         private int panel_x;
@@ -90,7 +60,7 @@ namespace Wingpanel {
         private MenuBar clock;
         private MenuBar apps_menubar;
 
-        private Shadow shadow;
+        private PanelShadow shadow;
         private IndicatorsModel model;
         private Gee.HashMap<string, Gtk.MenuItem> menuhash;
 
@@ -109,7 +79,7 @@ namespace Wingpanel {
             set_type_hint (WindowTypeHint.DOCK);
             get_style_context ().add_provider_for_screen (this.get_screen (), app.provider, Gtk.STYLE_PROVIDER_PRIORITY_FALLBACK);
 
-            shadow = new Shadow ();
+            shadow = new PanelShadow ();
 
             panel_resize (false);
             /* update the panel size on screen size or monitor changes */
@@ -163,7 +133,7 @@ namespace Wingpanel {
             shadow.move (panel_x, panel_y + panel_height + panel_displacement);
 
             this.set_size_request (this.panel_width, -1);
-            shadow.set_size_request (this.panel_width, this.shadow_size);
+            shadow.set_size_request (this.panel_width, this.SHADOW_SIZE);
 
             set_struts ();
             if (redraw)
