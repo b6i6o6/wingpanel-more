@@ -39,11 +39,9 @@ find_package (PkgConfig)
 pkg_check_modules (DEPS REQUIRED ${WINGPANEL_DEPS})
 pkg_check_modules (DEPS_NOVALA REQUIRED ${WINGPANEL_DEPS_NOVALA})
 
-
 list (APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
 # Static Files
-file (GLOB stylesheets "${CMAKE_CURRENT_SOURCE_DIR}/data/style/*.css")
 file (GLOB desktop_entry "${CMAKE_CURRENT_SOURCE_DIR}/data/wingpanel.desktop")
 file (GLOB icon "${CMAKE_CURRENT_SOURCE_DIR}/data/wingpanel.svg")
 
@@ -99,6 +97,5 @@ add_executable(${EXEC_NAME} ${VALA_C})
 
 # Installation
 install (TARGETS ${EXEC_NAME} RUNTIME DESTINATION bin)
-install (FILES ${stylesheets} DESTINATION ${PKGDATADIR}/style)
 install (FILES ${desktop_entry} DESTINATION ${DATADIR}/applications)
 install (FILES ${icon} DESTINATION ${DATADIR}/icons/hicolor/scalable/apps)

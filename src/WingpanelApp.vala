@@ -30,7 +30,6 @@ namespace Wingpanel {
         private Panel panel = null;
 
         public Settings settings { get; private set; default = null; }
-        public CssProvider provider { get; private set; default = null; }
 
         construct {
             build_data_dir = Build.DATADIR;
@@ -45,17 +44,7 @@ namespace Wingpanel {
         }
 
         public WingpanelApp () {
-            debug ("In wingpanel");
-
             settings = new Settings ();
-            provider = new CssProvider ();
-
-            try {
-                provider.load_from_path (Build.PKGDATADIR + "/style/default.css");
-            } catch (Error e) {
-                warning ("Error: %s\n", e.message);
-            }
-
             DEBUG = false;
         }
 
