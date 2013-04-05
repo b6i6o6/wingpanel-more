@@ -15,6 +15,7 @@ enable_testing ()
 set (DATADIR "${CMAKE_INSTALL_PREFIX}/share")
 set (PKGDATADIR "${DATADIR}/wingpanel")
 set (GETTEXT_PACKAGE "wingpanel")
+set (EXEC_NAME "wingpanel")
 set (RELEASE_NAME "A super sexy space-saving top panel.")
 set (VERSION "0.4.0")
 set (VERSION_INFO "Testing")
@@ -66,7 +67,7 @@ include(ValaVersion)
 ensure_vala_version("0.16.0" MINIMUM)
 
 include(ValaPrecompile)
-vala_precompile (VALA_C
+vala_precompile (VALA_C ${EXEC_NAME}
     src/Settings.vala
     src/Utils.vala
     src/WingpanelApp.vala
@@ -93,10 +94,10 @@ add_schema ("org.pantheon.desktop.wingpanel.gschema.xml")
 add_subdirectory (po)
 
 # Create the Executable
-add_executable(wingpanel ${VALA_C})
+add_executable(${EXEC_NAME} ${VALA_C})
 
 # Installation
-install (TARGETS wingpanel RUNTIME DESTINATION bin)
+install (TARGETS ${EXEC_NAME} RUNTIME DESTINATION bin)
 install (FILES ${stylesheets} DESTINATION ${PKGDATADIR}/style)
 install (FILES ${desktop_entry} DESTINATION ${DATADIR}/applications)
 install (FILES ${icon} DESTINATION ${DATADIR}/icons/hicolor/scalable/apps)
