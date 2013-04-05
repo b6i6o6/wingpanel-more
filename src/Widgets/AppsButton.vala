@@ -40,7 +40,7 @@ namespace Wingpanel.Widgets {
             this.settings = settings;
             this.can_focus = true;
 
-            app_label = new Gtk.Label ("<b>%s</b>".printf (_("Applications")));
+            app_label = new Gtk.Label (_("Applications"));
             app_label.use_markup = true;
             app_label.halign = Gtk.Align.CENTER;
             app_label.margin_left = app_label.margin_right = 6;

@@ -146,11 +146,6 @@ namespace Wingpanel {
             menuhash[indicator_model.get_indicator_name(object)] = menuitem;
 
             if (indicator_model.get_indicator_name(object) == "libdatetime.so") { // load libdatetime in center
-                /* Bold clock label font */
-                var font = new Pango.FontDescription ();
-                font.set_weight (Pango.Weight.HEAVY);
-                var box = menuitem.get_child () as Gtk.Container;
-                box.get_children ().nth_data (0).modify_font (font);
                 clock.prepend(menuitem);
             } else {
                 menubar.prepend (menuitem);
