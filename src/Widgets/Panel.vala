@@ -19,40 +19,10 @@
 ***/
 
 using Gtk;
-using Gdk;
-using Cairo;
-
-using Granite;
-using Granite.Services;
 
 namespace Wingpanel {
 
-    public enum Struts {
-        LEFT,
-        RIGHT,
-        TOP,
-        BOTTOM,
-        LEFT_START,
-        LEFT_END,
-        RIGHT_START,
-        RIGHT_END,
-        TOP_START,
-        TOP_END,
-        BOTTOM_START,
-        BOTTOM_END,
-        N_VALUES
-    }
-
-    public class Panel : Gtk.Window {
-        private const int SHADOW_SIZE = 4;
-
-        private int panel_height = 24;
-        private int panel_x;
-        private int panel_y;
-        private int panel_width;
-        private uint animation_timer = 0;
-        private int panel_displacement = -40;
-
+    public class Panel : BasePanel {
         private Box container;
         private Box left_wrapper;
         private Box right_wrapper;
@@ -60,7 +30,6 @@ namespace Wingpanel {
         private MenuBar clock;
         private MenuBar apps_menubar;
 
-        private PanelShadow shadow;
         private IndicatorsModel indicator_model;
         private Gee.HashMap<string, Gtk.MenuItem> menuhash;
 
@@ -74,24 +43,6 @@ namespace Wingpanel {
 
             set_application (app as Gtk.Application);
 
-            //Window properties
-            skip_taskbar_hint = true; // no taskbar
-            decorated = false; // no window decoration
-            app_paintable = true;
-            set_visual (get_screen ().get_rgba_visual ());
-            set_type_hint (WindowTypeHint.DOCK);
-
-            shadow = new PanelShadow ();
-
-            panel_resize (false);
-            /* update the panel size on screen size or monitor changes */
-            screen.size_changed.connect (() => {
-                panel_resize (true);
-            });
-            screen.monitors_changed.connect (() => {
-                panel_resize (true);
-            });
-
             menuhash = new Gee.HashMap<string, Gtk.MenuItem> ();
 
             // HBox container
@@ -101,7 +52,6 @@ namespace Wingpanel {
             container.set_homogeneous (false);
             left_wrapper.set_homogeneous (false);
             right_wrapper.set_homogeneous (false);
-            resizable = false;
 
             add (container);
 
@@ -110,34 +60,8 @@ namespace Wingpanel {
 
             var indicators_list = indicator_model.get_indicators ();
 
-            foreach (Indicator.Object o in indicators_list) {
+            foreach (Indicator.Object o in indicators_list)
                  load_indicator (o);
-            }
-
-            // Signals
-            realize.connect (() => { panel_resize(false);});
-            destroy.connect (Gtk.main_quit);
-        }
-
-        private void panel_resize (bool redraw)  {
-
-            Gdk.Rectangle monitor_dimensions;
-
-            screen.get_monitor_geometry (this.screen.get_primary_monitor(), out monitor_dimensions);
-
-            this.panel_x = monitor_dimensions.x;
-            this.panel_y = monitor_dimensions.y;
-            this.panel_width = monitor_dimensions.width;
-
-            this.move (panel_x, panel_y + panel_displacement);
-            shadow.move (panel_x, panel_y + panel_height + panel_displacement);
-
-            this.set_size_request (this.panel_width, -1);
-            shadow.set_size_request (this.panel_width, this.SHADOW_SIZE);
-
-            set_struts ();
-            if (redraw)
-                queue_draw ();
         }
 
         private void create_entry (Indicator.ObjectEntry entry, Indicator.Object object) {
@@ -212,72 +136,6 @@ namespace Wingpanel {
             SizeGroup gpr = new SizeGroup (SizeGroupMode.HORIZONTAL);
             gpr.add_widget (left_wrapper);
             gpr.add_widget (right_wrapper);
-        }
-
-        protected override bool draw (Context cr) {
-            Allocation size;
-            this.get_allocation (out size);
-
-            if(this.panel_height != size.height) {
-                this.panel_height = size.height;
-                warning("Panel Height: "+size.height.to_string());
-                shadow.move (this.panel_x, this.panel_y + this.panel_height + this.panel_displacement);
-                set_struts();
-            }
-
-            var ctx = menubar.get_style_context ();
-            render_background (ctx, cr, size.x, size.y,
-                               size.width, size.height);
-
-            // Slide in
-            if (animation_timer == 0) {
-                this.panel_displacement = -this.panel_height;
-
-                animation_timer = GLib.Timeout.add (300 / this.panel_height, () => {
-                    if (this.panel_displacement >= 0 ) {
-                        return false;
-                    } else {
-                        this.panel_displacement += 1;
-                        this.move (this.panel_x, this.panel_y + this.panel_displacement);
-                        shadow.move (this.panel_x, this.panel_y + this.panel_height + this.panel_displacement);
-                        return true;
-                    }
-                });
-            }
-
-            propagate_draw (container, cr);
-
-            if (!shadow.visible)
-                shadow.show_all ();
-
-            return true;
-        }
-
-        private void set_struts () {
-            if (!get_realized ()) {
-                return;
-            }
-
-            // since uchar is 8 bits in vala but the struts are 32 bits
-            // we have to allocate 4 times as much and do bit-masking
-            var struts = new ulong[Struts.N_VALUES];
-
-            struts[Struts.TOP] = this.panel_height + this.panel_y;
-            struts[Struts.TOP_START] = this.panel_x;
-            struts[Struts.TOP_END] = this.panel_x + this.panel_width;
-
-            var first_struts = new ulong [Struts.BOTTOM + 1];
-            for (var i = 0; i < first_struts.length; i++) {
-                first_struts [i] = struts [i];
-            }
-
-            unowned X.Display display = X11Display.get_xdisplay (get_display ());
-            var xid = X11Window.get_xid(get_window ());
-
-            display.change_property (xid, display.intern_atom ("_NET_WM_STRUT_PARTIAL", false), X.XA_CARDINAL,
-                                     32, X.PropMode.Replace, (uchar[]) struts, struts.length);
-            display.change_property (xid, display.intern_atom ("_NET_WM_STRUT", false), X.XA_CARDINAL,
-                                      32, X.PropMode.Replace, (uchar[]) first_struts, first_struts.length);
         }
     }
 }

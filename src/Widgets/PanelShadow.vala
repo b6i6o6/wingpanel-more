@@ -15,9 +15,9 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-public class PanelShadow : Granite.Widgets.CompositedWindow {
+public class Wingpanel.PanelShadow : Granite.Widgets.CompositedWindow {
     public PanelShadow () {
-        skip_taskbar_hint = true; // no taskbar
+        skip_taskbar_hint = true;
 
         var style_context = get_style_context ();
         style_context.add_class ("shadow");
