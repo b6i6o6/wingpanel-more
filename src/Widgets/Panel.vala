@@ -18,17 +18,15 @@
   END LICENSE
 ***/
 
-using Gtk;
-
 namespace Wingpanel {
 
     public class Panel : BasePanel {
-        private Box container;
-        private Box left_wrapper;
-        private Box right_wrapper;
-        private MenuBar menubar;
-        private MenuBar clock;
-        private MenuBar apps_menubar;
+        private Gtk.Box container;
+        private Gtk.Box left_wrapper;
+        private Gtk.Box right_wrapper;
+        private Gtk.MenuBar menubar;
+        private Gtk.MenuBar clock;
+        private Gtk.MenuBar apps_menubar;
 
         private IndicatorsModel indicator_model;
         private Gee.HashMap<string, Gtk.MenuItem> menuhash;
@@ -46,14 +44,18 @@ namespace Wingpanel {
             menuhash = new Gee.HashMap<string, Gtk.MenuItem> ();
 
             // HBox container
-            container = new Box (Orientation.HORIZONTAL, 0);
-            left_wrapper = new Box (Orientation.HORIZONTAL, 0);
-            right_wrapper = new Box (Orientation.HORIZONTAL, 0);
+            container = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+            left_wrapper = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+            right_wrapper = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
             container.set_homogeneous (false);
             left_wrapper.set_homogeneous (false);
             right_wrapper.set_homogeneous (false);
 
             add (container);
+
+            var style_context = get_style_context ();
+            style_context.add_class (StyleClass.PANEL);
+            style_context.add_class (Gtk.STYLE_CLASS_MENUBAR);
 
             // Add default widgets
             add_defaults ();
@@ -65,22 +67,21 @@ namespace Wingpanel {
         }
 
         private void create_entry (Indicator.ObjectEntry entry, Indicator.Object object) {
-            //delete_entry(entry, object);
+            // delete_entry (entry, object);
             Gtk.MenuItem menuitem = new IndicatorObjectEntry (indicator_model, entry, object);
-            menuhash[indicator_model.get_indicator_name(object)] = menuitem;
+            menuhash[indicator_model.get_indicator_name (object)] = menuitem;
 
-            if (indicator_model.get_indicator_name(object) == "libdatetime.so") { // load libdatetime in center
-                clock.prepend(menuitem);
+            if (indicator_model.get_indicator_name (object) == "libdatetime.so") { // load libdatetime in center
+                clock.prepend (menuitem);
             } else {
                 menubar.prepend (menuitem);
             }
         }
 
         private void delete_entry (Indicator.ObjectEntry entry, Indicator.Object object) {
-            if (menuhash.has_key(indicator_model.get_indicator_name(object))) {
+            if (menuhash.has_key(indicator_model.get_indicator_name (object))) {
                 var menuitem = menuhash[indicator_model.get_indicator_name(object)];
                 this.menubar.remove (menuitem);
-
             }
         }
 
@@ -94,8 +95,8 @@ namespace Wingpanel {
 
         public void load_indicator (Indicator.Object indicator) {
             if (indicator is Indicator.Object) {
-                indicator.entry_added.connect (this.on_entry_added);
-                indicator.entry_removed.connect (this.on_entry_removed);
+                indicator.entry_added.connect (on_entry_added);
+                indicator.entry_removed.connect (on_entry_removed);
                 indicator.ref();
 
                 GLib.List<unowned Indicator.ObjectEntry> list = indicator.get_entries ();
@@ -109,31 +110,23 @@ namespace Wingpanel {
 
         private void add_defaults () {
             // Add Apps button
-            apps_menubar = new Gtk.MenuBar ();
-            apps_menubar.get_style_context ().add_class (COMPOSITED_INDICATOR_STYLE_CLASS);
+            apps_menubar = new MenuBar ();
             apps_menubar.append (new Widgets.AppsButton (settings));
+
             left_wrapper.pack_start (apps_menubar, false, true, 0);
 
             container.pack_start (left_wrapper);
 
-            clock = new Gtk.MenuBar ();
-            clock.can_focus = true;
-            clock.border_width = 0;
-            clock.get_style_context ().add_class (COMPOSITED_INDICATOR_STYLE_CLASS);
+            clock = new MenuBar ();
             container.pack_start (clock, false, false, 0);
 
-            /* Menubar for storing indicators */
-            menubar = new Gtk.MenuBar ();
-            menubar.can_focus = true;
-            menubar.border_width = 0;
-            menubar.get_style_context ().add_class (COMPOSITED_INDICATOR_STYLE_CLASS);
+            // Menubar for storing indicators
+            menubar = new MenuBar ();
+
             right_wrapper.pack_end (menubar, false, false, 0);
             container.pack_end (right_wrapper);
 
-            get_style_context ().add_class ("menubar");
-            get_style_context ().add_class ("panel");
-
-            SizeGroup gpr = new SizeGroup (SizeGroupMode.HORIZONTAL);
+            var gpr = new Gtk.SizeGroup (Gtk.SizeGroupMode.HORIZONTAL);
             gpr.add_widget (left_wrapper);
             gpr.add_widget (right_wrapper);
         }
