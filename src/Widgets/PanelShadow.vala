@@ -16,15 +16,25 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 public class Wingpanel.PanelShadow : Granite.Widgets.CompositedWindow {
+    private const string DEFAULT_THEME = """
+        .panel-shadow {
+            background-color: @transparent;
+            background-image: -gtk-gradient (linear,
+                             left top, left bottom,
+                             from (alpha (#000, 0.3)),
+                             to (alpha (#000, 0.0)));
+        }
+    """;
+
     public PanelShadow () {
         skip_taskbar_hint = true;
-
-        var style_context = get_style_context ();
-        style_context.add_class ("shadow");
 
         set_type_hint (Gdk.WindowTypeHint.DOCK);
         set_keep_below (true);
         stick ();
+
+        Granite.Widgets.Utils.set_theming (this, DEFAULT_THEME, StyleClass.SHADOW,
+                                           Gtk.STYLE_PROVIDER_PRIORITY_FALLBACK);
     }
 
     protected override bool draw (Cairo.Context cr) {
