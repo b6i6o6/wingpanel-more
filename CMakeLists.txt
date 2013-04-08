@@ -74,6 +74,7 @@ vala_precompile (VALA_C ${EXEC_NAME}
     src/Widgets/PanelShadow.vala
     src/Widgets/IndicatorButton.vala
     src/Widgets/AppsButton.vala
+    src/Widgets/MenuBar.vala
     src/Widgets/StyleClass.vala
     src/Services/WingpanelObjectEntry.vala
     src/Services/IndicatorFileModel.vala
