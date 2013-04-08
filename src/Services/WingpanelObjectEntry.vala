@@ -22,21 +22,31 @@ using Gdk;
 
 namespace  Wingpanel 
 {
-    public class IndicatorObjectEntry: IndicatorButton
-    {
-        Indicator.Object object;
-        unowned Indicator.ObjectEntry entry;
+    public class IndicatorObjectEntry: IndicatorButton {
+        private Indicator.Object object;
+        private unowned Indicator.ObjectEntry entry;
         
-        //used for drawing
-        Gtk.Window menu;
-        Granite.Drawing.BufferSurface buffer;
-        int w = -1;
-        int h = -1;
-        int arrow_height = 10;
-        int arrow_width = 20;
-        double x = 10.5;
-        double y = 10.5;
-        int radius = 5;
+        // used for drawing
+        private Gtk.Window menu;
+        private Granite.Drawing.BufferSurface buffer;
+        private int w = -1;
+        private int h = -1;
+        private int arrow_height = 10;
+        private int arrow_width = 20;
+        private double x = 10.5;
+        private double y = 10.5;
+        private int radius = 5;
+
+        private const string MENU_STYLESHEET = """
+            .menu {
+                background-color:@transparent;
+                border-color:@transparent;
+                -unico-inner-stroke-width: 0;
+             }
+             .popover_bg {
+               background-color:#fff;
+             }
+         """;
 
         public IndicatorObjectEntry (IndicatorsModel model, Indicator.ObjectEntry entry, Indicator.Object iobject) {
             object = iobject;
@@ -52,10 +62,13 @@ namespace  Wingpanel
                 set_widget (WidgetSlot.LABEL, entry.label);
             }
 
-            if (entry.menu != null)
-                set_submenu (entry.menu);
-
             show ();
+
+            if (entry.menu == null)
+                return;
+
+            set_submenu (entry.menu);
+
             scroll_event.connect (on_scroll_event);
 
             buffer = new Granite.Drawing.BufferSurface (100, 100);
@@ -118,24 +131,14 @@ namespace  Wingpanel
             entry.menu.margin_top = 28;
             entry.menu.margin_bottom = 18;
 
-            var transp_css = new Gtk.CssProvider ();
-            try {
-                transp_css.load_from_data (""" .menu {
-                           background-color:@transparent;
-                           border-color:@transparent;
-                           -unico-inner-stroke-width: 0;
-                           }
-                           .popover_bg {
-                               background-color:#fff;
-                           }""", -1);
-            } catch (Error e) {
-                warning (e.message);
-            }
+            Granite.Widgets.Utils.set_theming (entry.menu, MENU_STYLESHEET, null,
+                                               Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
 
-            entry.menu.get_style_context ().add_provider (transp_css, 20000);
             menu = new Granite.Widgets.PopOver ();
-            menu.get_style_context ().add_provider (transp_css, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
-            menu.get_style_context ().add_class ("popover_bg");
+
+            Granite.Widgets.Utils.set_theming (menu, MENU_STYLESHEET,
+                                               Granite.StyleClass.POPOVER_BG,
+                                               Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
         }
 
         void cairo_popover (int w, int h) {
