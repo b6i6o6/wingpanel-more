@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-public abstract class Wingpanel.BasePanel : Gtk.Window {
+public class Wingpanel.BasePanel : Gtk.Window {
     private enum Struts {
         LEFT,
         RIGHT,
