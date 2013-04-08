@@ -22,7 +22,7 @@ using Gdk;
 
 namespace  Wingpanel 
 {
-    public class IndicatorObjectEntry: Widgets.IndicatorButton
+    public class IndicatorObjectEntry: IndicatorButton
     {
         Indicator.Object object;
         unowned Indicator.ObjectEntry entry;
@@ -42,26 +42,19 @@ namespace  Wingpanel
             object = iobject;
             this.entry = entry;
 
-            Gtk.Box box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
-            box.set_homogeneous (false);
-            box.spacing = 2;
-
             if (entry.image != null && entry.image is Gtk.Image) {
-                log ("wingpanel", LogLevelFlags.LEVEL_DEBUG, "Indicator: %s has attribute image", model.get_indicator_name(object));
-                box.pack_start (entry.image, false, false, 0);
+                debug ("Indicator: %s has attribute image", model.get_indicator_name (object));
+                set_widget (WidgetSlot.IMAGE, entry.image);
             }
 
             if (entry.label != null && entry.label is Gtk.Label) {
-                log ("wingpanel", LogLevelFlags.LEVEL_DEBUG, "Indicator: %s has attribute label", model.get_indicator_name (object));
-                box.pack_end (entry.label, false, false, 0);
-                entry.label.get_style_context().add_class(INDICATOR_BUTTON_STYLE_CLASS);
+                debug ("Indicator: %s has attribute label", model.get_indicator_name (object));
+                set_widget (WidgetSlot.LABEL, entry.label);
             }
-
-            add (box);
-            box.show ();
 
             if (entry.menu != null)
                 set_submenu (entry.menu);
+
             show ();
             scroll_event.connect (on_scroll_event);
 

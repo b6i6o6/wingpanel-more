@@ -19,7 +19,6 @@
 namespace Wingpanel.Widgets {
 
     public class AppsButton : IndicatorButton {
-
         private bool _active = false;
         public bool active {
             get {
@@ -31,24 +30,17 @@ namespace Wingpanel.Widgets {
             }
         }
 
-        private Gtk.Label app_label;
         private AppLauncherService? launcher_service = null;
-
         private Settings settings;
 
         public AppsButton (Settings settings) {
             this.settings = settings;
             this.can_focus = true;
 
-            app_label = new Gtk.Label (_("Applications"));
-            app_label.use_markup = true;
-            app_label.halign = Gtk.Align.CENTER;
-            app_label.margin_left = app_label.margin_right = 6;
-            app_label.get_style_context ().add_class (INDICATOR_BUTTON_STYLE_CLASS);
-
-            add (app_label);
-
+            set_widget (WidgetSlot.LABEL, new Gtk.Label (_("Applications")));
             active = false;
+
+            get_style_context ().add_class (StyleClass.APP_BUTTON);
 
             launcher_service = new AppLauncherService (settings);
             launcher_service.launcher_state_changed.connect (on_launcher_state_changed);
@@ -71,7 +63,6 @@ namespace Wingpanel.Widgets {
          * Make sure the menuitem appears to be selected even if the focus moves
          * to the client launcher app being displayed.
          */
-
         public override void state_flags_changed (Gtk.StateFlags flags) {
             update_state_flags ();
         }
