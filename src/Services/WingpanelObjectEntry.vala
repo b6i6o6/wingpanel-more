@@ -22,10 +22,10 @@ using Gdk;
 
 namespace  Wingpanel 
 {
-    public class IndicatorObjectEntry: IndicatorButton {
-        private Indicator.Object object;
+    public class IndicatorObjectEntry: IndicatorButton, IndicatorWidget {
         private unowned Indicator.ObjectEntry entry;
-        
+        private Indicator.Object object;
+
         // used for drawing
         private Gtk.Window menu;
         private Granite.Drawing.BufferSurface buffer;
@@ -139,6 +139,14 @@ namespace  Wingpanel
             Granite.Widgets.Utils.set_theming (menu, MENU_STYLESHEET,
                                                Granite.StyleClass.POPOVER_BG,
                                                Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+        }
+
+        public unowned Indicator.Object get_object () {
+            return object;
+        }
+
+        public unowned Indicator.ObjectEntry get_entry () {
+            return entry;
         }
 
         void cairo_popover (int w, int h) {
