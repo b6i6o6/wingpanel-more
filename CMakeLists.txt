@@ -76,11 +76,13 @@ vala_precompile (VALA_C ${EXEC_NAME}
     src/Widgets/IndicatorButton.vala
     src/Widgets/AppsButton.vala
     src/Widgets/MenuBar.vala
+    src/Widgets/IndicatorMenubar.vala
     src/Widgets/StyleClass.vala
     src/Services/WingpanelObjectEntry.vala
     src/Services/IndicatorFileModel.vala
     src/Services/AppLauncherService.vala
     src/Services/LauncherRunner.vala
+    src/Services/IndicatorSorter.vala
 PACKAGES
 	${WINGPANEL_DEPS}
 CUSTOM_VAPIS

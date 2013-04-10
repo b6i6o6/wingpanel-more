@@ -24,9 +24,10 @@ namespace Wingpanel {
         private Gtk.Box container;
         private Gtk.Box left_wrapper;
         private Gtk.Box right_wrapper;
-        private Gtk.MenuBar menubar;
-        private Gtk.MenuBar clock;
-        private Gtk.MenuBar apps_menubar;
+
+        private IndicatorMenubar menubar;
+        private MenuBar clock;
+        private MenuBar apps_menubar;
 
         private IndicatorsModel indicator_model;
         private Gee.HashMap<string, Gtk.MenuItem> menuhash;
@@ -68,19 +69,19 @@ namespace Wingpanel {
 
         private void create_entry (Indicator.ObjectEntry entry, Indicator.Object object) {
             // delete_entry (entry, object);
-            Gtk.MenuItem menuitem = new IndicatorObjectEntry (indicator_model, entry, object);
+            IndicatorWidget menuitem = new IndicatorObjectEntry (indicator_model, entry, object);
             menuhash[indicator_model.get_indicator_name (object)] = menuitem;
 
             if (indicator_model.get_indicator_name (object) == "libdatetime.so") { // load libdatetime in center
                 clock.prepend (menuitem);
             } else {
-                menubar.prepend (menuitem);
+                menubar.insert_sorted (menuitem);
             }
         }
 
         private void delete_entry (Indicator.ObjectEntry entry, Indicator.Object object) {
             if (menuhash.has_key(indicator_model.get_indicator_name (object))) {
-                var menuitem = menuhash[indicator_model.get_indicator_name(object)];
+                var menuitem = menuhash[indicator_model.get_indicator_name (object)];
                 this.menubar.remove (menuitem);
             }
         }
@@ -121,7 +122,7 @@ namespace Wingpanel {
             container.pack_start (clock, false, false, 0);
 
             // Menubar for storing indicators
-            menubar = new MenuBar ();
+            menubar = new IndicatorMenubar (indicator_model);
 
             right_wrapper.pack_end (menubar, false, false, 0);
             container.pack_end (right_wrapper);
