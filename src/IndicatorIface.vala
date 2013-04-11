@@ -15,7 +15,10 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-public interface Wingpanel.IndicatorWidget : Gtk.MenuItem {
-    public abstract string get_entry_name ();
-    public abstract IndicatorIface get_indicator ();
+public interface Wingpanel.IndicatorIface : Object {
+    public signal void entry_added (IndicatorWidget entry);
+    public signal void entry_removed (IndicatorWidget entry);
+
+    public abstract string get_name ();
+    public abstract Gee.Collection<IndicatorWidget> get_entries ();
 }
