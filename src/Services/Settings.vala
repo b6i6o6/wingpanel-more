@@ -2,7 +2,7 @@
 /***
   BEGIN LICENSE
 
-  Copyright (C) 2011-2012 Wingpanel Developers
+  Copyright (C) 2011-2013 Wingpanel Developers
   This program is free software: you can redistribute it and/or modify it
   under the terms of the GNU Lesser General Public License version 3, as published
   by the Free Software Foundation.
@@ -18,12 +18,8 @@
   END LICENSE
 ***/
 
-using Granite.Services;
-
 namespace Wingpanel {
-
     public class Settings : Granite.Services.Settings {
-
         public string[] blacklist { get; set; }
         public bool show_launcher { get; set; }
         public string default_launcher { get; set; }
@@ -31,7 +27,5 @@ namespace Wingpanel {
         public Settings () {
             base ("org.pantheon.desktop.wingpanel");
         }
-
     }
-
 }
