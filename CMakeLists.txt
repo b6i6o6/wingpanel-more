@@ -71,6 +71,8 @@ vala_precompile (VALA_C ${EXEC_NAME}
     src/WingpanelApp.vala
     src/IndicatorWidget.vala
     src/IndicatorModel.vala
+    src/IndicatorIface.vala
+    src/IndicatorObject.vala
     src/Widgets/Panel.vala
     src/Widgets/BasePanel.vala
     src/Widgets/PanelShadow.vala
@@ -80,6 +82,7 @@ vala_precompile (VALA_C ${EXEC_NAME}
     src/Widgets/IndicatorMenubar.vala
     src/Widgets/StyleClass.vala
     src/Services/WingpanelObjectEntry.vala
+    src/Services/IndicatorFactory.vala
     src/Services/IndicatorFileModel.vala
     src/Services/AppLauncherService.vala
     src/Services/LauncherRunner.vala

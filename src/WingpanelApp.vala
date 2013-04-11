@@ -21,9 +21,8 @@
 namespace Wingpanel {
 
     public class WingpanelApp : Granite.Application {
-        public Settings settings { get; private set; }
-        public IndicatorModel indicator_model { get; private set; }
-
+        private IndicatorFactory indicator_factory;
+        private Settings settings;
         private Panel panel;
 
         construct {
@@ -47,8 +46,8 @@ namespace Wingpanel {
 
         private void init () {
             settings = new Settings ();
-            indicator_model = new IndicatorsFileModel (settings);
-            panel = new Panel (this);
+            indicator_factory = new IndicatorFactory (settings);
+            panel = new Panel (this, settings, indicator_factory);
 
             panel.show_all ();
         }
