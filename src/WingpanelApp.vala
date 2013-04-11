@@ -22,7 +22,7 @@ namespace Wingpanel {
 
     public class WingpanelApp : Granite.Application {
         public Settings settings { get; private set; }
-        public IndicatorsModel indicator_model { get; private set; }
+        public IndicatorModel indicator_model { get; private set; }
 
         private Panel panel;
 

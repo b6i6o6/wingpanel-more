@@ -18,10 +18,8 @@
 public class Wingpanel.IndicatorMenubar : MenuBar {
     private List<IndicatorWidget> sorted_items;
     private bool update_pending = false;
-    private IndicatorsModel indicator_model;
 
-    public IndicatorMenubar (IndicatorsModel indicator_model) {
-        this.indicator_model = indicator_model;
+    public IndicatorMenubar () {
         sorted_items = new List<IndicatorWidget> ();
     }
 
@@ -29,7 +27,6 @@ public class Wingpanel.IndicatorMenubar : MenuBar {
         if (sorted_items.index (item) > 0)
             return; // item already added
 
-        IndicatorSorter.set_model (indicator_model);
         sorted_items.insert_sorted (item, (CompareFunc) IndicatorSorter.compare_func);
 
         apply_new_order.begin ();

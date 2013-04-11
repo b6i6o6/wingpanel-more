@@ -44,12 +44,6 @@ public class Wingpanel.IndicatorSorter {
         { "libsession.so", "indicator-session-devices" } // indicator-session
     };
 
-    private static IndicatorsModel indicator_model;
-
-    public static void set_model (IndicatorsModel model) {
-        indicator_model = model;
-    }
-
     public static int compare_func (IndicatorWidget? a, IndicatorWidget? b) {
         if (a == null)
             return (b == null) ? 0 : -1;

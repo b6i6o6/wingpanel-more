@@ -25,7 +25,7 @@ namespace  Wingpanel
     public class IndicatorObjectEntry: IndicatorButton, IndicatorWidget {
         private unowned Indicator.ObjectEntry entry;
         private Indicator.Object object;
-        private IndicatorsModel model;
+        private IndicatorModel model;
 
         // used for drawing
         private Gtk.Window menu;
@@ -49,7 +49,7 @@ namespace  Wingpanel
              }
          """;
 
-        public IndicatorObjectEntry (IndicatorsModel model, Indicator.ObjectEntry entry, Indicator.Object iobject) {
+        public IndicatorObjectEntry (IndicatorModel model, Indicator.ObjectEntry entry, Indicator.Object iobject) {
             this.object = iobject;
             this.entry = entry;
             this.model = model;

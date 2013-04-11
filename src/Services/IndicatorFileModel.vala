@@ -22,14 +22,9 @@
 
 namespace Wingpanel {
 
-    public abstract class IndicatorsModel : GLib.Object {
-        public abstract Gee.ArrayList<Indicator.Object> get_indicators ();
-        public abstract string get_indicator_name (Indicator.Object o);
-    }
-
-    public class IndicatorsFileModel : IndicatorsModel {
-        public Gee.HashMap<GLib.Object, string> indicator_map;
-        public Gee.ArrayList<GLib.Object> indicator_list;
+    public class IndicatorsFileModel : Object, IndicatorModel {
+        private Gee.HashMap<GLib.Object, string> indicator_map;
+        private Gee.ArrayList<GLib.Object> indicator_list;
 
         private Settings settings;
 
@@ -90,11 +85,11 @@ namespace Wingpanel {
             }
         }
 
-        public override Gee.ArrayList<GLib.Object> get_indicators () {
+        public Gee.ArrayList<GLib.Object> get_indicators () {
             return indicator_list;
         }
 
-        public override string get_indicator_name (Indicator.Object o) {
+        public string get_indicator_name (Indicator.Object o) {
             return indicator_map[o];
         }
 
