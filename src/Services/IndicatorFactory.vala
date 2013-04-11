@@ -37,7 +37,7 @@ public class Wingpanel.IndicatorFactory {
         indicators = new Gee.LinkedList<IndicatorIface> ();
         var indicators_list = model.get_indicators ();
 
-        foreach (var object in indicators_list)
-             indicators.add (new IndicatorObject (object, model));
+        foreach (var indicator in indicators_list)
+            indicators.add (new IndicatorObject (indicator, model));
     }
 }

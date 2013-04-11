@@ -23,24 +23,15 @@
 namespace Wingpanel {
 
     public class IndicatorsFileModel : Object, IndicatorModel {
-        private Gee.HashMap<GLib.Object, string> indicator_map;
-        private Gee.ArrayList<GLib.Object> indicator_list;
-
-        private Settings settings;
+        private Gee.HashMap<Indicator.Object, string> indicator_map;
+        private Gee.ArrayList<Indicator.Object> indicator_list;
 
         public IndicatorsFileModel (Settings settings) {
-            this.settings = settings;
-
-            string skip_list;
-
-            indicator_map = new Gee.HashMap<GLib.Object, string> ();
-            indicator_list = new Gee.ArrayList<GLib.Object> ();
+            indicator_map = new Gee.HashMap<Indicator.Object, string> ();
+            indicator_list = new Gee.ArrayList<Indicator.Object> ();
 
             // Indicators we don't want to load
-            skip_list = Environment.get_variable ("UNITY_PANEL_INDICATORS_SKIP");
-
-            if (skip_list == null)
-                skip_list = "";
+            string skip_list = Environment.get_variable ("UNITY_PANEL_INDICATORS_SKIP") ?? "";
 
             if (skip_list == "all") {
                 warning ("Skipping all indicator loading");
@@ -54,13 +45,13 @@ namespace Wingpanel {
 
             debug ("Blacklisted Indicators: %s", skip_list);
 
-            debug ( "Indicatordir: %s", Build.INDICATORDIR);
-
+            var indicators_to_load = new Gee.ArrayList<string> ();
             var dir = File.new_for_path (Build.INDICATORDIR);
+            debug ("Indicator Directory: %s", dir.get_path ());
 
             try {
-                var enumerator = dir.enumerate_children (FILE_ATTRIBUTE_STANDARD_NAME, 0, null);
-                var indicators_to_load = new Gee.ArrayList<string> ();
+                var enumerator = dir.enumerate_children (FileAttribute.STANDARD_NAME,
+                                                         FileQueryInfoFlags.NONE, null);
 
                 FileInfo file_info;
 
@@ -72,37 +63,35 @@ namespace Wingpanel {
                         continue;
                     }
 
-                    if (leaf.has_suffix (".so")) {
+                    if (leaf.has_suffix (".so"))
                         indicators_to_load.add (leaf);
-                        debug ("LOADING: %s", leaf);
-                    }
                 }
-
-                foreach (string leaf in indicators_to_load)
-                    load_indicator (dir.get_path () + "/" + leaf, leaf);
             } catch (Error err) {
-                error ("Unable to read indicators: %s\n", err.message);
+                error ("Unable to read indicators: %s", err.message);
             }
+
+            foreach (string leaf in indicators_to_load)
+                load_indicator (dir.get_child (leaf).get_path (), leaf);
         }
 
-        public Gee.ArrayList<GLib.Object> get_indicators () {
+        public Gee.ArrayList<Indicator.Object> get_indicators () {
             return indicator_list;
         }
 
-        public string get_indicator_name (Indicator.Object o) {
-            return indicator_map[o];
+        public string get_indicator_name (Indicator.Object indicator) {
+            return indicator_map.get (indicator);
         }
 
         private void load_indicator (string filename, string leaf) {
-            Indicator.Object o;
+            debug ("LOADING: %s", leaf);
 
-            o = new Indicator.Object.from_file (filename);
+            var indicator = new Indicator.Object.from_file (filename);
 
-            if (o is Indicator.Object) {
-                this.indicator_map[o] = leaf;
-                indicator_list.add (o);
+            if (indicator is Indicator.Object) {
+                indicator_map.set (indicator, leaf);
+                indicator_list.add (indicator);
             } else {
-                error ("Unable to load %s\n", filename);
+                error ("Unable to load %s", filename);
             }
         }
     }
