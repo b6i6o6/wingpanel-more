@@ -25,6 +25,7 @@ namespace  Wingpanel
     public class IndicatorObjectEntry: IndicatorButton, IndicatorWidget {
         private unowned Indicator.ObjectEntry entry;
         private Indicator.Object object;
+        private IndicatorsModel model;
 
         // used for drawing
         private Gtk.Window menu;
@@ -49,8 +50,9 @@ namespace  Wingpanel
          """;
 
         public IndicatorObjectEntry (IndicatorsModel model, Indicator.ObjectEntry entry, Indicator.Object iobject) {
-            object = iobject;
+            this.object = iobject;
             this.entry = entry;
+            this.model = model;
 
             if (entry.image != null && entry.image is Gtk.Image) {
                 debug ("Indicator: %s has attribute image", model.get_indicator_name (object));
@@ -141,12 +143,12 @@ namespace  Wingpanel
                                                Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
         }
 
-        public unowned Indicator.Object get_object () {
-            return object;
+        public string get_indicator_name () {
+            return model.get_indicator_name (object);
         }
 
-        public unowned Indicator.ObjectEntry get_entry () {
-            return entry;
+        public string get_entry_name () {
+            return entry.name_hint;
         }
 
         void cairo_popover (int w, int h) {

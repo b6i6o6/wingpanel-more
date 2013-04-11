@@ -80,11 +80,8 @@ public class Wingpanel.IndicatorSorter {
     private static IndicatorOrderNode get_order_node (IndicatorWidget widget) {
         var order_node = IndicatorOrderNode ();
 
-        var object = widget.get_object ();
-        assert (object != null);
-
-        order_node.name = indicator_model.get_indicator_name (object);
-        order_node.entry_name = widget.get_entry ().name_hint;
+        order_node.name = widget.get_indicator_name ();
+        order_node.entry_name = widget.get_entry_name ();
 
         return order_node;
     }

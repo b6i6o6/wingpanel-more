@@ -16,6 +16,6 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 public interface IndicatorWidget : Gtk.MenuItem {
-    public abstract unowned Indicator.ObjectEntry get_entry ();
-    public abstract unowned Indicator.Object get_object ();
+    public abstract string get_entry_name ();
+    public abstract string get_indicator_name ();
 }
