@@ -67,7 +67,6 @@ ensure_vala_version("0.16.0" MINIMUM)
 include(ValaPrecompile)
 vala_precompile (VALA_C ${EXEC_NAME}
     src/Settings.vala
-    src/Utils.vala
     src/WingpanelApp.vala
     src/IndicatorWidget.vala
     src/IndicatorModel.vala
