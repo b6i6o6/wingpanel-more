@@ -30,6 +30,8 @@ public class Wingpanel.IndicatorSorter {
 
     private const IndicatorOrderNode[] DEFAULT_ORDER = {
         { "libapplication.so", null },                   // indicator-application (App indicators)
+        { "libapplication.so", "keyboard" },             // Keyboard layout selector (old)
+        { "libapplication.so", "gsd-keyboard-xkb" },     // keyboard layout selector
         { "libsoundmenu.so", null },                     // indicator-sound
         { "libnetwork.so", null },                       // indicator-network
         { "libnetworkmenu.so", null },                   // indicator-network
@@ -37,9 +39,9 @@ public class Wingpanel.IndicatorSorter {
         { "libbluetooth.so", null },                     // indicator-bluetooth
         { "libprintersmenu.so", null },                  // indicator-printers
         { "libsyncindicator.so", null },                 // indicator-sync
-        { "libapplication.so", "gsd-keyboard-xkb" },     // keyboard layout selector
         { "libpower.so", null },                         // indicator-power
         { "libmessaging.so", null },                     // indicator-messages
+        { "libsession.so", null },                       // indicator-session
         { "libsession.so", "indicator-session-users" },  // indicator-session
         { "libsession.so", "indicator-session-devices" } // indicator-session
     };
