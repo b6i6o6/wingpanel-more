@@ -29,22 +29,13 @@ namespace Wingpanel {
         private MenuBar clock;
         private MenuBar apps_menubar;
 
-        private IndicatorModel indicator_model;
-        private Gee.HashMap<string, Gtk.MenuItem> menuhash;
+        private IndicatorFactory indicator_factory;
 
-        private WingpanelApp app;
-        private Settings settings;
-
-        public Panel (WingpanelApp app) {
-            this.app = app;
-            settings = app.settings;
-            indicator_model = app.indicator_model;
-
+        public Panel (WingpanelApp app, Settings settings, IndicatorFactory indicator_factory) {
             set_application (app as Gtk.Application);
 
-            menuhash = new Gee.HashMap<string, Gtk.MenuItem> ();
+            this.indicator_factory = indicator_factory;
 
-            // HBox container
             container = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
             left_wrapper = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
             right_wrapper = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
@@ -59,65 +50,45 @@ namespace Wingpanel {
             style_context.add_class (Gtk.STYLE_CLASS_MENUBAR);
 
             // Add default widgets
-            add_defaults ();
+            add_defaults (settings);
 
-            var indicators_list = indicator_model.get_indicators ();
-
-            foreach (Indicator.Object o in indicators_list)
-                 load_indicator (o);
+            load_indicators ();
         }
 
-        private void create_entry (Indicator.ObjectEntry entry, Indicator.Object object) {
-            // delete_entry (entry, object);
-            IndicatorWidget menuitem = new IndicatorObjectEntry (indicator_model, entry, object);
+        private void load_indicators () {
+            var indicators = indicator_factory.get_indicators ();
 
-            string indicator_name = menuitem.get_indicator_name ();
-            menuhash.set (indicator_name, menuitem);
+            foreach (var indicator in indicators)
+                load_indicator (indicator);
+        }
 
-            if (indicator_name == "libdatetime.so") // load libdatetime in center
-                clock.prepend (menuitem);
+        private void load_indicator (IndicatorIface indicator) {
+            var entries = indicator.get_entries ();
+
+            foreach (var entry in entries)
+                create_entry (entry);
+
+            indicator.entry_added.connect (create_entry);
+            indicator.entry_removed.connect (delete_entry);
+        }
+
+        private void create_entry (IndicatorWidget entry) {
+            if (entry.get_indicator ().get_name () == "libdatetime.so")
+                clock.prepend (entry);
             else
-                menubar.insert_sorted (menuitem);
+                menubar.insert_sorted (entry);
         }
 
-        private void delete_entry (Indicator.ObjectEntry entry, Indicator.Object object) {
-            if (menuhash.has_key(indicator_model.get_indicator_name (object))) {
-                /* FIXME: some indicators like libapplication.so can have multiple entries
-                 * (i.e. menuitems). This code assumes that there's only one entry per
-                 * indicator. That's what entry is for, and it is passed along to the callback.
-                 */
-                var menuitem = menuhash[indicator_model.get_indicator_name (object)];
-                this.menubar.remove (menuitem);
-            }
+        private void delete_entry (IndicatorWidget entry) {
+            var parent = entry.parent;
+            parent.remove (entry);
         }
 
-        private void on_entry_added (Indicator.Object object, Indicator.ObjectEntry entry) {
-            create_entry (entry, object);
-        }
-
-        private void on_entry_removed (Indicator.Object object, Indicator.ObjectEntry entry) {
-            delete_entry (entry, object);
-        }
-
-        public void load_indicator (Indicator.Object indicator) {
-            if (indicator is Indicator.Object) {
-                indicator.entry_added.connect (on_entry_added);
-                indicator.entry_removed.connect (on_entry_removed);
-                indicator.ref();
-
-                GLib.List<unowned Indicator.ObjectEntry> list = indicator.get_entries ();
-                list.foreach ((entry) => create_entry (entry, indicator));
-
-                message ("Loaded indicator %s", indicator_model.get_indicator_name (indicator));
-            } else {
-                warning ("Unable to load %s", indicator_model.get_indicator_name (indicator));
-            }
-        }
-
-        private void add_defaults () {
+        private void add_defaults (Settings settings) {
             // Add Apps button
             apps_menubar = new MenuBar ();
-            apps_menubar.append (new Widgets.AppsButton (settings));
+            var apps_button = new Widgets.AppsButton (settings);
+            apps_menubar.append (apps_button);
 
             left_wrapper.pack_start (apps_menubar, false, true, 0);
 
