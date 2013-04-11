@@ -46,7 +46,7 @@ public class Wingpanel.IndicatorMenubar : MenuBar {
 
         update_pending = true;
 
-        Idle.add_full (Priority.HIGH_IDLE, apply_new_order.callback);
+        Idle.add (apply_new_order.callback);
         yield;
 
         clear ();
