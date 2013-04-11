@@ -74,7 +74,7 @@ public class Wingpanel.IndicatorSorter {
     private static IndicatorOrderNode get_order_node (IndicatorWidget widget) {
         var order_node = IndicatorOrderNode ();
 
-        order_node.name = widget.get_indicator_name ();
+        order_node.name = widget.get_indicator ().get_name ();
         order_node.entry_name = widget.get_entry_name ();
 
         return order_node;

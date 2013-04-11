@@ -25,7 +25,7 @@ namespace  Wingpanel
     public class IndicatorObjectEntry: IndicatorButton, IndicatorWidget {
         private unowned Indicator.ObjectEntry entry;
         private Indicator.Object object;
-        private IndicatorModel model;
+        private IndicatorIface indicator;
 
         // used for drawing
         private Gtk.Window menu;
@@ -49,18 +49,18 @@ namespace  Wingpanel
              }
          """;
 
-        public IndicatorObjectEntry (IndicatorModel model, Indicator.ObjectEntry entry, Indicator.Object iobject) {
-            this.object = iobject;
+        public IndicatorObjectEntry (Indicator.ObjectEntry entry, Indicator.Object object, IndicatorIface indicator) {
             this.entry = entry;
-            this.model = model;
+            this.object = object;
+            this.indicator = indicator;
 
             if (entry.image != null && entry.image is Gtk.Image) {
-                debug ("Indicator: %s has attribute image", model.get_indicator_name (object));
+                debug ("Indicator: %s (%s) has attribute image", indicator.get_name (), get_entry_name ());
                 set_widget (WidgetSlot.IMAGE, entry.image);
             }
 
             if (entry.label != null && entry.label is Gtk.Label) {
-                debug ("Indicator: %s has attribute label", model.get_indicator_name (object));
+                debug ("Indicator: %s (%s) has attribute label", indicator.get_name (), get_entry_name ());
                 set_widget (WidgetSlot.LABEL, entry.label);
             }
 
@@ -143,8 +143,8 @@ namespace  Wingpanel
                                                Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
         }
 
-        public string get_indicator_name () {
-            return model.get_indicator_name (object);
+        public IndicatorIface get_indicator () {
+            return indicator;
         }
 
         public string get_entry_name () {
