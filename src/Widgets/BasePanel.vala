@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-public class Wingpanel.BasePanel : Gtk.Window {
+public abstract class Wingpanel.BasePanel : Gtk.Window {
     private enum Struts {
         LEFT,
         RIGHT,
@@ -60,6 +60,8 @@ public class Wingpanel.BasePanel : Gtk.Window {
         destroy.connect (Gtk.main_quit);
     }
 
+    protected abstract Gtk.StyleContext get_draw_style_context ();
+
     public override void realize () {
         base.realize ();
         panel_resize (false);
@@ -76,7 +78,7 @@ public class Wingpanel.BasePanel : Gtk.Window {
             set_struts ();
         }
 
-        var ctx = get_style_context ();
+        var ctx = get_draw_style_context ();
         ctx.render_background (cr, size.x, size.y, size.width, size.height);
 
         // Slide in

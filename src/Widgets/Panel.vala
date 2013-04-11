@@ -55,6 +55,10 @@ namespace Wingpanel {
             load_indicators ();
         }
 
+        protected override Gtk.StyleContext get_draw_style_context () {
+            return menubar.get_style_context ();
+        }
+
         private void load_indicators () {
             var indicators = indicator_factory.get_indicators ();
 
