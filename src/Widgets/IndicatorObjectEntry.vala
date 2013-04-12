@@ -18,13 +18,10 @@
   END LICENSE
 ***/
 
-using Gdk;
-
 namespace  Wingpanel 
 {
     public class IndicatorObjectEntry: IndicatorButton, IndicatorWidget {
         private unowned Indicator.ObjectEntry entry;
-        private Indicator.Object object;
         private IndicatorIface indicator;
 
         // used for drawing
@@ -49,9 +46,8 @@ namespace  Wingpanel
              }
          """;
 
-        public IndicatorObjectEntry (Indicator.ObjectEntry entry, Indicator.Object object, IndicatorIface indicator) {
+        public IndicatorObjectEntry (Indicator.ObjectEntry entry, IndicatorIface indicator) {
             this.entry = entry;
-            this.object = object;
             this.indicator = indicator;
 
             if (entry.image != null && entry.image is Gtk.Image) {
@@ -151,7 +147,7 @@ namespace  Wingpanel
             return entry.name_hint;
         }
 
-        void cairo_popover (int w, int h) {
+        private void cairo_popover (int w, int h) {
             w = w - 20;
             h = h - 20;
 
@@ -183,12 +179,34 @@ namespace  Wingpanel
             buffer.context.close_path ();
         }
 
-        private bool on_scroll_event (EventScroll event) {
-            //Signal.emit_by_name (object, "scroll", 1, event.direction);
-            object.entry_scrolled (entry, 1, (Indicator.ScrollDirection) event.direction);
+        private bool on_scroll_event (Gdk.EventScroll event) {
+            var direction = Indicator.ScrollDirection.UP;
+            double delta = 0;
+
+            switch (event.direction) {
+                case Gdk.ScrollDirection.UP:
+                    delta = event.delta_y;
+                    direction = Indicator.ScrollDirection.UP;
+                    break;
+                case Gdk.ScrollDirection.DOWN:
+                    delta = event.delta_y;
+                    direction = Indicator.ScrollDirection.DOWN;
+                    break;
+                case Gdk.ScrollDirection.LEFT:
+                    delta = event.delta_x;
+                    direction = Indicator.ScrollDirection.LEFT;
+                    break;
+                case Gdk.ScrollDirection.RIGHT:
+                    delta = event.delta_x;
+                    direction = Indicator.ScrollDirection.RIGHT;
+                    break;
+                default:
+                    break;
+            }
+
+            entry.parent_object.entry_scrolled (entry, (uint) delta, direction);
 
             return false;
         }
-
     }
 }

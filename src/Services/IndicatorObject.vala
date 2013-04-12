@@ -30,9 +30,6 @@ public class Wingpanel.IndicatorObject : Object, IndicatorIface {
 
         object.entry_added.connect (on_entry_added);
         object.entry_removed.connect (on_entry_removed);
-        //object.ref ();
-
-        message ("Loaded indicator %s", get_name ());
     }
 
     public string get_name () {
@@ -69,6 +66,6 @@ public class Wingpanel.IndicatorObject : Object, IndicatorIface {
     }
 
     private IndicatorWidget create_entry (Indicator.ObjectEntry entry) {
-        return new IndicatorObjectEntry (entry, object, this);
+        return new IndicatorObjectEntry (entry, this);
     }
 }
