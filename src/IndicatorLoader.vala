@@ -15,29 +15,6 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-public class Wingpanel.IndicatorFactory {
-    private IndicatorModel model;
-    private Gee.Collection<IndicatorIface> indicators;
-    private bool initted = false;
-
-    public IndicatorFactory (Settings settings) {
-        model = new IndicatorsFileModel (settings);
-    }
-
-    public Gee.Collection<IndicatorIface> get_indicators () {
-        if (!initted) {
-            load_indicators ();
-            initted = true;
-        }
-
-        return indicators.read_only_view;
-    }
-
-    private void load_indicators () {
-        indicators = new Gee.LinkedList<IndicatorIface> ();
-        var indicators_list = model.get_indicators ();
-
-        foreach (var indicator in indicators_list)
-            indicators.add (new IndicatorObject (indicator, model));
-    }
+public interface Wingpanel.IndicatorLoader : Object {
+    public abstract Gee.Collection<IndicatorIface> get_indicators ();
 }

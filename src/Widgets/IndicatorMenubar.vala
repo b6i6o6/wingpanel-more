@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-public class Wingpanel.IndicatorMenubar : MenuBar {
+public class Wingpanel.Widgets.IndicatorMenubar : MenuBar {
     private List<IndicatorWidget> sorted_items;
     private bool update_pending = false;
 

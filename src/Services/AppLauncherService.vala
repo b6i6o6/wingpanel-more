@@ -16,10 +16,10 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-namespace Wingpanel {
+namespace Wingpanel.Services {
 
     [DBus (name = "org.pantheon.desktop.AppLauncherService")]
-    private interface AppLauncherIface : Object {
+    interface AppLauncherIface : Object {
         public signal void visibility_changed (bool launcher_visible);
     }
 

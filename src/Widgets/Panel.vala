@@ -18,7 +18,7 @@
   END LICENSE
 ***/
 
-namespace Wingpanel {
+namespace Wingpanel.Widgets {
 
     public class Panel : BasePanel {
         private Gtk.Box container;
@@ -29,12 +29,12 @@ namespace Wingpanel {
         private MenuBar clock;
         private MenuBar apps_menubar;
 
-        private IndicatorFactory indicator_factory;
+        private IndicatorLoader indicator_loader;
 
-        public Panel (WingpanelApp app, Settings settings, IndicatorFactory indicator_factory) {
+        public Panel (WingpanelApp app, Services.Settings settings, IndicatorLoader indicator_loader) {
             set_application (app as Gtk.Application);
 
-            this.indicator_factory = indicator_factory;
+            this.indicator_loader = indicator_loader;
 
             container = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
             left_wrapper = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
@@ -60,7 +60,7 @@ namespace Wingpanel {
         }
 
         private void load_indicators () {
-            var indicators = indicator_factory.get_indicators ();
+            var indicators = indicator_loader.get_indicators ();
 
             foreach (var indicator in indicators)
                 load_indicator (indicator);
@@ -88,7 +88,7 @@ namespace Wingpanel {
             parent.remove (entry);
         }
 
-        private void add_defaults (Settings settings) {
+        private void add_defaults (Services.Settings settings) {
             // Add Apps button
             apps_menubar = new MenuBar ();
             var apps_button = new Widgets.AppsButton (settings);

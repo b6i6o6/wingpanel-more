@@ -30,10 +30,10 @@ namespace Wingpanel.Widgets {
             }
         }
 
-        private AppLauncherService? launcher_service = null;
-        private Settings settings;
+        private Services.AppLauncherService? launcher_service = null;
+        private Services.Settings settings;
 
-        public AppsButton (Settings settings) {
+        public AppsButton (Services.Settings settings) {
             this.settings = settings;
             this.can_focus = true;
 
@@ -42,7 +42,7 @@ namespace Wingpanel.Widgets {
 
             get_style_context ().add_class (StyleClass.APP_BUTTON);
 
-            launcher_service = new AppLauncherService (settings);
+            launcher_service = new Services.AppLauncherService (settings);
             launcher_service.launcher_state_changed.connect (on_launcher_state_changed);
 
             this.button_press_event.connect (() => {

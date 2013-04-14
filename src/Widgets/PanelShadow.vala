@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-public class Wingpanel.PanelShadow : Granite.Widgets.CompositedWindow {
+public class Wingpanel.Widgets.PanelShadow : Granite.Widgets.CompositedWindow {
     private const string DEFAULT_THEME = """
         .panel-shadow {
             background-color: @transparent;

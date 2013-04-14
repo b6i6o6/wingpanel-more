@@ -15,12 +15,12 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-public class Wingpanel.IndicatorObject : Object, IndicatorIface {
-    private IndicatorModel model;
+public class Wingpanel.Backend.IndicatorObject : Object, IndicatorIface {
+    private IndicatorFileModel model;
     private Indicator.Object object;
     private Gee.HashMap<unowned Indicator.ObjectEntry, IndicatorWidget> entries;
 
-    public IndicatorObject (Indicator.Object object, IndicatorModel model) {
+    public IndicatorObject (Indicator.Object object, IndicatorFileModel model) {
         this.object = object;
         this.model = model;
 

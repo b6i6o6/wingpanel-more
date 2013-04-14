@@ -18,7 +18,7 @@
   END LICENSE
 ***/
 
-namespace Wingpanel {
+namespace Wingpanel.Services {
     public class Settings : Granite.Services.Settings {
         public string[] blacklist { get; set; }
         public bool show_launcher { get; set; }

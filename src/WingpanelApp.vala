@@ -21,9 +21,9 @@
 namespace Wingpanel {
 
     public class WingpanelApp : Granite.Application {
-        private IndicatorFactory indicator_factory;
-        private Settings settings;
-        private Panel panel;
+        private IndicatorLoader indicator_loader;
+        private Services.Settings settings;
+        private Widgets.BasePanel panel;
 
         construct {
             build_data_dir = Build.DATADIR;
@@ -45,9 +45,9 @@ namespace Wingpanel {
         }
 
         private void init () {
-            settings = new Settings ();
-            indicator_factory = new IndicatorFactory (settings);
-            panel = new Panel (this, settings, indicator_factory);
+            settings = new Services.Settings ();
+            indicator_loader = new Backend.IndicatorFactory (settings);
+            panel = new Widgets.Panel (this, settings, indicator_loader);
 
             panel.show_all ();
         }

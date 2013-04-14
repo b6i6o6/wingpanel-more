@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace Wingpanel.StyleClass {
+namespace Wingpanel.Widgets.StyleClass {
     public const string PANEL = "panel";
     public const string SHADOW = "panel-shadow";
     public const string APP_BUTTON = "panel-app-button";

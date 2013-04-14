@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-public class Wingpanel.MenuBar : Gtk.MenuBar {
+public class Wingpanel.Widgets.MenuBar : Gtk.MenuBar {
     public MenuBar () {
         can_focus = true;
         border_width = 0;

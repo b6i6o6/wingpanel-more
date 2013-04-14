@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-public class Wingpanel.LauncherRunner {
+public class Wingpanel.Services.LauncherRunner {
     private Settings settings;
     
     public LauncherRunner (Settings settings) {

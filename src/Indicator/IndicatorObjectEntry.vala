@@ -18,9 +18,9 @@
   END LICENSE
 ***/
 
-namespace  Wingpanel 
+namespace Wingpanel.Backend
 {
-    public class IndicatorObjectEntry: IndicatorButton, IndicatorWidget {
+    public class IndicatorObjectEntry: Widgets.IndicatorButton, IndicatorWidget {
         private unowned Indicator.ObjectEntry entry;
         private IndicatorIface indicator;
 

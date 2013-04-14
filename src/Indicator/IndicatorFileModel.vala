@@ -20,13 +20,13 @@
   Authored by canonical.com
 ***/
 
-namespace Wingpanel {
+namespace Wingpanel.Backend {
 
-    public class IndicatorsFileModel : Object, IndicatorModel {
+    public class IndicatorFileModel {
         private Gee.HashMap<Indicator.Object, string> indicator_map;
         private Gee.ArrayList<Indicator.Object> indicator_list;
 
-        public IndicatorsFileModel (Settings settings) {
+        public IndicatorFileModel (Services.Settings settings) {
             indicator_map = new Gee.HashMap<Indicator.Object, string> ();
             indicator_list = new Gee.ArrayList<Indicator.Object> ();
 
