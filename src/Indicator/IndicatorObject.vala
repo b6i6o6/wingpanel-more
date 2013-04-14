@@ -32,6 +32,11 @@ public class Wingpanel.Backend.IndicatorObject : Object, IndicatorIface {
         object.entry_removed.connect (on_entry_removed);
     }
 
+    ~IndicatorObject () {
+        object.entry_added.disconnect (on_entry_added);
+        object.entry_removed.disconnect (on_entry_removed);
+    }
+
     public string get_name () {
         return name;
     }
