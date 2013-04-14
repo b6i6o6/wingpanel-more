@@ -22,7 +22,7 @@
  * to be static in order to work properly, since instance methods cannot
  * be passed as CompareFuncs.
  */
-public class Wingpanel.IndicatorSorter {
+public class Wingpanel.Services.IndicatorSorter {
     private struct IndicatorOrderNode {
         public string name;        // name of indicator (library)
         public string? entry_name; // name of entry (menu item)

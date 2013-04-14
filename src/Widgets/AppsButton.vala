@@ -45,11 +45,6 @@ namespace Wingpanel.Widgets {
             launcher_service = new Services.AppLauncherService (settings);
             launcher_service.launcher_state_changed.connect (on_launcher_state_changed);
 
-            this.button_press_event.connect (() => {
-                launcher_service.launch_launcher ();
-                return false;
-            });
-
             on_settings_update ();
             settings.changed.connect (on_settings_update);
         }
@@ -57,6 +52,11 @@ namespace Wingpanel.Widgets {
         private void on_launcher_state_changed (bool visible) {
             debug ("Launcher visibility changed to %s", visible.to_string ());
             active = visible;
+        }
+
+        public override bool button_press_event (Gdk.EventButton event) {
+            launcher_service.launch_launcher ();
+            return true;
         }
 
         /**

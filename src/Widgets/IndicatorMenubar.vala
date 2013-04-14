@@ -27,7 +27,7 @@ public class Wingpanel.Widgets.IndicatorMenubar : MenuBar {
         if (sorted_items.index (item) > 0)
             return; // item already added
 
-        sorted_items.insert_sorted (item, (CompareFunc) IndicatorSorter.compare_func);
+        sorted_items.insert_sorted (item, (CompareFunc) Services.IndicatorSorter.compare_func);
 
         apply_new_order.begin ();
     }
