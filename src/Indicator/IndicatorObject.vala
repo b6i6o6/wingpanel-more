@@ -16,13 +16,13 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 public class Wingpanel.Backend.IndicatorObject : Object, IndicatorIface {
-    private IndicatorFileModel model;
     private Indicator.Object object;
     private Gee.HashMap<unowned Indicator.ObjectEntry, IndicatorWidget> entries;
+    private string name;
 
-    public IndicatorObject (Indicator.Object object, IndicatorFileModel model) {
+    public IndicatorObject (Indicator.Object object, string name) {
         this.object = object;
-        this.model = model;
+        this.name = name;
 
         entries = new Gee.HashMap<unowned Indicator.ObjectEntry, IndicatorWidget> ();
 
@@ -33,7 +33,7 @@ public class Wingpanel.Backend.IndicatorObject : Object, IndicatorIface {
     }
 
     public string get_name () {
-        return model.get_indicator_name (object);
+        return name;
     }
 
     public Gee.Collection<IndicatorWidget> get_entries () {
