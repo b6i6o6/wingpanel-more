@@ -37,6 +37,7 @@ public class Wingpanel.IndicatorSorter {
         { "libnetworkmenu.so", null },                   // indicator-network
         { "libapplication.so", "nm-applet" },            // network manager
         { "libbluetooth.so", null },                     // indicator-bluetooth
+        { "libapplication.so", "bluetooth-manager" },    // indicator-gnome-bluetooth (old)
         { "libprintersmenu.so", null },                  // indicator-printers
         { "libsyncindicator.so", null },                 // indicator-sync
         { "libpower.so", null },                         // indicator-power
