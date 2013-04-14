@@ -50,81 +50,41 @@ namespace  Wingpanel
             this.entry = entry;
             this.indicator = indicator;
 
-            if (entry.image != null && entry.image is Gtk.Image) {
-                debug ("Indicator: %s (%s) has attribute image", indicator.get_name (), get_entry_name ());
-                set_widget (WidgetSlot.IMAGE, entry.image);
-            }
+            string indicator_name = indicator.get_name ();
+            string entry_name = get_entry_name ();
 
-            if (entry.label != null && entry.label is Gtk.Label) {
-                debug ("Indicator: %s (%s) has attribute label", indicator.get_name (), get_entry_name ());
-                set_widget (WidgetSlot.LABEL, entry.label);
-            }
+            var image = entry.image;
+            if (image != null && image is Gtk.Image)
+                set_widget (WidgetSlot.IMAGE, image);
+
+            var label = entry.label;
+            if (label != null && label is Gtk.Label)
+                set_widget (WidgetSlot.LABEL, label);
 
             show ();
 
-            if (entry.menu == null)
+            if (entry.menu == null) {
+                critical ("Indicator: %s (%s) has no menu widget.", indicator_name, entry_name);
                 return;
+            }
 
             set_submenu (entry.menu);
 
-            scroll_event.connect (on_scroll_event);
+            setup_drawing ();
+        }
+
+        public IndicatorIface get_indicator () {
+            return indicator;
+        }
+
+        public string get_entry_name () {
+            return entry.name_hint;
+        }
+
+        private void setup_drawing () {
+            setup_entry_menu_parent ();
 
             buffer = new Granite.Drawing.BufferSurface (100, 100);
-
-            entry.menu.get_parent ().app_paintable = true;
-            entry.menu.get_parent ().set_visual (Gdk.Screen.get_default ().get_rgba_visual ());
-
-            entry.menu.get_parent ().size_allocate.connect (() => {
-                /*entry.menu.margin_left = 10;
-                entry.menu.margin_right = 9;
-                FIXME => This is what we want to get, but to solve spacing issues we do this:*/
-                entry.menu.get_children ().foreach ((c) => {
-                    c.margin_left = 10;
-                    c.margin_right = 9;
-                }); //make sure it is always right
-            });
-
-            entry.menu.get_parent ().draw.connect ((ctx) => {
-                var new_w  = entry.menu.get_parent ().get_allocated_width ();
-                var new_h = entry.menu.get_parent ().get_allocated_height ();
-                if (new_w != w || new_h != h) {
-                    w = new_w;
-                    h = new_h;
-
-                    buffer = new Granite.Drawing.BufferSurface (w, h);
-                    cairo_popover (w, h);
-
-                    var cr = buffer.context;
-
-                    //shadow
-                    cr.set_source_rgba (0, 0, 0, 0.5);
-                    cr.fill_preserve ();
-                    buffer.exponential_blur (6);
-                    cr.clip ();
-
-                    //background
-                    menu.get_style_context ().render_background (cr, 0, 0, w, h);
-                    cr.reset_clip ();
-
-                    //border
-                    cairo_popover (w, h);
-                    cr.set_operator (Cairo.Operator.SOURCE);
-                    cr.set_line_width (1);
-                    Gdk.cairo_set_source_rgba (cr, menu.get_style_context ().get_border_color (Gtk.StateFlags.NORMAL));
-                    cr.stroke ();
-                }
-
-                //clear surface to transparent
-                ctx.set_operator (Cairo.Operator.SOURCE);
-                ctx.set_source_rgba (0, 0, 0, 0);
-                ctx.paint ();
-
-                //now paint our buffer on
-                ctx.set_source_surface (buffer.surface, 0, 0);
-                ctx.paint ();
-                
-                return false;
-            });
 
             entry.menu.margin_top = 28;
             entry.menu.margin_bottom = 18;
@@ -139,12 +99,68 @@ namespace  Wingpanel
                                                Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
         }
 
-        public IndicatorIface get_indicator () {
-            return indicator;
+        private void setup_entry_menu_parent () {
+            var menu_parent = entry.menu.get_parent ();
+            menu_parent.app_paintable = true;
+            menu_parent.set_visual (Gdk.Screen.get_default ().get_rgba_visual ());
+
+            menu_parent.size_allocate.connect (entry_menu_parent_size_allocate);
+            menu_parent.draw.connect (entry_menu_parent_draw_callback);
         }
 
-        public string get_entry_name () {
-            return entry.name_hint;
+        private void entry_menu_parent_size_allocate (Gtk.Allocation alloc) {
+            /* entry.menu.margin_left = 10;
+               entry.menu.margin_right = 9;
+               FIXME => This is what we want to get, but to solve spacing issues we do this: */
+
+            entry.menu.get_children ().foreach ((c) => {
+                // make sure it is always right
+                c.margin_left = 10;
+                c.margin_right = 9;
+            });
+        }
+
+        private bool entry_menu_parent_draw_callback (Cairo.Context ctx) {
+            var new_w  = entry.menu.get_parent ().get_allocated_width ();
+            var new_h = entry.menu.get_parent ().get_allocated_height ();
+
+            if (new_w != w || new_h != h) {
+                w = new_w;
+                h = new_h;
+
+                buffer = new Granite.Drawing.BufferSurface (w, h);
+                cairo_popover (w, h);
+
+                var cr = buffer.context;
+
+                // shadow
+                cr.set_source_rgba (0, 0, 0, 0.5);
+                cr.fill_preserve ();
+                buffer.exponential_blur (6);
+                cr.clip ();
+
+                // background
+                menu.get_style_context ().render_background (cr, 0, 0, w, h);
+                cr.reset_clip ();
+
+                // border
+                cairo_popover (w, h);
+                cr.set_operator (Cairo.Operator.SOURCE);
+                cr.set_line_width (1);
+                Gdk.cairo_set_source_rgba (cr, menu.get_style_context ().get_border_color (Gtk.StateFlags.NORMAL));
+                cr.stroke ();
+            }
+
+            // clear surface to transparent
+            ctx.set_operator (Cairo.Operator.SOURCE);
+            ctx.set_source_rgba (0, 0, 0, 0);
+            ctx.paint ();
+
+            // now paint our buffer on
+            ctx.set_source_surface (buffer.surface, 0, 0);
+            ctx.paint ();
+            
+            return false;
         }
 
         private void cairo_popover (int w, int h) {
@@ -179,7 +195,7 @@ namespace  Wingpanel
             buffer.context.close_path ();
         }
 
-        private bool on_scroll_event (Gdk.EventScroll event) {
+        public override bool scroll_event (Gdk.EventScroll event) {
             var direction = Indicator.ScrollDirection.UP;
             double delta = 0;
 
