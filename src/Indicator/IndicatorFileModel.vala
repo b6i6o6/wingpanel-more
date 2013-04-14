@@ -24,11 +24,9 @@ namespace Wingpanel.Backend {
 
     public class IndicatorFileModel {
         private Gee.HashMap<Indicator.Object, string> indicator_map;
-        private Gee.ArrayList<Indicator.Object> indicator_list;
 
         public IndicatorFileModel (Services.Settings settings) {
             indicator_map = new Gee.HashMap<Indicator.Object, string> ();
-            indicator_list = new Gee.ArrayList<Indicator.Object> ();
 
             // Indicators we don't want to load
             string skip_list = Environment.get_variable ("UNITY_PANEL_INDICATORS_SKIP") ?? "";
@@ -74,8 +72,8 @@ namespace Wingpanel.Backend {
                 load_indicator (dir.get_child (leaf).get_path (), leaf);
         }
 
-        public Gee.ArrayList<Indicator.Object> get_indicators () {
-            return indicator_list;
+        public Gee.Collection<Indicator.Object> get_indicators () {
+            return indicator_map.keys;
         }
 
         public string get_indicator_name (Indicator.Object indicator) {
@@ -87,12 +85,10 @@ namespace Wingpanel.Backend {
 
             var indicator = new Indicator.Object.from_file (filename);
 
-            if (indicator is Indicator.Object) {
+            if (indicator is Indicator.Object)
                 indicator_map.set (indicator, leaf);
-                indicator_list.add (indicator);
-            } else {
-                error ("Unable to load %s", filename);
-            }
+            else
+                critical ("Unable to load %s", filename);
         }
     }
 }
