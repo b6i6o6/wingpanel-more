@@ -15,6 +15,7 @@ enable_testing ()
 set (DATADIR "${CMAKE_INSTALL_PREFIX}/share")
 set (PKGDATADIR "${DATADIR}/wingpanel")
 set (GETTEXT_PACKAGE "wingpanel")
+set (EXEC_NAME "wingpanel")
 set (RELEASE_NAME "A super sexy space-saving top panel.")
 set (VERSION "0.4.0")
 set (VERSION_INFO "Testing")
@@ -38,11 +39,9 @@ find_package (PkgConfig)
 pkg_check_modules (DEPS REQUIRED ${WINGPANEL_DEPS})
 pkg_check_modules (DEPS_NOVALA REQUIRED ${WINGPANEL_DEPS_NOVALA})
 
-
 list (APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
 # Static Files
-file (GLOB stylesheets "${CMAKE_CURRENT_SOURCE_DIR}/data/style/*.css")
 file (GLOB desktop_entry "${CMAKE_CURRENT_SOURCE_DIR}/data/wingpanel.desktop")
 file (GLOB icon "${CMAKE_CURRENT_SOURCE_DIR}/data/wingpanel.svg")
 
@@ -66,16 +65,30 @@ include(ValaVersion)
 ensure_vala_version("0.16.0" MINIMUM)
 
 include(ValaPrecompile)
-vala_precompile (VALA_C
-    src/Settings.vala
-    src/Utils.vala
+vala_precompile (VALA_C ${EXEC_NAME}
     src/WingpanelApp.vala
+    src/IndicatorWidget.vala
+    src/IndicatorIface.vala
+    src/IndicatorLoader.vala
+
+    src/Indicator/IndicatorFileModel.vala
+    src/Indicator/IndicatorObjectEntry.vala
+    src/Indicator/IndicatorObject.vala
+    src/Indicator/IndicatorFactory.vala
+
     src/Widgets/Panel.vala
+    src/Widgets/BasePanel.vala
+    src/Widgets/PanelShadow.vala
     src/Widgets/IndicatorButton.vala
     src/Widgets/AppsButton.vala
-    src/Services/WingpanelObjectEntry.vala
-    src/Services/IndicatorFileModel.vala
+    src/Widgets/MenuBar.vala
+    src/Widgets/IndicatorMenubar.vala
+    src/Widgets/StyleClass.vala
+
+    src/Services/Settings.vala
     src/Services/AppLauncherService.vala
+    src/Services/LauncherRunner.vala
+    src/Services/IndicatorSorter.vala
 PACKAGES
 	${WINGPANEL_DEPS}
 CUSTOM_VAPIS
@@ -93,10 +106,9 @@ add_schema ("org.pantheon.desktop.wingpanel.gschema.xml")
 add_subdirectory (po)
 
 # Create the Executable
-add_executable(wingpanel ${VALA_C})
+add_executable(${EXEC_NAME} ${VALA_C})
 
 # Installation
-install (TARGETS wingpanel RUNTIME DESTINATION bin)
-install (FILES ${stylesheets} DESTINATION ${PKGDATADIR}/style)
+install (TARGETS ${EXEC_NAME} RUNTIME DESTINATION bin)
 install (FILES ${desktop_entry} DESTINATION ${DATADIR}/applications)
 install (FILES ${icon} DESTINATION ${DATADIR}/icons/hicolor/scalable/apps)

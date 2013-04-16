@@ -18,310 +18,98 @@
   END LICENSE
 ***/
 
-using Gtk;
-using Gdk;
-using Cairo;
+namespace Wingpanel.Widgets {
 
-using Granite;
-using Granite.Services;
+    public class Panel : BasePanel {
+        private Gtk.Box container;
+        private Gtk.Box left_wrapper;
+        private Gtk.Box right_wrapper;
 
-namespace Wingpanel {
-
-    public enum Struts {
-        LEFT,
-        RIGHT,
-        TOP,
-        BOTTOM,
-        LEFT_START,
-        LEFT_END,
-        RIGHT_START,
-        RIGHT_END,
-        TOP_START,
-        TOP_END,
-        BOTTOM_START,
-        BOTTOM_END,
-        N_VALUES
-    }
-
-    private class Shadow : Granite.Widgets.CompositedWindow {
-
-        private MenuBar menubar;
-
-        public Shadow () {
-            menubar = new MenuBar ();
-
-            skip_taskbar_hint = true; // no taskbar
-            //skip_pager_hint = true;
-            menubar.get_style_context ().add_class ("shadow");
-            set_type_hint (WindowTypeHint.DOCK);
-            set_keep_below (true);
-            stick ();
-
-        }
-
-        protected override bool draw (Context cr) {
-            Allocation size;
-            get_allocation (out size);
-
-            var ctx = menubar.get_style_context ();
-            render_background (ctx, cr, size.x, size.y,
-                               size.width, size.height);
-
-            return true;
-        }
-
-    }
-
-    public class Panel : Gtk.Window {
-
-        private const int shadow_size = 4;
-
-        private int panel_height = 24;
-        private int panel_x;
-        private int panel_y;
-        private int panel_width;
-        private uint animation_timer = 0;
-        private int panel_displacement = -40;
-
-        private Box container;
-        private Box left_wrapper;
-        private Box right_wrapper;
-        private MenuBar menubar;
+        private IndicatorMenubar menubar;
         private MenuBar clock;
         private MenuBar apps_menubar;
 
-        private Shadow shadow;
-        private IndicatorsModel model;
-        private Gee.HashMap<string, Gtk.MenuItem> menuhash;
+        private IndicatorLoader indicator_loader;
 
-        private WingpanelApp app;
-
-        public Panel (WingpanelApp app) {
-            /* TODO: Clean Up Code and add the this reference where used */
-            this.app = app;
+        public Panel (WingpanelApp app, Services.Settings settings, IndicatorLoader indicator_loader) {
             set_application (app as Gtk.Application);
 
-            //Window properties
-            skip_taskbar_hint = true; // no taskbar
-            decorated = false; // no window decoration
-            app_paintable = true;
-            set_visual (get_screen ().get_rgba_visual ());
-            set_type_hint (WindowTypeHint.DOCK);
-            get_style_context ().add_provider_for_screen (this.get_screen (), app.provider, Gtk.STYLE_PROVIDER_PRIORITY_FALLBACK);
+            this.indicator_loader = indicator_loader;
 
-            shadow = new Shadow ();
-
-            panel_resize (false);
-            /* update the panel size on screen size or monitor changes */
-            screen.size_changed.connect (() => {
-                panel_resize (true);
-            });
-            screen.monitors_changed.connect (() => {
-                panel_resize (true);
-            });
-
-            menuhash = new Gee.HashMap<string, Gtk.MenuItem> ();
-
-            // HBox container
-            container = new Box (Orientation.HORIZONTAL, 0);
-            left_wrapper = new Box (Orientation.HORIZONTAL, 0);
-            right_wrapper = new Box (Orientation.HORIZONTAL, 0);
+            container = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+            left_wrapper = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+            right_wrapper = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
             container.set_homogeneous (false);
             left_wrapper.set_homogeneous (false);
             right_wrapper.set_homogeneous (false);
-            resizable = false;
 
             add (container);
 
+            var style_context = get_style_context ();
+            style_context.add_class (StyleClass.PANEL);
+            style_context.add_class (Gtk.STYLE_CLASS_MENUBAR);
+
             // Add default widgets
-            add_defaults ();
+            add_defaults (settings);
 
-            model = IndicatorsModel.get_default ();
-            var indicators_list = model.get_indicators ();
-
-            foreach (Indicator.Object o in indicators_list) {
-                 load_indicator (o);
-            }
-
-            // Signals
-            realize.connect (() => { panel_resize(false);});
-            destroy.connect (Gtk.main_quit);
-
+            load_indicators ();
         }
 
-        private void panel_resize (bool redraw)  {
-
-            Gdk.Rectangle monitor_dimensions;
-
-            screen.get_monitor_geometry (this.screen.get_primary_monitor(), out monitor_dimensions);
-
-            this.panel_x = monitor_dimensions.x;
-            this.panel_y = monitor_dimensions.y;
-            this.panel_width = monitor_dimensions.width;
-
-            this.move (panel_x, panel_y + panel_displacement);
-            shadow.move (panel_x, panel_y + panel_height + panel_displacement);
-
-            this.set_size_request (this.panel_width, -1);
-            shadow.set_size_request (this.panel_width, this.shadow_size);
-
-            set_struts ();
-            if (redraw)
-                queue_draw ();
+        protected override Gtk.StyleContext get_draw_style_context () {
+            return menubar.get_style_context ();
         }
 
-        private void create_entry (Indicator.ObjectEntry entry,
-                                   Indicator.Object      object) {
+        private void load_indicators () {
+            var indicators = indicator_loader.get_indicators ();
 
-            //delete_entry(entry, object);
-            Gtk.MenuItem menuitem = new IndicatorObjectEntry (entry, object);
-            menuhash[model.get_indicator_name(object)] = menuitem;
-
-            if (model.get_indicator_name(object) == "libdatetime.so") { // load libdatetime in center
-                /* Bold clock label font */
-                var font = new Pango.FontDescription ();
-                font.set_weight (Pango.Weight.HEAVY);
-                var box = menuitem.get_child () as Gtk.Container;
-                box.get_children ().nth_data (0).modify_font (font);
-                clock.prepend(menuitem);
-            } else {
-                menubar.prepend (menuitem);
-            }
-
+            foreach (var indicator in indicators)
+                load_indicator (indicator);
         }
 
-        private void delete_entry (Indicator.ObjectEntry entry,
-                                   Indicator.Object     object) {
+        private void load_indicator (IndicatorIface indicator) {
+            var entries = indicator.get_entries ();
 
-            if (menuhash.has_key(model.get_indicator_name(object))) {
-                var menuitem = menuhash[model.get_indicator_name(object)];
-                this.menubar.remove (menuitem);
+            foreach (var entry in entries)
+                create_entry (entry);
 
-            }
+            indicator.entry_added.connect (create_entry);
+            indicator.entry_removed.connect (delete_entry);
         }
 
-        private void on_entry_added (Indicator.Object      object,
-                                     Indicator.ObjectEntry entry) {
-
-            create_entry (entry, object);
+        private void create_entry (IndicatorWidget entry) {
+            if (entry.get_indicator ().get_name () == "libdatetime.so")
+                clock.prepend (entry);
+            else
+                menubar.insert_sorted (entry);
         }
 
-        private void on_entry_removed (Indicator.Object      object,
-                                       Indicator.ObjectEntry entry) {
-
-            delete_entry (entry, object);
+        private void delete_entry (IndicatorWidget entry) {
+            var parent = entry.parent;
+            parent.remove (entry);
         }
 
-        public void load_indicator (Indicator.Object indicator) {
-            if (indicator is Indicator.Object) {
-                indicator.entry_added.connect (this.on_entry_added);
-                indicator.entry_removed.connect (this.on_entry_removed);
-                indicator.ref();
-
-                GLib.List<unowned Indicator.ObjectEntry> list = indicator.get_entries ();
-                list.foreach ((entry) => create_entry (entry, indicator));
-
-                message ("Loaded indicator %s", model.get_indicator_name (indicator));
-            } else {
-                warning ("Unable to load %s", model.get_indicator_name (indicator));
-            }
-        }
-
-        private void add_defaults () {
+        private void add_defaults (Services.Settings settings) {
             // Add Apps button
-            apps_menubar = new Gtk.MenuBar ();
-            apps_menubar.get_style_context ().add_class (COMPOSITED_INDICATOR_STYLE_CLASS);
-            apps_menubar.append (new Widgets.AppsButton ());
+            apps_menubar = new MenuBar ();
+            var apps_button = new Widgets.AppsButton (settings);
+            apps_menubar.append (apps_button);
+
             left_wrapper.pack_start (apps_menubar, false, true, 0);
 
             container.pack_start (left_wrapper);
 
-            clock = new Gtk.MenuBar ();
-            clock.can_focus = true;
-            clock.border_width = 0;
-            clock.get_style_context ().add_class (COMPOSITED_INDICATOR_STYLE_CLASS);
+            clock = new MenuBar ();
             container.pack_start (clock, false, false, 0);
 
-            /* Menubar for storing indicators */
-            menubar = new Gtk.MenuBar ();
-            menubar.can_focus = true;
-            menubar.border_width = 0;
-            menubar.get_style_context ().add_class (COMPOSITED_INDICATOR_STYLE_CLASS);
+            // Menubar for storing indicators
+            menubar = new IndicatorMenubar ();
+
             right_wrapper.pack_end (menubar, false, false, 0);
             container.pack_end (right_wrapper);
 
-            get_style_context ().add_class ("menubar");
-            get_style_context ().add_class ("panel");
-
-            SizeGroup gpr = new SizeGroup (SizeGroupMode.HORIZONTAL);
+            var gpr = new Gtk.SizeGroup (Gtk.SizeGroupMode.HORIZONTAL);
             gpr.add_widget (left_wrapper);
             gpr.add_widget (right_wrapper);
-        }
-
-        protected override bool draw (Context cr) {
-            Allocation size;
-            this.get_allocation (out size);
-
-            if(this.panel_height != size.height) {
-                this.panel_height = size.height;
-                warning("Panel Height: "+size.height.to_string());
-                shadow.move (this.panel_x, this.panel_y + this.panel_height + this.panel_displacement);
-                set_struts();
-            }
-
-            var ctx = menubar.get_style_context ();
-            render_background (ctx, cr, size.x, size.y,
-                               size.width, size.height);
-
-            // Slide in
-            if (animation_timer == 0) {
-                this.panel_displacement = -this.panel_height;
-
-                animation_timer = GLib.Timeout.add (300 / this.panel_height, () => {
-                    if (this.panel_displacement >= 0 ) {
-                        return false;
-                    } else {
-                        this.panel_displacement += 1;
-                        this.move (this.panel_x, this.panel_y + this.panel_displacement);
-                        shadow.move (this.panel_x, this.panel_y + this.panel_height + this.panel_displacement);
-                        return true;
-                    }
-                });
-            }
-
-            propagate_draw (container, cr);
-
-            if (!shadow.visible)
-                shadow.show_all ();
-
-            return true;
-        }
-
-        private void set_struts () {
-            if (!get_realized ()) {
-                return;
-            }
-
-            // since uchar is 8 bits in vala but the struts are 32 bits
-            // we have to allocate 4 times as much and do bit-masking
-            var struts = new ulong[Struts.N_VALUES];
-
-            struts[Struts.TOP] = this.panel_height + this.panel_y;
-            struts[Struts.TOP_START] = this.panel_x;
-            struts[Struts.TOP_END] = this.panel_x + this.panel_width;
-
-            var first_struts = new ulong [Struts.BOTTOM + 1];
-            for (var i = 0; i < first_struts.length; i++) {
-                first_struts [i] = struts [i];
-            }
-
-            unowned X.Display display = X11Display.get_xdisplay (get_display ());
-            var xid = X11Window.get_xid(get_window ());
-
-            display.change_property (xid, display.intern_atom ("_NET_WM_STRUT_PARTIAL", false), X.XA_CARDINAL,
-                                     32, X.PropMode.Replace, (uchar[]) struts, struts.length);
-            display.change_property (xid, display.intern_atom ("_NET_WM_STRUT", false), X.XA_CARDINAL,
-                                      32, X.PropMode.Replace, (uchar[]) first_struts, first_struts.length);
         }
     }
 }

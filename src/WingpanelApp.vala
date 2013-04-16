@@ -18,19 +18,12 @@
   END LICENSE
 ***/
 
-using Gtk;
-using Granite;
-
 namespace Wingpanel {
 
-    public WingpanelApp app;
-    
     public class WingpanelApp : Granite.Application {
-
-        private Panel panel = null;
-
-        public Settings settings { get; private set; default = null; }
-        public CssProvider provider { get; private set; default = null; }
+        private IndicatorLoader indicator_loader;
+        private Services.Settings settings;
+        private Widgets.BasePanel panel;
 
         construct {
             build_data_dir = Build.DATADIR;
@@ -38,51 +31,29 @@ namespace Wingpanel {
             build_release_name = Build.RELEASE_NAME;
             build_version = Build.VERSION;
             build_version_info = Build.VERSION_INFO;
-            
+
             program_name = "Wingpanel";
             exec_name = "wingpanel";
-            app_copyright = "GPLv3";
-            app_icon = "";
-            app_launcher = "";
             application_id = "net.launchpad.wingpanel";
-            main_url = "https://launchpad.net/wingpanel";
-            bug_url = "https://bugs.launchpad.net/wingpanel";
-            help_url = "https://answers.launchpad.net/wingpanel";
-            translate_url = "https://translations.launchpad.net/wingpanel";
-
-            about_authors = {"Giulio Collura <random.cpp@gmail.com>"};
-            about_artists = {"Daniel Foré <bunny@go-docky.com>"};
-        }
-
-        public WingpanelApp () {
-            debug ("In wingpanel");
-
-            settings = new Settings ();
-            provider = new CssProvider ();
-
-            try {
-                provider.load_from_path (Build.PKGDATADIR + "/style/default.css");
-            } catch (Error e) {
-                warning ("Error: %s\n", e.message);
-            }
-
-            DEBUG = false;
         }
 
         protected override void activate () {
             debug ("Activating");
 
             if (get_windows () == null)
-                panel = new Panel (this);
+                init ();
+        }
+
+        private void init () {
+            settings = new Services.Settings ();
+            indicator_loader = new Backend.IndicatorFactory (settings);
+            panel = new Widgets.Panel (this, settings, indicator_loader);
 
             panel.show_all ();
         }
 
         public static int main (string[] args) {
-            Wingpanel.app = new WingpanelApp ();
-            return Wingpanel.app.run (args);
+            return new WingpanelApp ().run (args);
         }
-
     }
-
 }

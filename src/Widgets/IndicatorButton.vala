@@ -15,21 +15,55 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace Wingpanel {
+public class Wingpanel.Widgets.IndicatorButton : Gtk.MenuItem {
+    public enum WidgetSlot {
+        LABEL,
+        IMAGE
+    }
 
-    public static const string INDICATOR_BUTTON_STYLE_CLASS = "wingpanel-indicator-button";
-    public static const string COMPOSITED_INDICATOR_STYLE_CLASS = "composited-indicator";
+    private Gtk.Widget the_label;
+    private Gtk.Widget the_image;
+    private Gtk.Box box;
 
-    public class Widgets.IndicatorButton : Gtk.MenuItem {
+    public IndicatorButton () {
+        box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+        box.set_homogeneous (false);
+        box.spacing = 2;
 
-        public IndicatorButton () {
-            // Enable scrolling events
-            add_events (Gdk.EventMask.SCROLL_MASK);
+        add (box);
+        box.show ();
 
-            var style_context = get_style_context ();
-            style_context.add_class (COMPOSITED_INDICATOR_STYLE_CLASS);
-            style_context.add_class (INDICATOR_BUTTON_STYLE_CLASS);
+        get_style_context ().add_class (StyleClass.COMPOSITED_INDICATOR);
+
+        // Enable scrolling events
+        add_events (Gdk.EventMask.SCROLL_MASK);
+    }
+
+    public void set_widget (WidgetSlot slot, Gtk.Widget widget) {
+        Gtk.Widget old_widget;
+
+        if (slot == WidgetSlot.LABEL)
+            old_widget = the_label;
+        else if (slot == WidgetSlot.IMAGE)
+            old_widget = the_image;
+        else
+            assert_not_reached ();
+
+        if (old_widget != null) {
+            box.remove (old_widget);
+            old_widget.get_style_context ().remove_class (StyleClass.COMPOSITED_INDICATOR);
         }
 
+        widget.get_style_context ().add_class (StyleClass.COMPOSITED_INDICATOR);
+
+        if (slot == WidgetSlot.LABEL) {
+            the_label = widget;
+            box.pack_end (the_label, false, false, 0);
+        } else if (slot == WidgetSlot.IMAGE) {
+            the_image = widget;
+            box.pack_start (the_image, false, false, 0);
+        } else {
+            assert_not_reached ();
+        }
     }
 }
