@@ -60,7 +60,7 @@ link_directories(${DEPS_LIBRARY_DIRS} ${DEPS_NOVALA_DIRS})
 # Handle Vala Compilation
 find_package(Vala REQUIRED)
 include(ValaVersion)
-ensure_vala_version("0.16.0" MINIMUM)
+ensure_vala_version("0.16.1" MINIMUM)
 
 include(ValaPrecompile)
 vala_precompile (VALA_C ${EXEC_NAME}
