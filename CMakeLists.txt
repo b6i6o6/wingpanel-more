@@ -4,7 +4,7 @@ project (wingpanel)
 cmake_minimum_required (VERSION 2.8)
 cmake_policy (VERSION 2.8)
 
-list (APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/vala)
+list (APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
 #
 # Base bits
@@ -16,9 +16,9 @@ set (DATADIR "${CMAKE_INSTALL_PREFIX}/share")
 set (PKGDATADIR "${DATADIR}/wingpanel")
 set (GETTEXT_PACKAGE "wingpanel")
 set (EXEC_NAME "wingpanel")
-set (RELEASE_NAME "A super sexy space-saving top panel.")
-set (VERSION "0.4.0")
-set (VERSION_INFO "Testing")
+set (RELEASE_NAME "Luna Beta 2")
+set (VERSION "0.2.2")
+set (VERSION_INFO "luna-beta2")
 set (CMAKE_C_FLAGS "-ggdb")
 set (PREFIX ${CMAKE_INSTALL_PREFIX})
 set (DOLLAR "$")
@@ -38,8 +38,6 @@ set (WINGPANEL_DEPS_NOVALA "gthread-2.0;indicator3-0.4")
 find_package (PkgConfig)
 pkg_check_modules (DEPS REQUIRED ${WINGPANEL_DEPS})
 pkg_check_modules (DEPS_NOVALA REQUIRED ${WINGPANEL_DEPS_NOVALA})
-
-list (APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
 # Static Files
 file (GLOB desktop_entry "${CMAKE_CURRENT_SOURCE_DIR}/data/wingpanel.desktop")
