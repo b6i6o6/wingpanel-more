@@ -50,9 +50,6 @@ namespace Wingpanel.Backend
             this.entry = entry;
             this.indicator = indicator;
 
-            string indicator_name = indicator.get_name ();
-            string entry_name = get_entry_name ();
-
             var image = entry.image;
             if (image != null && image is Gtk.Image)
                 set_widget (WidgetSlot.IMAGE, image);
@@ -64,6 +61,9 @@ namespace Wingpanel.Backend
             show ();
 
             if (entry.menu == null) {
+                string indicator_name = indicator.get_name ();
+                string entry_name = get_entry_name ();
+
                 critical ("Indicator: %s (%s) has no menu widget.", indicator_name, entry_name);
                 return;
             }
@@ -78,7 +78,7 @@ namespace Wingpanel.Backend
         }
 
         public string get_entry_name () {
-            return entry.name_hint;
+            return entry.name_hint ?? "";
         }
 
         private void setup_drawing () {
