@@ -141,7 +141,29 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
     private void panel_resize (bool redraw) {
         Gdk.Rectangle monitor_dimensions;
 
-        screen.get_monitor_geometry (screen.get_primary_monitor(), out monitor_dimensions);
+        screen.get_monitor_geometry (screen.get_primary_monitor (), out monitor_dimensions);
+
+        // if we have multiple monitors, we must check if the panel would be placed inbetween
+        // monitors. If that's the case we have to move it to the topmost, or we'll make the 
+        // upper monitor unusable because of the struts.
+        // First check if there are monitors overlapping horizontally and if they are higher 
+        // our current highest, make this one the new highest and test all again
+        if (screen.get_n_monitors () > 1) {
+            Gdk.Rectangle dimensions;
+            for (var i = 0; i < screen.get_n_monitors (); i++) {
+                screen.get_monitor_geometry (i, out dimensions);
+                if (((dimensions.x >= monitor_dimensions.x
+                    && dimensions.x < monitor_dimensions.x + monitor_dimensions.width)
+                    || (dimensions.x + dimensions.width >= monitor_dimensions.x
+                    && dimensions.x + dimensions.width <= monitor_dimensions.x + monitor_dimensions.width))
+                    && dimensions.y < monitor_dimensions.y) {
+                    warning ("Not placing wingpanl on the primary monitor because of problems" +
+                        " with multimonitor setups");
+                    monitor_dimensions = dimensions;
+                    i = 0;
+                }
+            }
+        }
 
         panel_x = monitor_dimensions.x;
         panel_y = monitor_dimensions.y;
