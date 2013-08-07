@@ -154,10 +154,12 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
                 screen.get_monitor_geometry (i, out dimensions);
                 if (((dimensions.x >= monitor_dimensions.x
                     && dimensions.x < monitor_dimensions.x + monitor_dimensions.width)
-                    || (dimensions.x + dimensions.width >= monitor_dimensions.x
-                    && dimensions.x + dimensions.width <= monitor_dimensions.x + monitor_dimensions.width))
+                    || (dimensions.x + dimensions.width > monitor_dimensions.x
+                    && dimensions.x + dimensions.width <= monitor_dimensions.x + monitor_dimensions.width)
+					|| (dimensions.x < monitor_dimensions.x
+					&& dimensions.x + dimensions.width > monitor_dimensions.x + monitor_dimensions.width))
                     && dimensions.y < monitor_dimensions.y) {
-                    warning ("Not placing wingpanl on the primary monitor because of problems" +
+                    warning ("Not placing wingpanel on the primary monitor because of problems" +
                         " with multimonitor setups");
                     monitor_dimensions = dimensions;
                     i = 0;
