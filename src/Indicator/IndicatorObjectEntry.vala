@@ -72,9 +72,9 @@ namespace Wingpanel.Backend
             set_submenu (entry.menu);
 
             setup_drawing ();
-            
+
             entry.menu.get_children ().foreach (setup_margin);
-            entry.menu.insert.connect (setup_margin); 
+            entry.menu.insert.connect (setup_margin);
         }
 
         public IndicatorIface get_indicator () {
@@ -84,7 +84,7 @@ namespace Wingpanel.Backend
         public string get_entry_name () {
             return entry.name_hint ?? "";
         }
-        
+
         private void setup_margin (Gtk.Widget widget) {
             widget.margin_left = 10;
             widget.margin_right = 9;
@@ -155,7 +155,7 @@ namespace Wingpanel.Backend
             // now paint our buffer on
             ctx.set_source_surface (buffer.surface, 0, 0);
             ctx.paint ();
-            
+
             return false;
         }
 
@@ -187,7 +187,7 @@ namespace Wingpanel.Backend
 
             buffer.context.arc (x + w - radius, y + h - radius, radius, 0, Math.PI * 0.5);
             buffer.context.arc (x + radius, y + h - radius, radius, Math.PI * 0.5, Math.PI);
-            
+
             buffer.context.close_path ();
         }
 
