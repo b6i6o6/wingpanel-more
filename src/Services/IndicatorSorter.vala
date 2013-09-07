@@ -32,25 +32,25 @@ public class Wingpanel.Services.IndicatorSorter {
         { "libapplication.so", null },                   // indicator-application (App indicators)
         { "libapplication.so", "keyboard" },             // Keyboard layout selector (old)
         { "libapplication.so", "gsd-keyboard-xkb" },     // keyboard layout selector
-		{ "com.canonical.indicator.keyboard", null },
+        { "com.canonical.indicator.keyboard", null },
         { "libsoundmenu.so", null },                     // indicator-sound
-		{ "com.canonical.indicator.sound", null },
+        { "com.canonical.indicator.sound", null },
         { "libnetwork.so", null },                       // indicator-network
         { "libnetworkmenu.so", null },                   // indicator-network
         { "libapplication.so", "nm-applet" },            // network manager
         { "libbluetooth.so", null },                     // indicator-bluetooth
         { "libapplication.so", "bluetooth-manager" },    // indicator-gnome-bluetooth (old)
-		{ "com.canonical.indicator.bluetooth", null },
+        { "com.canonical.indicator.bluetooth", null },
         { "libprintersmenu.so", null },                  // indicator-printers
         { "libsyncindicator.so", null },                 // indicator-sync
         { "libpower.so", null },                         // indicator-power
-		{ "com.canonical.indicator.power", null },
+        { "com.canonical.indicator.power", null },
         { "libmessaging.so", null },                     // indicator-messages
-		{ "com.canonical.indicator.messages", null },
+        { "com.canonical.indicator.messages", null },
         { "libsession.so", null },                       // indicator-session
         { "libsession.so", "indicator-session-users" },  // indicator-session
         { "libsession.so", "indicator-session-devices" },// indicator-session
-		{ "com.canonical.indicator.session", null }
+        { "com.canonical.indicator.session", null }
     };
 
     public static int compare_func (IndicatorWidget? a, IndicatorWidget? b) {

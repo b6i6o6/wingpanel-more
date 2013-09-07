@@ -25,7 +25,7 @@ namespace Wingpanel.Backend {
     public class IndicatorFileModel {
         private Gee.HashMap<Indicator.Object, string> indicator_map;
 
-		const string INDICATOR_FILE_DIR = "/usr/share/unity/indicators/";
+        const string INDICATOR_FILE_DIR = "/usr/share/unity/indicators/";
 
         public IndicatorFileModel (Services.Settings settings) {
             indicator_map = new Gee.HashMap<Indicator.Object, string> ();
@@ -45,7 +45,7 @@ namespace Wingpanel.Backend {
 
             debug ("Blacklisted Indicators: %s", skip_list);
 
-			// traditional indicator libraries
+            // traditional indicator libraries
             var indicators_to_load = new Gee.ArrayList<string> ();
             var dir = File.new_for_path (Build.INDICATORDIR);
             debug ("Indicator Directory: %s", dir.get_path ());
@@ -74,26 +74,26 @@ namespace Wingpanel.Backend {
             foreach (string leaf in indicators_to_load)
                 load_indicator_library (dir.get_child (leaf).get_path (), leaf);
 
-			// indidicator files
-			indicators_to_load = new Gee.ArrayList<string> ();
-			dir = File.new_for_path (INDICATOR_FILE_DIR);
+            // indidicator files
+            indicators_to_load = new Gee.ArrayList<string> ();
+            dir = File.new_for_path (INDICATOR_FILE_DIR);
 
-			try {
-				var enumerator = dir.enumerate_children(FileAttribute.STANDARD_NAME,
-				                                        FileQueryInfoFlags.NONE, null);
-				FileInfo file_info;
-				while ((file_info = enumerator.next_file (null)) != null) {
-					var name = file_info.get_name ();
-					if (name in skip_list)
-						continue;
-					indicators_to_load.add (name);
-				}
-			} catch (Error err) {
-				warning ("Unable to read indicators: %s", err.message);
-			}
+            try {
+                var enumerator = dir.enumerate_children(FileAttribute.STANDARD_NAME,
+                                                        FileQueryInfoFlags.NONE, null);
+                FileInfo file_info;
+                while ((file_info = enumerator.next_file (null)) != null) {
+                    var name = file_info.get_name ();
+                    if (name in skip_list)
+                        continue;
+                    indicators_to_load.add (name);
+                }
+            } catch (Error err) {
+                warning ("Unable to read indicators: %s", err.message);
+            }
 
-			foreach (var name in indicators_to_load)
-				load_indicator_file (name);
+            foreach (var name in indicators_to_load)
+                load_indicator_file (name);
         }
 
         public Gee.Collection<Indicator.Object> get_indicators () {

@@ -78,7 +78,7 @@ namespace Wingpanel.Widgets {
 
         private void create_entry (IndicatorWidget entry) {
             if (entry.get_indicator ().get_name () == "libdatetime.so"
-				|| entry.get_indicator ().get_name () == "com.canonical.indicator.datetime")
+                || entry.get_indicator ().get_name () == "com.canonical.indicator.datetime")
                 clock.prepend (entry);
             else
                 menubar.insert_sorted (entry);
