@@ -45,6 +45,8 @@ namespace Wingpanel {
         }
 
         private void init () {
+			Ido.init ();
+
             settings = new Services.Settings ();
             indicator_loader = new Backend.IndicatorFactory (settings);
             panel = new Widgets.Panel (this, settings, indicator_loader);

@@ -216,7 +216,8 @@ namespace Wingpanel.Backend
                     break;
             }
 
-            entry.parent_object.entry_scrolled (entry, (uint) delta, direction);
+			//FIXME no access to parent_object anymore
+			// entry.parent_object.entry_scrolled (entry, (uint) delta, direction);
 
             return false;
         }

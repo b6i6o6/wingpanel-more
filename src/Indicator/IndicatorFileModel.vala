@@ -25,6 +25,8 @@ namespace Wingpanel.Backend {
     public class IndicatorFileModel {
         private Gee.HashMap<Indicator.Object, string> indicator_map;
 
+		const string INDICATOR_FILE_DIR = "/usr/share/unity/indicators/";
+
         public IndicatorFileModel (Services.Settings settings) {
             indicator_map = new Gee.HashMap<Indicator.Object, string> ();
 
@@ -43,6 +45,7 @@ namespace Wingpanel.Backend {
 
             debug ("Blacklisted Indicators: %s", skip_list);
 
+			// traditional indicator libraries
             var indicators_to_load = new Gee.ArrayList<string> ();
             var dir = File.new_for_path (Build.INDICATORDIR);
             debug ("Indicator Directory: %s", dir.get_path ());
@@ -65,11 +68,32 @@ namespace Wingpanel.Backend {
                         indicators_to_load.add (leaf);
                 }
             } catch (Error err) {
-                error ("Unable to read indicators: %s", err.message);
+                warning ("Unable to read indicators: %s", err.message);
             }
 
             foreach (string leaf in indicators_to_load)
-                load_indicator (dir.get_child (leaf).get_path (), leaf);
+                load_indicator_library (dir.get_child (leaf).get_path (), leaf);
+
+			// indidicator files
+			indicators_to_load = new Gee.ArrayList<string> ();
+			dir = File.new_for_path (INDICATOR_FILE_DIR);
+
+			try {
+				var enumerator = dir.enumerate_children(FileAttribute.STANDARD_NAME,
+				                                        FileQueryInfoFlags.NONE, null);
+				FileInfo file_info;
+				while ((file_info = enumerator.next_file (null)) != null) {
+					var name = file_info.get_name ();
+					if (name in skip_list)
+						continue;
+					indicators_to_load.add (name);
+				}
+			} catch (Error err) {
+				warning ("Unable to read indicators: %s", err.message);
+			}
+
+			foreach (var name in indicators_to_load)
+				load_indicator_file (name);
         }
 
         public Gee.Collection<Indicator.Object> get_indicators () {
@@ -80,8 +104,8 @@ namespace Wingpanel.Backend {
             return indicator_map.get (indicator);
         }
 
-        private void load_indicator (string filename, string leaf) {
-            debug ("LOADING: %s", leaf);
+        private void load_indicator_library (string filename, string leaf) {
+            debug ("Loading Library: %s", leaf);
 
             var indicator = new Indicator.Object.from_file (filename);
 
@@ -89,6 +113,17 @@ namespace Wingpanel.Backend {
                 indicator_map.set (indicator, leaf);
             else
                 critical ("Unable to load %s", filename);
+        }
+
+        private void load_indicator_file (string name) {
+            debug ("Loading File: %s", name);
+
+            var indicator = new Indicator.Ng.for_profile (INDICATOR_FILE_DIR + "/" + name, "desktop");
+
+            if (indicator is Indicator.Object)
+                indicator_map.set (indicator, name);
+            else
+                critical ("Unable to load %s", name);
         }
     }
 }
