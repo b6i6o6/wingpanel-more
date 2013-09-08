@@ -18,8 +18,8 @@
   END LICENSE
 ***/
 
-namespace Wingpanel.Backend
-{
+namespace Wingpanel.Backend {
+
     public class IndicatorObjectEntry: Widgets.IndicatorButton, IndicatorWidget {
         private unowned Indicator.ObjectEntry entry;
         private IndicatorIface indicator;
@@ -216,7 +216,7 @@ namespace Wingpanel.Backend
                     break;
             }
 
-            //FIXME no access to parent_object anymore
+            // FIXME no access to parent_object anymore
             // entry.parent_object.entry_scrolled (entry, (uint) delta, direction);
 
             return false;

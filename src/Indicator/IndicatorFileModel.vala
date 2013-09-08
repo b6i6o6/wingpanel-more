@@ -45,7 +45,7 @@ namespace Wingpanel.Backend {
 
             debug ("Blacklisted Indicators: %s", skip_list);
 
-            // traditional indicator libraries
+            // Traditional indicator libraries
             var indicators_to_load = new Gee.ArrayList<string> ();
             var dir = File.new_for_path (Build.INDICATORDIR);
             debug ("Indicator Directory: %s", dir.get_path ());
@@ -79,13 +79,15 @@ namespace Wingpanel.Backend {
             dir = File.new_for_path (INDICATOR_FILE_DIR);
 
             try {
-                var enumerator = dir.enumerate_children(FileAttribute.STANDARD_NAME,
-                                                        FileQueryInfoFlags.NONE, null);
+                var enumerator = dir.enumerate_children (FileAttribute.STANDARD_NAME,
+                                                         FileQueryInfoFlags.NONE, null);
                 FileInfo file_info;
                 while ((file_info = enumerator.next_file (null)) != null) {
                     var name = file_info.get_name ();
+
                     if (name in skip_list)
                         continue;
+
                     indicators_to_load.add (name);
                 }
             } catch (Error err) {
