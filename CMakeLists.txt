@@ -82,7 +82,6 @@ vala_precompile (VALA_C ${EXEC_NAME}
     src/IndicatorIface.vala
     src/IndicatorLoader.vala
 
-    src/Indicator/IndicatorFileModel.vala
     src/Indicator/IndicatorObjectEntry.vala
     src/Indicator/IndicatorObject.vala
     src/Indicator/IndicatorFactory.vala
