@@ -1,6 +1,6 @@
 # Check http://webdev.elementaryos.org/docs/developer-guide/cmake for documentation
 
-project (wingpanel)
+project (wingpanel C)
 cmake_minimum_required (VERSION 2.8)
 cmake_policy (VERSION 2.8)
 
