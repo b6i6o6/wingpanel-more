@@ -104,7 +104,7 @@ PACKAGES
 	${WINGPANEL_DEPS}
 CUSTOM_VAPIS
     vapi/config.vapi
-    vapi/indicator-0.4.vapi
+    vapi/indicator.vapi
 OPTIONS
 	--thread
 )
