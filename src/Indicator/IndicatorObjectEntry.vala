@@ -40,8 +40,8 @@ namespace Wingpanel.Backend {
             .menu {
                 background-color:@transparent;
                 border-color:@transparent;
-                -unico-inner-stroke-width: 0;
                 background-image:none;
+                border-width:0;
              }
              .popover_bg {
                background-color:#fff;
