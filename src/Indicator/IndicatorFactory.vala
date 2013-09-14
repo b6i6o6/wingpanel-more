@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 public class Wingpanel.Backend.IndicatorFactory : Object, IndicatorLoader {
-    private const string NG_INDICATOR_FILE_DIR = "/usr/share/unity/indicators";
     private Gee.Collection<IndicatorIface> indicators;
     private string[] settings_blacklist;
 
@@ -34,7 +33,7 @@ public class Wingpanel.Backend.IndicatorFactory : Object, IndicatorLoader {
     }
 
     private void load_indicators () {
-        // Indicators we don't want to load
+        // Fetch list of indicators that should not be loaded
         string skip_list = Environment.get_variable ("UNITY_PANEL_INDICATORS_SKIP") ?? "";
 
         if (skip_list == "all") {
@@ -48,44 +47,55 @@ public class Wingpanel.Backend.IndicatorFactory : Object, IndicatorLoader {
         debug ("Blacklisted Indicators: %s", skip_list);
 
         // Legacy indicator libraries
-        var legacy_indicator_dir = File.new_for_path (Build.INDICATORDIR);
-        load_indicators_from_directory (legacy_indicator_dir, true, skip_list);
+        load_indicators_from_dir (Build.INDICATORDIR, true, skip_list);
 
         // Ng indicators
-        var ng_indicator_dir = File.new_for_path (NG_INDICATOR_FILE_DIR);
-        load_indicators_from_directory (ng_indicator_dir, false, skip_list);
+        load_indicators_from_dir ("/usr/share/unity/indicators", false, skip_list);
     }
 
-    private void load_indicators_from_directory (File dir, bool legacy_libs_only, string skip_list) {
+    private void load_indicators_from_dir (string dir_path, bool legacy_libs_only, string skip_list) {
         try {
+            var dir = File.new_for_path (dir_path);
             var enumerator = dir.enumerate_children (FileAttribute.STANDARD_NAME,
                                                      FileQueryInfoFlags.NONE, null);
             FileInfo file_info;
+
             while ((file_info = enumerator.next_file (null)) != null) {
-                Indicator.Object indicator = null;
                 string name = file_info.get_name ();
 
                 if (name in skip_list)
                     continue;
 
-                if (legacy_libs_only) {
-                    if (!name.has_suffix (".so"))
-                        continue;
-
-                    debug ("Loading Indicator Library: %s", name);
-                    indicator = new Indicator.Object.from_file (dir.get_child (name).get_path ());
-                } else {
-                    debug ("Loading Indicator File: %s", name);
-                    indicator = new Indicator.Ng.for_profile (dir.get_child (name).get_path (), "desktop");
-                }
-
-                if (indicator != null)
-                    indicators.add (new IndicatorObject (indicator, name));
-                else
-                    critical ("Unable to load %s: invalid object.", name);
+                load_indicator (dir, legacy_libs_only, name);
             }
         } catch (Error err) {
             warning ("Unable to read indicators: %s", err.message);
+        }
+    }
+
+    private void load_indicator (File parent_dir, bool legacy_lib, string name) {
+        string indicator_path = parent_dir.get_child (name).get_path ();
+
+        try {
+            Indicator.Object indicator = null;
+
+            if (legacy_lib) {
+                if (!name.has_suffix (".so"))
+                    return;
+
+                debug ("Loading Indicator Library: %s", name);
+                indicator = new Indicator.Object.from_file (indicator_path);
+            } else {
+                debug ("Loading Indicator File: %s", name);
+                indicator = new Indicator.Ng.for_profile (indicator_path, "desktop");
+            }
+
+            if (indicator != null)
+                indicators.add (new IndicatorObject (indicator, name));
+            else
+                critical ("Unable to load %s: invalid object.", name);
+        } catch (Error err) {
+            warning ("Could not load indicator at %s: %s", indicator_path, err.message);
         }
     }
 }
