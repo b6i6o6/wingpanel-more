@@ -31,8 +31,8 @@ namespace Wingpanel.Widgets {
 
         private IndicatorLoader indicator_loader;
 
-        public Panel (WingpanelApp app, Services.Settings settings, IndicatorLoader indicator_loader) {
-            set_application (app as Gtk.Application);
+        public Panel (Gtk.Application app, Services.Settings settings, IndicatorLoader indicator_loader) {
+            set_application (app);
 
             this.indicator_loader = indicator_loader;
 
@@ -77,8 +77,9 @@ namespace Wingpanel.Widgets {
         }
 
         private void create_entry (IndicatorWidget entry) {
-            if (entry.get_indicator ().get_name () == "libdatetime.so"
-                || entry.get_indicator ().get_name () == "com.canonical.indicator.datetime")
+            string entry_name = entry.get_indicator ().get_name ();
+
+            if (entry_name == "libdatetime.so" || entry_name == "com.canonical.indicator.datetime")
                 clock.prepend (entry);
             else
                 menubar.insert_sorted (entry);

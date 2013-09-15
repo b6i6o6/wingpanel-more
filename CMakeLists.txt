@@ -1,6 +1,6 @@
 # Check http://webdev.elementaryos.org/docs/developer-guide/cmake for documentation
 
-project (wingpanel)
+project (wingpanel C)
 cmake_minimum_required (VERSION 2.8)
 cmake_policy (VERSION 2.8)
 
@@ -33,10 +33,23 @@ include (CPack)
 add_custom_target (dist COMMAND ${CMAKE_MAKE_PROGRAM} package_source)
 
 # Set dependencies
-set (WINGPANEL_DEPS "gobject-2.0;glib-2.0;gio-2.0;gee-1.0;gdk-x11-3.0;x11;gtk+-3.0;granite")
-set (WINGPANEL_DEPS_NOVALA "gthread-2.0;indicator3-0.4")
+set (WINGPANEL_DEPS
+    gobject-2.0
+    glib-2.0
+    gio-2.0
+    gee-1.0
+    gdk-x11-3.0
+    x11
+    gtk+-3.0
+    granite)
+
+set (WINGPANEL_DEPS_NOVALA
+    gthread-2.0
+    indicator3-0.4
+    libido3-0.1)
+
 find_package (PkgConfig)
-pkg_check_modules (DEPS REQUIRED ${WINGPANEL_DEPS} libido3-0.1)
+pkg_check_modules (DEPS REQUIRED ${WINGPANEL_DEPS})
 pkg_check_modules (DEPS_NOVALA REQUIRED ${WINGPANEL_DEPS_NOVALA})
 
 # Static Files
@@ -69,7 +82,6 @@ vala_precompile (VALA_C ${EXEC_NAME}
     src/IndicatorIface.vala
     src/IndicatorLoader.vala
 
-    src/Indicator/IndicatorFileModel.vala
     src/Indicator/IndicatorObjectEntry.vala
     src/Indicator/IndicatorObject.vala
     src/Indicator/IndicatorFactory.vala
@@ -91,7 +103,7 @@ PACKAGES
 	${WINGPANEL_DEPS}
 CUSTOM_VAPIS
     vapi/config.vapi
-    vapi/indicator-0.4.vapi
+    vapi/indicator.vapi
 OPTIONS
 	--thread
 )
