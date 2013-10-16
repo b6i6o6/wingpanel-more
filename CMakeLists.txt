@@ -41,12 +41,14 @@ set (WINGPANEL_DEPS
     gdk-x11-3.0
     x11
     gtk+-3.0
-    granite)
+    granite
+    indicator3-0.4
+    libido3-0.1
+)
 
 set (WINGPANEL_DEPS_NOVALA
     gthread-2.0
-    indicator3-0.4
-    libido3-0.1)
+)
 
 find_package (PkgConfig)
 pkg_check_modules (DEPS REQUIRED ${WINGPANEL_DEPS})
@@ -103,9 +105,10 @@ PACKAGES
 	${WINGPANEL_DEPS}
 CUSTOM_VAPIS
     vapi/config.vapi
-    vapi/indicator.vapi
 OPTIONS
+    -g
 	--thread
+    --vapidir=${CMAKE_CURRENT_SOURCE_DIR}/vapi/
 )
 
 # Settings Schema
