@@ -31,8 +31,10 @@ namespace Wingpanel.Widgets {
 
         private IndicatorLoader indicator_loader;
 
-        public Panel (Gtk.Application app, Services.Settings settings, IndicatorLoader indicator_loader) {
+        public Panel (Gtk.Application app, Services.Settings _settings, IndicatorLoader indicator_loader) {
             set_application (app);
+            
+            settings = _settings;
 
             this.indicator_loader = indicator_loader;
 
@@ -48,6 +50,22 @@ namespace Wingpanel.Widgets {
             var style_context = get_style_context ();
             style_context.add_class (StyleClass.PANEL);
             style_context.add_class (Gtk.STYLE_CLASS_MENUBAR);
+            
+            settings.changed.connect (() => {
+                override_background_color (Gtk.StateFlags.NORMAL, Gdk.RGBA () {
+                    red = 0.0, green = 0.0, blue = 0.0, alpha = settings.background_alpha
+                });
+                
+                clock.override_background_color (Gtk.StateFlags.NORMAL, Gdk.RGBA () {
+                    red = 0.0, green = 0.0, blue = 0.0, alpha = 0.0
+                });
+                menubar.override_background_color (Gtk.StateFlags.NORMAL, Gdk.RGBA () {
+                    red = 0.0, green = 0.0, blue = 0.0, alpha = 0.0
+                });
+                apps_menubar.override_background_color (Gtk.StateFlags.NORMAL, Gdk.RGBA () {
+                    red = 0.0, green = 0.0, blue = 0.0, alpha = 0.0
+                });
+            });
 
             // Add default widgets
             add_defaults (settings);

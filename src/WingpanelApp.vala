@@ -41,6 +41,8 @@ public class Wingpanel.App : Granite.Application {
         panel = new Widgets.Panel (this, settings, indicator_loader);
 
         panel.show_all ();
+        
+        var background_manager = new Services.BackgroundManager (settings);
     }
 
     protected override void activate () {

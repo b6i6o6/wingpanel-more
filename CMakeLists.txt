@@ -101,6 +101,7 @@ vala_precompile (VALA_C ${EXEC_NAME}
     src/Services/AppLauncherService.vala
     src/Services/LauncherRunner.vala
     src/Services/IndicatorSorter.vala
+    src/Services/BackgroundManager.vala
 PACKAGES
 	${WINGPANEL_DEPS}
 CUSTOM_VAPIS
@@ -120,6 +121,7 @@ add_subdirectory (po)
 
 # Create the Executable
 add_executable(${EXEC_NAME} ${VALA_C})
+target_link_libraries(${EXEC_NAME} m)
 
 # Installation
 install (TARGETS ${EXEC_NAME} RUNTIME DESTINATION bin)

@@ -42,6 +42,13 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
     private uint animation_timer = 0;
 
     private PanelShadow shadow = new PanelShadow ();
+    
+    private Services.Settings _settings;
+    
+    public Services.Settings settings {
+        get { return _settings; }
+        set { _settings = value; }
+    }
 
     public BasePanel () {
         decorated = false;
@@ -92,8 +99,11 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
         if (child != null)
             propagate_draw (child, cr);
 
-        if (!shadow.visible)
+        if (settings.background_alpha > 1E-3) {
+            shadow.show ();
             shadow.show_all ();
+        } else
+            shadow.hide ();
 
         return true;
     }
