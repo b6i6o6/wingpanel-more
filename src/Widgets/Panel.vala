@@ -50,22 +50,6 @@ namespace Wingpanel.Widgets {
             var style_context = get_style_context ();
             style_context.add_class (StyleClass.PANEL);
             style_context.add_class (Gtk.STYLE_CLASS_MENUBAR);
-            
-            settings.changed.connect (() => {
-                override_background_color (Gtk.StateFlags.NORMAL, Gdk.RGBA () {
-                    red = 0.0, green = 0.0, blue = 0.0, alpha = settings.background_alpha
-                });
-                
-                clock.override_background_color (Gtk.StateFlags.NORMAL, Gdk.RGBA () {
-                    red = 0.0, green = 0.0, blue = 0.0, alpha = 0.0
-                });
-                menubar.override_background_color (Gtk.StateFlags.NORMAL, Gdk.RGBA () {
-                    red = 0.0, green = 0.0, blue = 0.0, alpha = 0.0
-                });
-                apps_menubar.override_background_color (Gtk.StateFlags.NORMAL, Gdk.RGBA () {
-                    red = 0.0, green = 0.0, blue = 0.0, alpha = 0.0
-                });
-            });
 
             // Add default widgets
             add_defaults (settings);
@@ -130,6 +114,18 @@ namespace Wingpanel.Widgets {
             var gpr = new Gtk.SizeGroup (Gtk.SizeGroupMode.HORIZONTAL);
             gpr.add_widget (left_wrapper);
             gpr.add_widget (right_wrapper);
+
+            // make sure those are all transparent when we later adjust the transparency
+            // in the panel's draw callback
+            clock.override_background_color (Gtk.StateFlags.NORMAL, Gdk.RGBA () {
+                red = 0.0, green = 0.0, blue = 0.0, alpha = 0.0
+            });
+            menubar.override_background_color (Gtk.StateFlags.NORMAL, Gdk.RGBA () {
+                red = 0.0, green = 0.0, blue = 0.0, alpha = 0.0
+            });
+            apps_menubar.override_background_color (Gtk.StateFlags.NORMAL, Gdk.RGBA () {
+                red = 0.0, green = 0.0, blue = 0.0, alpha = 0.0
+            });
         }
     }
 }

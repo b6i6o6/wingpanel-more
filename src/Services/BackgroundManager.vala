@@ -16,73 +16,93 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Wingpanel.Services {
-    public class BackgroundManager {
-    
-        const int HEIGHT = 20;
-        const double MIN_ALPHA = 0.7;
+    struct ColorInformation
+    {
+        double average_red;
+        double average_green;
+        double average_blue;
+        double mean;
+        double variance;
+    }
+
+    [DBus (name = "org.pantheon.gala")]
+    interface GalaDBus : Object {
+        public signal void background_changed ();
+        public async abstract ColorInformation get_background_color_information (int monitor,
+            int x, int y, int width, int height) throws IOError;
+    }
+
+    public class BackgroundManager : Object {
+        public static const double MIN_ALPHA = 0.7;
+
+        const int HEIGHT = 50;
         const double MIN_VARIANCE = 50;
         const double MIN_LUM = 25;
+
+        /**
+         * Emitted when the background changed. It supplies the alpha value that
+         * can be used with this wallpaper while maintining legibility
+         */
+        public signal void update_background_alpha (double legible_alpha_value);
         
-        GLib.Settings background_settings;
-        string image_location;
-        Services.Settings settings;
+        public Services.Settings settings { get; construct set; }
+        public Gdk.Screen screen { get; construct set; }
+
+        GalaDBus? gala_dbus = null;
         
-        public BackgroundManager (Services.Settings settings) {
-            this.settings = settings;
-            
-            background_settings = new GLib.Settings ("org.gnome.desktop.background");
-            
-            background_settings.changed["picture-uri"].connect ((key) => {
-                image_location = background_settings.get_string ("picture-uri");
-                
-                if (settings.auto_adjust_alpha)
-                	settings.background_alpha = calculate_alpha ();
-            });
-            
-            background_settings.changed ("picture-uri");
+        public BackgroundManager (Services.Settings settings, Gdk.Screen screen) {
+            Object (settings: settings, screen: screen);
+        }
+
+        construct {
+            try {
+                gala_dbus = Bus.get_proxy_sync (BusType.SESSION, "org.pantheon.gala", 
+                    "/org/pantheon/gala");
+
+                gala_dbus.background_changed.connect (background_changed);
+
+                background_changed ();
+            } catch (Error e) {
+                gala_dbus = null;
+                warning ("Auto-adjustment of background opacity not available, " +
+                    "connecting to gala dbus failed: %s", e.message);
+            }
+        }
+
+        private void background_changed ()
+        {
+            if (settings.auto_adjust_alpha) {
+                calculate_alpha.begin ((obj, res) => {
+                    var alpha = calculate_alpha.end (res);
+                    update_background_alpha (alpha);
+                });
+            }
         }
         
-        private double calculate_alpha () {
+        private async double calculate_alpha () {
             double alpha = 0;
-            
+            Gdk.Rectangle monitor_geometry;
+            ColorInformation? color_info = null;
+
+            var primary = screen.get_primary_monitor ();
+            screen.get_monitor_geometry (primary, out monitor_geometry);
+
             try {
-                var img_buf = new Gdk.Pixbuf.from_file(image_location.substring (5));
-                uint8 *pixels = img_buf.get_pixels();
-
-                int width = img_buf.get_width();
-                int height = img_buf.get_height();
-                
-                if (height > HEIGHT)
-	                height = HEIGHT;
-
-                int size = width * height;
-
-                double mean = 0;
-                double mean_squares = 0;
-
-                double pixel = 0;
-                int imax = size * 3;
-
-                for (int i = 0; i < imax; i += 3) {
-	                pixel = (0.3 * (double) pixels[i] +
-			                 0.6 * (double) pixels[i + 1] +
-			                 0.11 * (double) pixels[i + 2]) - 128f;
-
-	                mean += pixel;
-	                mean_squares += pixel * pixel;
-                }
-
-                mean /= size;
-                mean_squares *= mean_squares / size;
-
-                double variance = Math.sqrt(mean_squares - mean * mean) / (double) size;
-
-                if (mean > MIN_LUM || variance > MIN_VARIANCE)
-	                alpha = MIN_ALPHA;
-            }
-            catch {
+                color_info = yield gala_dbus.get_background_color_information (
+                                           primary,                // monitor index
+                                           0,                      // x of reference rect
+                                           0,                      // y of rect
+                                           monitor_geometry.width, // width of rect
+                                           HEIGHT);                // height of rect
+            } catch (Error e) {
+                warning (e.message);
                 alpha = MIN_ALPHA;
             }
+
+            if (color_info != null
+                && (color_info.mean > MIN_LUM
+                || color_info.variance > MIN_VARIANCE))
+                alpha = MIN_ALPHA;
             
             return alpha;
         }

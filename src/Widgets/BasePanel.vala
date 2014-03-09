@@ -41,9 +41,18 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
     private int panel_displacement = -40;
     private uint animation_timer = 0;
 
+    private double legible_alpha_value = -1.0;
+    private double panel_alpha = 0.0;
+    private double panel_current_alpha = 0.0;
+    private uint panel_alpha_timer = 0;
+    const int FPS = 60;
+    const double ALPHA_ANIMATION_STEP = 0.05;
+
     private PanelShadow shadow = new PanelShadow ();
     
     private Services.Settings _settings;
+
+    private Wnck.Screen wnck_screen;
     
     public Services.Settings settings {
         get { return _settings; }
@@ -65,6 +74,28 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
         screen.monitors_changed.connect (on_monitors_changed);
 
         destroy.connect (Gtk.main_quit);
+
+        wnck_screen = Wnck.Screen.get_default ();
+        wnck_screen.active_workspace_changed.connect (update_panel_alpha);
+        wnck_screen.window_opened.connect ((window) => {
+            if (window.get_window_type () == Wnck.WindowType.NORMAL)
+                window.state_changed.connect (window_state_changed);
+        });
+        wnck_screen.window_closed.connect ((window) => {
+            if (window.get_window_type () == Wnck.WindowType.NORMAL)
+                window.state_changed.disconnect (window_state_changed);
+        });
+
+        update_panel_alpha ();
+    }
+
+    private void window_state_changed (Wnck.Window window,
+            Wnck.WindowState changed_mask, Wnck.WindowState new_state) {
+        if ((changed_mask & Wnck.WindowState.MAXIMIZED_HORIZONTALLY) != 0
+            || (changed_mask & Wnck.WindowState.MAXIMIZED_VERTICALLY) != 0
+            && (window.get_workspace () == wnck_screen.get_active_workspace ()
+            || window.is_sticky ()))
+            update_panel_alpha ();
     }
 
     protected abstract Gtk.StyleContext get_draw_style_context ();
@@ -86,7 +117,11 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
         }
 
         var ctx = get_draw_style_context ();
-        ctx.render_background (cr, size.x, size.y, size.width, size.height);
+        var background_color = ctx.get_background_color (Gtk.StateFlags.NORMAL);
+        background_color.alpha = panel_current_alpha;
+        Gdk.cairo_set_source_rgba (cr, background_color);
+        cr.rectangle (size.x, size.y, size.width, size.height);
+        cr.fill ();
 
         // Slide in
         if (animation_timer == 0) {
@@ -108,6 +143,48 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
         return true;
     }
 
+    public void update_opacity (double alpha) {
+        legible_alpha_value = alpha;
+        update_panel_alpha ();
+    }
+
+    private void update_panel_alpha ()
+    {
+        panel_alpha = settings.background_alpha;
+        if (!active_workspace_has_maximized_window ()
+            && legible_alpha_value >= 0
+            && settings.auto_adjust_alpha) {
+            panel_alpha = legible_alpha_value;
+        }
+
+        if (panel_current_alpha != panel_alpha) {
+            panel_alpha_timer = Gdk.threads_add_timeout (1000 / FPS, draw_timeout);
+        }
+    }
+
+    private bool draw_timeout ()
+    {
+        queue_draw ();
+
+        if (panel_current_alpha > panel_alpha) {
+            panel_current_alpha -= ALPHA_ANIMATION_STEP;
+            panel_current_alpha = double.max (panel_current_alpha, panel_alpha);
+        } else if (panel_current_alpha < panel_alpha) {
+            panel_current_alpha += ALPHA_ANIMATION_STEP;
+            panel_current_alpha = double.min (panel_current_alpha, panel_alpha);
+        }
+
+        if (panel_current_alpha != panel_alpha)
+            return true;
+
+        if (panel_alpha_timer > 0) {
+            Source.remove (panel_alpha_timer);
+            panel_alpha_timer = 0;
+        }
+
+        return false;
+    }
+
     private bool animation_callback () {
         if (panel_displacement >= 0 ) {
             return false;
@@ -117,6 +194,19 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
             shadow.move (panel_x, panel_y + panel_height + panel_displacement);
             return true;
         }
+    }
+
+    private bool active_workspace_has_maximized_window ()
+    {
+        var workspace = wnck_screen.get_active_workspace ();
+        foreach (var window in wnck_screen.get_windows ()) {
+            if ((window.is_pinned () || window.get_workspace () == workspace)
+                && window.is_maximized ()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private void on_monitors_changed () {
