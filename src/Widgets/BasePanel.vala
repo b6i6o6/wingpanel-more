@@ -134,7 +134,7 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
         if (child != null)
             propagate_draw (child, cr);
 
-        if (settings.background_alpha > 1E-3) {
+        if (panel_alpha > 1E-3) {
             shadow.show ();
             shadow.show_all ();
         } else
@@ -151,10 +151,11 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
     private void update_panel_alpha ()
     {
         panel_alpha = settings.background_alpha;
-        if (!active_workspace_has_maximized_window ()
-            && legible_alpha_value >= 0
-            && settings.auto_adjust_alpha) {
-            panel_alpha = legible_alpha_value;
+        if (settings.auto_adjust_alpha) {
+            if (active_workspace_has_maximized_window ())
+                panel_alpha = 1.0;
+            else if (legible_alpha_value >= 0)
+                panel_alpha = legible_alpha_value;
         }
 
         if (panel_current_alpha != panel_alpha) {

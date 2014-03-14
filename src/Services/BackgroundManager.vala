@@ -33,7 +33,7 @@ namespace Wingpanel.Services {
     }
 
     public class BackgroundManager : Object {
-        public static const double MIN_ALPHA = 0.7;
+        public static const double MIN_ALPHA = 0.3;
 
         const int HEIGHT = 50;
         const double MIN_VARIANCE = 50;
