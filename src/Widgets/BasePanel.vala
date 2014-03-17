@@ -54,7 +54,7 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
     private Wnck.Screen wnck_screen;
 
     public BasePanel (Services.Settings settings) {
-		this.settings = settings;
+        this.settings = settings;
 
         decorated = false;
         resizable = false;
@@ -248,8 +248,8 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
                     && dimensions.x < monitor_dimensions.x + monitor_dimensions.width)
                     || (dimensions.x + dimensions.width > monitor_dimensions.x
                     && dimensions.x + dimensions.width <= monitor_dimensions.x + monitor_dimensions.width)
-					|| (dimensions.x < monitor_dimensions.x
-					&& dimensions.x + dimensions.width > monitor_dimensions.x + monitor_dimensions.width))
+                    || (dimensions.x < monitor_dimensions.x
+                    && dimensions.x + dimensions.width > monitor_dimensions.x + monitor_dimensions.width))
                     && dimensions.y < monitor_dimensions.y) {
                     warning ("Not placing wingpanel on the primary monitor because of problems" +
                         " with multimonitor setups");

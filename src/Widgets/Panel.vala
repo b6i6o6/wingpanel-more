@@ -32,7 +32,7 @@ namespace Wingpanel.Widgets {
         private IndicatorLoader indicator_loader;
 
         public Panel (Gtk.Application app, Services.Settings settings, IndicatorLoader indicator_loader) {
-			base (settings);
+            base (settings);
 
             this.indicator_loader = indicator_loader;
             set_application (app);
