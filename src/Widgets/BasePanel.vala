@@ -1,17 +1,17 @@
 // -*- Mode: vala; indent-tabs-mode: nil; tab-width: 4 -*-
-//  
-//  Copyright (C) 2011-2013 Wingpanel Developers
-// 
+//
+//  Copyright (C) 2011-2014 Wingpanel Developers
+//
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
-// 
+//
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU General Public License for more details.
-// 
+//
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -32,6 +32,8 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
         N_VALUES
     }
 
+    protected Services.Settings settings { get; private set; }
+
     private const int SHADOW_SIZE = 4;
 
     private int panel_height = 0;
@@ -49,17 +51,11 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
     const double ALPHA_ANIMATION_STEP = 0.05;
 
     private PanelShadow shadow = new PanelShadow ();
-    
-    private Services.Settings _settings;
-
     private Wnck.Screen wnck_screen;
-    
-    public Services.Settings settings {
-        get { return _settings; }
-        set { _settings = value; }
-    }
 
-    public BasePanel () {
+    public BasePanel (Services.Settings settings) {
+		this.settings = settings;
+
         decorated = false;
         resizable = false;
         skip_taskbar_hint = true;
@@ -148,8 +144,7 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
         update_panel_alpha ();
     }
 
-    private void update_panel_alpha ()
-    {
+    private void update_panel_alpha () {
         panel_alpha = settings.background_alpha;
         if (settings.auto_adjust_alpha) {
             if (active_workspace_has_maximized_window ())
@@ -158,13 +153,11 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
                 panel_alpha = legible_alpha_value;
         }
 
-        if (panel_current_alpha != panel_alpha) {
+        if (panel_current_alpha != panel_alpha)
             panel_alpha_timer = Gdk.threads_add_timeout (1000 / FPS, draw_timeout);
-        }
     }
 
-    private bool draw_timeout ()
-    {
+    private bool draw_timeout () {
         queue_draw ();
 
         if (panel_current_alpha > panel_alpha) {
@@ -187,24 +180,22 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
     }
 
     private bool animation_callback () {
-        if (panel_displacement >= 0 ) {
+        if (panel_displacement >= 0 )
             return false;
-        } else {
-            panel_displacement += 1;
-            move (panel_x, panel_y + panel_displacement);
-            shadow.move (panel_x, panel_y + panel_height + panel_displacement);
-            return true;
-        }
+
+        panel_displacement += 1;
+        move (panel_x, panel_y + panel_displacement);
+        shadow.move (panel_x, panel_y + panel_height + panel_displacement);
+        return true;
     }
 
-    private bool active_workspace_has_maximized_window ()
-    {
+    private bool active_workspace_has_maximized_window () {
         var workspace = wnck_screen.get_active_workspace ();
+
         foreach (var window in wnck_screen.get_windows ()) {
             if ((window.is_pinned () || window.get_workspace () == workspace)
-                && window.is_maximized ()) {
+                && window.is_maximized ())
                 return true;
-            }
         }
 
         return false;
@@ -245,9 +236,9 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
         screen.get_monitor_geometry (screen.get_primary_monitor (), out monitor_dimensions);
 
         // if we have multiple monitors, we must check if the panel would be placed inbetween
-        // monitors. If that's the case we have to move it to the topmost, or we'll make the 
+        // monitors. If that's the case we have to move it to the topmost, or we'll make the
         // upper monitor unusable because of the struts.
-        // First check if there are monitors overlapping horizontally and if they are higher 
+        // First check if there are monitors overlapping horizontally and if they are higher
         // our current highest, make this one the new highest and test all again
         if (screen.get_n_monitors () > 1) {
             Gdk.Rectangle dimensions;

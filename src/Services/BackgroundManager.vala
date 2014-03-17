@@ -1,23 +1,22 @@
 // -*- Mode: vala; indent-tabs-mode: nil; tab-width: 4 -*-
-//  
-//  Copyright (C) 2013 Wingpanel Developers
-// 
+//
+//  Copyright (C) 2014 Wingpanel Developers
+//
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
-// 
+//
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU General Public License for more details.
-// 
+//
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Wingpanel.Services {
-    struct ColorInformation
-    {
+    struct ColorInformation {
         double average_red;
         double average_green;
         double average_blue;
@@ -35,50 +34,51 @@ namespace Wingpanel.Services {
     public class BackgroundManager : Object {
         public static const double MIN_ALPHA = 0.3;
 
-        const int HEIGHT = 50;
-        const double MIN_VARIANCE = 50;
-        const double MIN_LUM = 25;
+        private const int HEIGHT = 50;
+        private const double MIN_VARIANCE = 50;
+        private const double MIN_LUM = 25;
 
         /**
          * Emitted when the background changed. It supplies the alpha value that
          * can be used with this wallpaper while maintining legibility
          */
         public signal void update_background_alpha (double legible_alpha_value);
-        
-        public Services.Settings settings { get; construct set; }
-        public Gdk.Screen screen { get; construct set; }
 
-        GalaDBus? gala_dbus = null;
-        
+        private Services.Settings settings;
+        private Gdk.Screen screen;
+        private GalaDBus gala_dbus;
+
         public BackgroundManager (Services.Settings settings, Gdk.Screen screen) {
-            Object (settings: settings, screen: screen);
+            this.settings = settings;
+            this.screen = screen;
+            establish_connection ();
         }
 
-        construct {
+        private void establish_connection () {
             try {
-                gala_dbus = Bus.get_proxy_sync (BusType.SESSION, "org.pantheon.gala", 
-                    "/org/pantheon/gala");
-
-                gala_dbus.background_changed.connect (background_changed);
-
-                background_changed ();
+                gala_dbus = Bus.get_proxy_sync (BusType.SESSION,
+                                                "org.pantheon.gala",
+                                                "/org/pantheon/gala");
+                gala_dbus.background_changed.connect (on_background_change);
+                on_background_change ();
             } catch (Error e) {
                 gala_dbus = null;
                 warning ("Auto-adjustment of background opacity not available, " +
                     "connecting to gala dbus failed: %s", e.message);
+                return;
             }
         }
 
-        private void background_changed ()
-        {
-            if (settings.auto_adjust_alpha) {
-                calculate_alpha.begin ((obj, res) => {
-                    var alpha = calculate_alpha.end (res);
-                    update_background_alpha (alpha);
-                });
-            }
+        private void on_background_change () {
+            if (!settings.auto_adjust_alpha)
+                return;
+
+            calculate_alpha.begin ((obj, res) => {
+                var alpha = calculate_alpha.end (res);
+                update_background_alpha (alpha);
+            });
         }
-        
+
         private async double calculate_alpha () {
             double alpha = 0;
             Gdk.Rectangle monitor_geometry;
@@ -103,7 +103,7 @@ namespace Wingpanel.Services {
                 && (color_info.mean > MIN_LUM
                 || color_info.variance > MIN_VARIANCE))
                 alpha = MIN_ALPHA;
-            
+
             return alpha;
         }
     }

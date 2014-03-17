@@ -2,7 +2,7 @@
 /***
   BEGIN LICENSE
 
-  Copyright (C) 2011-2012 Wingpanel Developers
+  Copyright (C) 2011-2014 Wingpanel Developers
   This program is free software: you can redistribute it and/or modify it
   under the terms of the GNU Lesser General Public License version 3, as published
   by the Free Software Foundation.
@@ -31,12 +31,11 @@ namespace Wingpanel.Widgets {
 
         private IndicatorLoader indicator_loader;
 
-        public Panel (Gtk.Application app, Services.Settings _settings, IndicatorLoader indicator_loader) {
-            set_application (app);
-            
-            settings = _settings;
+        public Panel (Gtk.Application app, Services.Settings settings, IndicatorLoader indicator_loader) {
+			base (settings);
 
             this.indicator_loader = indicator_loader;
+            set_application (app);
 
             container = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
             left_wrapper = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
