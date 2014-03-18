@@ -13,7 +13,17 @@
 		<key type="s" name="default-launcher">
 			<default>"slingshot-launcher"</default>
 			<summary>The default program to use as App launcher.</summary>
-			<description>Description</description>
+			<description>The default program to use as App launcher.</description>
+		</key>
+		<key type="d" name="background-alpha">
+			<default>0.8</default>
+			<summary>Background opacity variable.</summary>
+			<description>Background opacity variable (must be between zero and one).</description>
+		</key>
+		<key type="b" name="auto-adjust-alpha">
+			<default>true</default>
+			<summary>Automatically update background alpha.</summary>
+			<description>Automatically update the background alpha to zero if it will be readable, else 0.8.</description>
 		</key>
 	</schema>
 </schemalist>

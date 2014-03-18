@@ -18,6 +18,7 @@
 public class Wingpanel.App : Granite.Application {
     private IndicatorLoader indicator_loader;
     private Widgets.BasePanel panel;
+    private Services.BackgroundManager background_manager;
 
     construct {
         build_data_dir = Build.DATADIR;
@@ -41,6 +42,9 @@ public class Wingpanel.App : Granite.Application {
         panel = new Widgets.Panel (this, settings, indicator_loader);
 
         panel.show_all ();
+
+        background_manager = new Services.BackgroundManager (settings, panel.get_screen ());
+        background_manager.update_background_alpha.connect (panel.update_opacity);
     }
 
     protected override void activate () {

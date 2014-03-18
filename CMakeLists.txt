@@ -37,13 +37,14 @@ set (WINGPANEL_DEPS
     gobject-2.0
     glib-2.0
     gio-2.0
-    gee-1.0
+    gee-0.8
     gdk-x11-3.0
     x11
     gtk+-3.0
     granite
     indicator3-0.4
     libido3-0.1
+    libwnck-3.0
 )
 
 set (WINGPANEL_DEPS_NOVALA
@@ -71,6 +72,8 @@ add_definitions(${DEPS_CFLAGS} ${DEPS_NOVALA_CFLAGS} -include config.h)
 
 link_libraries(${DEPS_LIBRARIES} ${DEPS_NOVALA_LIBRARIES})
 link_directories(${DEPS_LIBRARY_DIRS} ${DEPS_NOVALA_DIRS})
+
+add_definitions (-DWNCK_I_KNOW_THIS_IS_UNSTABLE)
 
 # Handle Vala Compilation
 find_package(Vala REQUIRED)
@@ -101,6 +104,7 @@ vala_precompile (VALA_C ${EXEC_NAME}
     src/Services/AppLauncherService.vala
     src/Services/LauncherRunner.vala
     src/Services/IndicatorSorter.vala
+    src/Services/BackgroundManager.vala
 PACKAGES
 	${WINGPANEL_DEPS}
 CUSTOM_VAPIS
@@ -120,6 +124,7 @@ add_subdirectory (po)
 
 # Create the Executable
 add_executable(${EXEC_NAME} ${VALA_C})
+target_link_libraries(${EXEC_NAME} m)
 
 # Installation
 install (TARGETS ${EXEC_NAME} RUNTIME DESTINATION bin)

@@ -2,7 +2,7 @@
 /***
   BEGIN LICENSE
 
-  Copyright (C) 2011-2012 Wingpanel Developers
+  Copyright (C) 2011-2014 Wingpanel Developers
   This program is free software: you can redistribute it and/or modify it
   under the terms of the GNU Lesser General Public License version 3, as published
   by the Free Software Foundation.
@@ -32,9 +32,10 @@ namespace Wingpanel.Widgets {
         private IndicatorLoader indicator_loader;
 
         public Panel (Gtk.Application app, Services.Settings settings, IndicatorLoader indicator_loader) {
-            set_application (app);
+            base (settings);
 
             this.indicator_loader = indicator_loader;
+            set_application (app);
 
             container = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
             left_wrapper = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
@@ -112,6 +113,18 @@ namespace Wingpanel.Widgets {
             var gpr = new Gtk.SizeGroup (Gtk.SizeGroupMode.HORIZONTAL);
             gpr.add_widget (left_wrapper);
             gpr.add_widget (right_wrapper);
+
+            // make sure those are all transparent when we later adjust the transparency
+            // in the panel's draw callback
+            clock.override_background_color (Gtk.StateFlags.NORMAL, Gdk.RGBA () {
+                red = 0.0, green = 0.0, blue = 0.0, alpha = 0.0
+            });
+            menubar.override_background_color (Gtk.StateFlags.NORMAL, Gdk.RGBA () {
+                red = 0.0, green = 0.0, blue = 0.0, alpha = 0.0
+            });
+            apps_menubar.override_background_color (Gtk.StateFlags.NORMAL, Gdk.RGBA () {
+                red = 0.0, green = 0.0, blue = 0.0, alpha = 0.0
+            });
         }
     }
 }
