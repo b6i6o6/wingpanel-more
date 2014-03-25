@@ -76,10 +76,15 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
         wnck_screen.window_opened.connect ((window) => {
             if (window.get_window_type () == Wnck.WindowType.NORMAL)
                 window.state_changed.connect (window_state_changed);
+
+            update_panel_alpha ();
         });
+
         wnck_screen.window_closed.connect ((window) => {
             if (window.get_window_type () == Wnck.WindowType.NORMAL)
                 window.state_changed.disconnect (window_state_changed);
+
+            update_panel_alpha ();
         });
 
         update_panel_alpha ();
