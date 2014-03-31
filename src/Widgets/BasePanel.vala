@@ -76,10 +76,15 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
         wnck_screen.window_opened.connect ((window) => {
             if (window.get_window_type () == Wnck.WindowType.NORMAL)
                 window.state_changed.connect (window_state_changed);
+
+            update_panel_alpha ();
         });
+
         wnck_screen.window_closed.connect ((window) => {
             if (window.get_window_type () == Wnck.WindowType.NORMAL)
                 window.state_changed.disconnect (window_state_changed);
+
+            update_panel_alpha ();
         });
 
         update_panel_alpha ();
@@ -87,8 +92,9 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
 
     private void window_state_changed (Wnck.Window window,
             Wnck.WindowState changed_mask, Wnck.WindowState new_state) {
-        if ((changed_mask & Wnck.WindowState.MAXIMIZED_HORIZONTALLY) != 0
+        if (((changed_mask & Wnck.WindowState.MAXIMIZED_HORIZONTALLY) != 0
             || (changed_mask & Wnck.WindowState.MAXIMIZED_VERTICALLY) != 0
+            || (changed_mask & Wnck.WindowState.MINIMIZED) != 0)
             && (window.get_workspace () == wnck_screen.get_active_workspace ()
             || window.is_sticky ()))
             update_panel_alpha ();
@@ -194,7 +200,7 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
 
         foreach (var window in wnck_screen.get_windows ()) {
             if ((window.is_pinned () || window.get_workspace () == workspace)
-                && window.is_maximized ())
+                && window.is_maximized () && !window.is_minimized ())
                 return true;
         }
 
