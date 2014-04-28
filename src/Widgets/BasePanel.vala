@@ -197,10 +197,17 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
 
     private bool active_workspace_has_maximized_window () {
         var workspace = wnck_screen.get_active_workspace ();
+        var primary_monitor = screen.get_primary_monitor ();
 
+        int window_x;
+        int window_y;
+        
         foreach (var window in wnck_screen.get_windows ()) {
+            window.get_geometry (out window_x, out window_y, null, null);
+
             if ((window.is_pinned () || window.get_workspace () == workspace)
-                && window.is_maximized () && !window.is_minimized ())
+                && window.is_maximized () && !window.is_minimized ()
+                && (screen.get_monitor_at_point (window_x, window_y) == primary_monitor))
                 return true;
         }
 
