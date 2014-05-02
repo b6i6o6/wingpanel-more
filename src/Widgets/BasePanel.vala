@@ -228,7 +228,7 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
 
         struts[Struts.TOP] = (panel_height + panel_y) * this.get_scale_factor ();
         struts[Struts.TOP_START] = panel_x;
-        struts[Struts.TOP_END] = panel_x + panel_width;
+        struts[Struts.TOP_END] = panel_x + panel_width - 1;
 
         var first_struts = new ulong[Struts.BOTTOM + 1];
         for (var i = 0; i < first_struts.length; i++)
