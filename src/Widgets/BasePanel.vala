@@ -226,7 +226,7 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
         // we have to allocate 4 times as much and do bit-masking
         var struts = new ulong[Struts.N_VALUES];
 
-        struts[Struts.TOP] = panel_height + panel_y;
+        struts[Struts.TOP] = (panel_height + panel_y) * this.get_scale_factor ();
         struts[Struts.TOP_START] = panel_x;
         struts[Struts.TOP_END] = panel_x + panel_width;
 
