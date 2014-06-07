@@ -54,6 +54,12 @@ public class Wingpanel.Widgets.IndicatorButton : Gtk.MenuItem {
             old_widget.get_style_context ().remove_class (StyleClass.COMPOSITED_INDICATOR);
         }
 
+        // Some widgets may still be part of a previous entry if
+        // their parent hasn't been actually removed from the panel
+        var parent = widget.parent;
+        if (parent != null)
+            parent.remove (widget);
+
         widget.get_style_context ().add_class (StyleClass.COMPOSITED_INDICATOR);
 
         if (slot == WidgetSlot.LABEL) {
