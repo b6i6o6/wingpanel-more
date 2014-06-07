@@ -75,7 +75,8 @@ namespace Wingpanel.Backend {
             // another panel entry which hasn't been destroyed yet. Those indicators
             // trigger entry-removed after entry-added, which means that the previous
             // parent is still in the panel when the new one is added.
-            entry.menu.detach ();
+            if (entry.menu.get_attach_widget () != null)
+                entry.menu.detach ();
 
             set_submenu (entry.menu);
 
