@@ -71,6 +71,12 @@ namespace Wingpanel.Backend {
                 return;
             }
 
+            // Workaround for buggy indicators: this menu may still be part of
+            // another panel entry which hasn't been destroyed yet. Those indicators
+            // trigger entry-removed after entry-added, which means that the previous
+            // parent is still in the panel when the new one is added.
+            entry.menu.detach ();
+
             set_submenu (entry.menu);
 
             setup_drawing ();
