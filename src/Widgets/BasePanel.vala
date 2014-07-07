@@ -74,15 +74,19 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
         wnck_screen = Wnck.Screen.get_default ();
         wnck_screen.active_workspace_changed.connect (update_panel_alpha);
         wnck_screen.window_opened.connect ((window) => {
-            if (window.get_window_type () == Wnck.WindowType.NORMAL)
+            if (window.get_window_type () == Wnck.WindowType.NORMAL) {
                 window.state_changed.connect (window_state_changed);
+                window.workspace_changed.connect (window_workspace_changed);
+            }
 
             update_panel_alpha ();
         });
 
         wnck_screen.window_closed.connect ((window) => {
-            if (window.get_window_type () == Wnck.WindowType.NORMAL)
+            if (window.get_window_type () == Wnck.WindowType.NORMAL) {
                 window.state_changed.disconnect (window_state_changed);
+                window.workspace_changed.disconnect (window_workspace_changed);
+            }
 
             update_panel_alpha ();
         });
@@ -98,6 +102,10 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
             && (window.get_workspace () == wnck_screen.get_active_workspace ()
             || window.is_sticky ()))
             update_panel_alpha ();
+    }
+
+    private void window_workspace_changed (Wnck.Window window) {
+        update_panel_alpha ();
     }
 
     protected abstract Gtk.StyleContext get_draw_style_context ();
