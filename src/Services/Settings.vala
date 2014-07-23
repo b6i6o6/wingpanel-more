@@ -25,6 +25,7 @@ namespace Wingpanel.Services {
         public string default_launcher { get; set; }
         public double background_alpha { get; set; }
         public bool auto_adjust_alpha { get; set; }
+        public int fade_duration { get; set; }
 
         public Settings () {
             base ("org.pantheon.desktop.wingpanel");

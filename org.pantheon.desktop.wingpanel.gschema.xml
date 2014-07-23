@@ -7,8 +7,8 @@
 		</key>
 		<key type="b" name="show-launcher">
 			<default>true</default>
-			<summary>Wheather to show the Applications Launcher or not.</summary>
-			<description>Wheather to show the Applications Launcher or not.</description>
+			<summary>Whether to show the Applications Launcher or not.</summary>
+			<description>Whether to show the Applications Launcher or not.</description>
 		</key>
 		<key type="s" name="default-launcher">
 			<default>"slingshot-launcher"</default>
@@ -24,6 +24,11 @@
 			<default>true</default>
 			<summary>Automatically update background alpha.</summary>
 			<description>Automatically update the background alpha to zero if it will be readable, else 0.8.</description>
+		</key>
+		<key type="i" name="fade-duration">
+			<default>150</default>
+			<summary>Duration of the panel fade animation.</summary>
+			<description>Time taken to fade from 0 to 1 opacity.</description>
 		</key>
 	</schema>
 </schemalist>
