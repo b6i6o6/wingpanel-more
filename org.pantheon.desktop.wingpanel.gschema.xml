@@ -25,10 +25,5 @@
 			<summary>Automatically update background alpha.</summary>
 			<description>Automatically update the background alpha to zero if it will be readable, else 0.8.</description>
 		</key>
-		<key type="i" name="fade-duration">
-			<default>150</default>
-			<summary>Duration of the panel fade animation.</summary>
-			<description>Time taken to fade from 0 to 1 opacity.</description>
-		</key>
 	</schema>
 </schemalist>

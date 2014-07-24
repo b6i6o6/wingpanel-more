@@ -41,14 +41,16 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
     private int panel_y;
     private int panel_width;
     private int panel_displacement = -40;
+    private int monitor_num;
     private uint animation_timer = 0;
 
     private double legible_alpha_value = -1.0;
     private double panel_alpha = 0.0;
     private double panel_current_alpha = 0.0;
-    private double alpha_animation_step = 0.05;
+    private double alpha_animation_step;
     private uint panel_alpha_timer = 0;
     const int FPS = 60;
+    const int fallback_fade_duration = 150;
 
     private PanelShadow shadow = new PanelShadow ();
     private Wnck.Screen wnck_screen;
@@ -170,8 +172,33 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
         }
 
         if (panel_current_alpha != panel_alpha)
-            alpha_animation_step = (double) 1000 / (FPS * settings.fade_duration);
-            panel_alpha_timer = add_tick_callback(draw_timeout);
+            alpha_animation_step = get_alpha_animation_step ();
+            panel_alpha_timer = add_tick_callback (draw_timeout);
+    }
+
+    private double get_alpha_animation_step () {
+        double aa_step;
+
+        if ("org.pantheon.desktop.gala.animations" in GLib.Settings.list_schemas ()) {
+            bool enable_animations = new Settings ("org.pantheon.desktop.gala.animations").get_boolean ("enable-animations");
+
+            if (enable_animations) {
+                int snap_duration = new Settings ("org.pantheon.desktop.gala.animations").get_int ("snap-duration");
+
+                if (legible_alpha_value >= 0)
+                    aa_step = (double) 1000 * (1 - legible_alpha_value) / (FPS * snap_duration);
+                else
+                    aa_step = (double) 1000 / (FPS * snap_duration);
+
+                return aa_step;
+            }
+
+            return 1;
+        }
+
+        aa_step = (double) 1000 / (FPS * fallback_fade_duartion);
+
+        return aa_step;
     }
 
     private bool draw_timeout () {
@@ -189,7 +216,7 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
             return true;
 
         if (panel_alpha_timer > 0) {
-            remove_tick_callback(panel_alpha_timer);
+            remove_tick_callback (panel_alpha_timer);
             panel_alpha_timer = 0;
         }
 
@@ -208,16 +235,29 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
 
     private bool active_workspace_has_maximized_window () {
         var workspace = wnck_screen.get_active_workspace ();
+        var monitor_workarea = screen.get_monitor_workarea (monitor_num);
+        bool window_left = false, window_right = false;
         
         foreach (var window in wnck_screen.get_windows ()) {
-            int window_x, window_y;
-            window.get_geometry (out window_x, out window_y, null, null);
+            int window_x, window_y, window_width, window_height;
+            window.get_geometry (out window_x, out window_y, out window_width, out window_height);
 
             if ((window.is_pinned () || window.get_workspace () == workspace)
                 && window.is_maximized_vertically () && !window.is_minimized ()
-                && (window_x == panel_x || window_x == panel_x + panel_width / 2)
-                && window_y == (panel_y + panel_height) * this.get_scale_factor ())
-                return true;
+                && window_y == monitor_workarea.y) {
+                    if (window_x == monitor_workarea.x
+                        && window_width == monitor_workarea.width)
+                        return true;
+                    else if (window_x == monitor_workarea.x
+                        && window_width == monitor_workarea.width / 2)
+                        window_left = true;
+                    else if (window_x == monitor_workarea.x + monitor_workarea.width / 2
+                        && window_width == monitor_workarea.width / 2)
+                        window_right = true;
+
+                    if (window_left && window_right)
+                        return true;
+            }
         }
 
         return false;
@@ -255,7 +295,8 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
     private void panel_resize (bool redraw) {
         Gdk.Rectangle monitor_dimensions;
 
-        screen.get_monitor_geometry (screen.get_primary_monitor (), out monitor_dimensions);
+        monitor_num = screen.get_primary_monitor ();
+        screen.get_monitor_geometry (monitor_num, out monitor_dimensions);
 
         // if we have multiple monitors, we must check if the panel would be placed inbetween
         // monitors. If that's the case we have to move it to the topmost, or we'll make the
@@ -276,6 +317,7 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
                     warning ("Not placing wingpanel on the primary monitor because of problems" +
                         " with multimonitor setups");
                     monitor_dimensions = dimensions;
+                    monitor_num = i;
                     i = 0;
                 }
             }
