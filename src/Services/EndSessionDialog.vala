@@ -57,7 +57,7 @@ namespace Wingpanel.Services {
          *             shutdown/reboot dialog.
          */
         public Dialog (EndSessionDialogType type) {
-            Object (dialog_type: type, title: "");
+            Object (dialog_type: type, title: "", deletable: false);
         }
 
         construct {
