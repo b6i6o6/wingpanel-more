@@ -36,6 +36,7 @@ public class Wingpanel.App : Granite.Application {
         base.startup ();
 
         Ido.init ();
+        Services.EndSessionDialog.register ();
 
         var settings = new Services.Settings ();
         indicator_loader = new Backend.IndicatorFactory (settings.blacklist);
