@@ -47,10 +47,10 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
     private double legible_alpha_value = -1.0;
     private double panel_alpha = 0.0;
     private double panel_current_alpha = 0.0;
-    private double alpha_animation_step;
-    private uint panel_alpha_timer = 0;
-    const int FPS = 60;
-    const int fallback_fade_duration = 150;
+    private double initial_panel_alpha;
+    private int fade_duration;
+    private int64 start_time;
+    const int FALLBACK_FADE_DURATION = 150;
 
     private PanelShadow shadow = new PanelShadow ();
     private Wnck.Screen wnck_screen;
@@ -95,7 +95,26 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
             update_panel_alpha ();
         });
 
+        var gala_settings = new Settings ("org.pantheon.desktop.gala.animations");
+        gala_settings.changed["enable-animations"].connect(get_fade_duration);
+        gala_settings.changed["snap-duration"].connect(get_fade_duration);
+
+        get_fade_duration ();
+
         update_panel_alpha ();
+    }
+
+    private void get_fade_duration () {
+        if ("org.pantheon.desktop.gala.animations" in Settings.list_schemas ()) {
+            var gala_settings = new Settings ("org.pantheon.desktop.gala.animations");
+
+            if (gala_settings.get_boolean ("enable-animations"))
+                fade_duration = gala_settings.get_int ("snap-duration");
+            else
+                fade_duration = 0;
+        } else {
+            fade_duration = FALLBACK_FADE_DURATION;
+        }
     }
 
     private void window_state_changed (Wnck.Window window,
@@ -171,54 +190,40 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
                 panel_alpha = legible_alpha_value;
         }
 
-        if (panel_current_alpha != panel_alpha)
-            alpha_animation_step = get_alpha_animation_step ();
-            panel_alpha_timer = add_tick_callback (draw_timeout);
+        if (panel_current_alpha != panel_alpha) {
+            initial_panel_alpha = panel_current_alpha;
+            start_time = 0;
+            add_tick_callback (draw_timeout);
+        }            
     }
 
-    private double get_alpha_animation_step () {
-        double aa_step;
-
-        if ("org.pantheon.desktop.gala.animations" in GLib.Settings.list_schemas ()) {
-            bool enable_animations = new Settings ("org.pantheon.desktop.gala.animations").get_boolean ("enable-animations");
-
-            if (enable_animations) {
-                int snap_duration = new Settings ("org.pantheon.desktop.gala.animations").get_int ("snap-duration");
-
-                if (legible_alpha_value >= 0)
-                    aa_step = (double) 1000 * (1 - legible_alpha_value) / (FPS * snap_duration);
-                else
-                    aa_step = (double) 1000 / (FPS * snap_duration);
-
-                return aa_step;
-            }
-
-            return 1;
-        }
-
-        aa_step = (double) 1000 / (FPS * fallback_fade_duartion);
-
-        return aa_step;
-    }
-
-    private bool draw_timeout () {
+    private bool draw_timeout (Gtk.Widget widget, Gdk.FrameClock frame_clock) {
         queue_draw ();
 
-        if (panel_current_alpha > panel_alpha) {
-            panel_current_alpha -= alpha_animation_step;
+        if (fade_duration == 0) {
+            panel_current_alpha = panel_alpha;
+
+            return false;
+        }
+
+        if (start_time == 0) {
+            start_time = frame_clock.get_frame_time ();
+
+            return true;
+        }
+
+        if (initial_panel_alpha > panel_alpha) {
+            panel_current_alpha = initial_panel_alpha - ((double) (frame_clock.get_frame_time () - start_time) 
+            / (fade_duration * 1000)) * (initial_panel_alpha - panel_alpha);
             panel_current_alpha = double.max (panel_current_alpha, panel_alpha);
-        } else if (panel_current_alpha < panel_alpha) {
-            panel_current_alpha += alpha_animation_step;
+        } else if (initial_panel_alpha < panel_alpha) {
+            panel_current_alpha = initial_panel_alpha + ((double) (frame_clock.get_frame_time () - start_time) 
+            / (fade_duration * 1000)) * (panel_alpha - initial_panel_alpha);
             panel_current_alpha = double.min (panel_current_alpha, panel_alpha);
         }
 
         if (panel_current_alpha != panel_alpha)
             return true;
-
-        if (panel_alpha_timer > 0) {
-            remove_tick_callback (panel_alpha_timer);
-            panel_alpha_timer = 0;
-        }
 
         return false;
     }
