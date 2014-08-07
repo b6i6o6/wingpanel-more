@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-06 22:41+0200\n"
+"POT-Creation-Date: 2014-08-06 22:10-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,38 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: /home/fabian/dev/wingpanel/po/../src/Widgets/AppsButton.vala:36
-#, c-format
+#: /home/codygarver/wingpanel/po/../src/Widgets/AppsButton.vala:40
 msgid "Applications"
+msgstr ""
+
+#: /home/codygarver/wingpanel/po/../src/Services/EndSessionDialog.vala:72
+msgid "Are you sure you want to Log Out?"
+msgstr ""
+
+#: /home/codygarver/wingpanel/po/../src/Services/EndSessionDialog.vala:73
+msgid "This will close all open applications."
+msgstr ""
+
+#: /home/codygarver/wingpanel/po/../src/Services/EndSessionDialog.vala:74
+msgid "Log Out"
+msgstr ""
+
+#: /home/codygarver/wingpanel/po/../src/Services/EndSessionDialog.vala:79
+msgid "Are you sure you want to Shut Down?"
+msgstr ""
+
+#: /home/codygarver/wingpanel/po/../src/Services/EndSessionDialog.vala:80
+msgid "This will close all open applications and turn off this device."
+msgstr ""
+
+#: /home/codygarver/wingpanel/po/../src/Services/EndSessionDialog.vala:81
+msgid "Shut Down"
+msgstr ""
+
+#: /home/codygarver/wingpanel/po/../src/Services/EndSessionDialog.vala:114
+msgid "Restart"
+msgstr ""
+
+#: /home/codygarver/wingpanel/po/../src/Services/EndSessionDialog.vala:121
+msgid "Cancel"
 msgstr ""
