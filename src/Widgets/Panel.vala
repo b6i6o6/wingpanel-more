@@ -57,7 +57,7 @@ namespace Wingpanel.Widgets {
         }
 
         protected override Gtk.StyleContext get_draw_style_context () {
-            return menubar.get_style_context ();
+            return get_style_context ();
         }
 
         private void load_indicators () {
