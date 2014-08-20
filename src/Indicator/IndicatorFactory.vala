@@ -49,8 +49,10 @@ public class Wingpanel.Backend.IndicatorFactory : Object, IndicatorLoader {
         // Legacy indicator libraries
         load_indicators_from_dir (Build.INDICATORDIR, true, skip_list);
 
+#if !NO_INDICATOR_NG
         // Ng indicators
         load_indicators_from_dir ("/usr/share/unity/indicators", false, skip_list);
+#endif
     }
 
     private void load_indicators_from_dir (string dir_path, bool legacy_libs_only, string skip_list) {
@@ -79,17 +81,21 @@ public class Wingpanel.Backend.IndicatorFactory : Object, IndicatorLoader {
         try {
             Indicator.Object indicator = null;
 
+#if !NO_INDICATOR_NG
             if (legacy_lib) {
+#endif
                 if (!name.has_suffix (".so"))
                     return;
 
                 debug ("Loading Indicator Library: %s", name);
                 indicator = new Indicator.Object.from_file (indicator_path);
+#if !NO_INDICATOR_NG
             } else {
                 debug ("Loading Indicator File: %s", name);
                 indicator = new Indicator.Ng.for_profile (indicator_path, "desktop");
             }
 
+#endif
             if (indicator != null)
                 indicators.add (new IndicatorObject (indicator, name));
             else
