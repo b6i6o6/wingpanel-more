@@ -35,20 +35,23 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
     protected Services.Settings settings { get; private set; }
 
     private const int SHADOW_SIZE = 4;
+    private const int FALLBACK_FADE_DURATION = 150;
 
     private int panel_height = 0;
     private int panel_x;
     private int panel_y;
     private int panel_width;
     private int panel_displacement = -40;
+    private int monitor_num;
     private uint animation_timer = 0;
 
     private double legible_alpha_value = -1.0;
     private double panel_alpha = 0.0;
     private double panel_current_alpha = 0.0;
-    private uint panel_alpha_timer = 0;
-    const int FPS = 60;
-    const double ALPHA_ANIMATION_STEP = 0.05;
+    private double initial_panel_alpha;
+    private int fade_duration;
+    private int64 start_time;
+    private Settings? gala_settings = null;
 
     private PanelShadow shadow = new PanelShadow ();
     private Wnck.Screen wnck_screen;
@@ -76,7 +79,8 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
         wnck_screen.window_opened.connect ((window) => {
             if (window.get_window_type () == Wnck.WindowType.NORMAL) {
                 window.state_changed.connect (window_state_changed);
-                window.workspace_changed.connect (window_workspace_changed);
+                window.geometry_changed.connect (window_geometry_changed);
+                window.workspace_changed.connect (update_panel_alpha);
             }
 
             update_panel_alpha ();
@@ -85,27 +89,47 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
         wnck_screen.window_closed.connect ((window) => {
             if (window.get_window_type () == Wnck.WindowType.NORMAL) {
                 window.state_changed.disconnect (window_state_changed);
-                window.workspace_changed.disconnect (window_workspace_changed);
+                window.geometry_changed.disconnect (window_geometry_changed);
+                window.workspace_changed.disconnect (update_panel_alpha);
             }
 
             update_panel_alpha ();
         });
 
+        if ("org.pantheon.desktop.gala.animations" in Settings.list_schemas ()) {
+            gala_settings = new Settings ("org.pantheon.desktop.gala.animations");
+            gala_settings.changed["enable-animations"].connect(get_fade_duration);
+            gala_settings.changed["snap-duration"].connect(get_fade_duration);
+        }
+
+        get_fade_duration ();
+
         update_panel_alpha ();
+    }
+
+    private void get_fade_duration () {
+        if (gala_settings != null) {
+            if (gala_settings.get_boolean ("enable-animations"))
+                fade_duration = gala_settings.get_int ("snap-duration");
+            else
+                fade_duration = 0;
+        } else {
+            fade_duration = FALLBACK_FADE_DURATION;
+        }
     }
 
     private void window_state_changed (Wnck.Window window,
             Wnck.WindowState changed_mask, Wnck.WindowState new_state) {
-        if (((changed_mask & Wnck.WindowState.MAXIMIZED_HORIZONTALLY) != 0
-            || (changed_mask & Wnck.WindowState.MAXIMIZED_VERTICALLY) != 0
+        if (((changed_mask & Wnck.WindowState.MAXIMIZED_VERTICALLY) != 0
             || (changed_mask & Wnck.WindowState.MINIMIZED) != 0)
             && (window.get_workspace () == wnck_screen.get_active_workspace ()
             || window.is_sticky ()))
             update_panel_alpha ();
     }
 
-    private void window_workspace_changed (Wnck.Window window) {
-        update_panel_alpha ();
+    private void window_geometry_changed (Wnck.Window window) {
+        if (window.is_maximized_vertically ())
+            update_panel_alpha ();
     }
 
     protected abstract Gtk.StyleContext get_draw_style_context ();
@@ -167,28 +191,40 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
                 panel_alpha = legible_alpha_value;
         }
 
-        if (panel_current_alpha != panel_alpha)
-            panel_alpha_timer = Gdk.threads_add_timeout (1000 / FPS, draw_timeout);
+        if (panel_current_alpha != panel_alpha) {
+            initial_panel_alpha = panel_current_alpha;
+            start_time = 0;
+            add_tick_callback (draw_timeout);
+        }  
     }
 
-    private bool draw_timeout () {
+    private bool draw_timeout (Gtk.Widget widget, Gdk.FrameClock frame_clock) {
         queue_draw ();
 
-        if (panel_current_alpha > panel_alpha) {
-            panel_current_alpha -= ALPHA_ANIMATION_STEP;
+        if (fade_duration == 0) {
+            panel_current_alpha = panel_alpha;
+
+            return false;
+        }
+
+        if (start_time == 0) {
+            start_time = frame_clock.get_frame_time ();
+
+            return true;
+        }
+
+        if (initial_panel_alpha > panel_alpha) {
+            panel_current_alpha = initial_panel_alpha - ((double) (frame_clock.get_frame_time () - start_time) 
+            / (fade_duration * 1000)) * (initial_panel_alpha - panel_alpha);
             panel_current_alpha = double.max (panel_current_alpha, panel_alpha);
-        } else if (panel_current_alpha < panel_alpha) {
-            panel_current_alpha += ALPHA_ANIMATION_STEP;
+        } else if (initial_panel_alpha < panel_alpha) {
+            panel_current_alpha = initial_panel_alpha + ((double) (frame_clock.get_frame_time () - start_time) 
+            / (fade_duration * 1000)) * (panel_alpha - initial_panel_alpha);
             panel_current_alpha = double.min (panel_current_alpha, panel_alpha);
         }
 
         if (panel_current_alpha != panel_alpha)
             return true;
-
-        if (panel_alpha_timer > 0) {
-            Source.remove (panel_alpha_timer);
-            panel_alpha_timer = 0;
-        }
 
         return false;
     }
@@ -205,18 +241,29 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
 
     private bool active_workspace_has_maximized_window () {
         var workspace = wnck_screen.get_active_workspace ();
-        var primary_monitor = screen.get_primary_monitor ();
-
-        int window_x;
-        int window_y;
+        var monitor_workarea = screen.get_monitor_workarea (monitor_num);
+        bool window_left = false, window_right = false;
         
         foreach (var window in wnck_screen.get_windows ()) {
-            window.get_geometry (out window_x, out window_y, null, null);
+            int window_x, window_y, window_width, window_height;
+            window.get_geometry (out window_x, out window_y, out window_width, out window_height);
 
             if ((window.is_pinned () || window.get_workspace () == workspace)
-                && window.is_maximized () && !window.is_minimized ()
-                && (screen.get_monitor_at_point (window_x, window_y) == primary_monitor))
-                return true;
+                && window.is_maximized_vertically () && !window.is_minimized ()
+                && window_y == monitor_workarea.y) {
+                    if (window_x == monitor_workarea.x
+                        && window_width == monitor_workarea.width)
+                        return true;
+                    else if (window_x == monitor_workarea.x
+                        && window_width == monitor_workarea.width / 2)
+                        window_left = true;
+                    else if (window_x == monitor_workarea.x + monitor_workarea.width / 2
+                        && window_width == monitor_workarea.width / 2)
+                        window_right = true;
+
+                    if (window_left && window_right)
+                        return true;
+            }
         }
 
         return false;
@@ -254,7 +301,8 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
     private void panel_resize (bool redraw) {
         Gdk.Rectangle monitor_dimensions;
 
-        screen.get_monitor_geometry (screen.get_primary_monitor (), out monitor_dimensions);
+        monitor_num = screen.get_primary_monitor ();
+        screen.get_monitor_geometry (monitor_num, out monitor_dimensions);
 
         // if we have multiple monitors, we must check if the panel would be placed inbetween
         // monitors. If that's the case we have to move it to the topmost, or we'll make the
@@ -275,6 +323,7 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
                     warning ("Not placing wingpanel on the primary monitor because of problems" +
                         " with multimonitor setups");
                     monitor_dimensions = dimensions;
+                    monitor_num = i;
                     i = 0;
                 }
             }
