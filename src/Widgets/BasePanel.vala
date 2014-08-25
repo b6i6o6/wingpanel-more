@@ -51,7 +51,18 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
     private double initial_panel_alpha;
     private int fade_duration;
     private int64 start_time;
+
     private Settings? gala_settings = null;
+    private enum duration {
+        DEFAULT,
+        CLOSE,
+        MINIMIZE,
+        OPEN,
+        SNAP,
+        WORKSPACE,
+        N_VALUES
+    }
+    private int[] duration_values;
 
     private PanelShadow shadow = new PanelShadow ();
     private Wnck.Screen wnck_screen;
@@ -75,47 +86,64 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
         destroy.connect (Gtk.main_quit);
 
         wnck_screen = Wnck.Screen.get_default ();
-        wnck_screen.active_workspace_changed.connect (update_panel_alpha);
+        wnck_screen.active_workspace_changed.connect (active_workspace_changed);
         wnck_screen.window_opened.connect ((window) => {
             if (window.get_window_type () == Wnck.WindowType.NORMAL) {
                 window.state_changed.connect (window_state_changed);
-                window.geometry_changed.connect (window_geometry_changed);
-                window.workspace_changed.connect (update_panel_alpha);
+                window.workspace_changed.connect (window_workspace_switched);
             }
 
-            update_panel_alpha ();
+            if (window.get_window_type () != Wnck.WindowType.DOCK)
+                update_panel_alpha (duration.OPEN);
         });
 
         wnck_screen.window_closed.connect ((window) => {
             if (window.get_window_type () == Wnck.WindowType.NORMAL) {
                 window.state_changed.disconnect (window_state_changed);
-                window.geometry_changed.disconnect (window_geometry_changed);
-                window.workspace_changed.disconnect (update_panel_alpha);
+                window.workspace_changed.disconnect (window_workspace_switched);
             }
 
-            update_panel_alpha ();
+            if (window.get_window_type () != Wnck.WindowType.DOCK)
+                update_panel_alpha (duration.CLOSE);
         });
 
         if ("org.pantheon.desktop.gala.animations" in Settings.list_schemas ()) {
             gala_settings = new Settings ("org.pantheon.desktop.gala.animations");
-            gala_settings.changed["enable-animations"].connect(get_fade_duration);
-            gala_settings.changed["snap-duration"].connect(get_fade_duration);
+            gala_settings.changed.connect (get_duration_values);
         }
 
-        get_fade_duration ();
+        get_duration_values ();
 
-        update_panel_alpha ();
+        update_panel_alpha (duration.DEFAULT);
     }
 
-    private void get_fade_duration () {
+    private void get_duration_values () {
+        duration_values = new int[duration.N_VALUES];
+
         if (gala_settings != null) {
-            if (gala_settings.get_boolean ("enable-animations"))
-                fade_duration = gala_settings.get_int ("snap-duration");
-            else
-                fade_duration = 0;
+            if (gala_settings.get_boolean ("enable-animations")) {
+                duration_values[duration.DEFAULT] = FALLBACK_FADE_DURATION;
+                duration_values[duration.CLOSE] = gala_settings.get_int ("close-duration");
+                duration_values[duration.MINIMIZE] = gala_settings.get_int ("minimize-duration");
+                duration_values[duration.OPEN] = gala_settings.get_int ("open-duration");
+                duration_values[duration.SNAP] = gala_settings.get_int ("snap-duration");
+                duration_values[duration.WORKSPACE] = gala_settings.get_int ("workspace-switch-duration");
+            } else {
+                foreach (int val in duration_values)
+                    val = 0;
+            }
         } else {
-            fade_duration = FALLBACK_FADE_DURATION;
+            foreach (int val in duration_values)
+                val = FALLBACK_FADE_DURATION;
         }
+    }
+
+    private void active_workspace_changed () {
+        update_panel_alpha (duration.WORKSPACE);
+    }
+
+    private void window_workspace_switched () {
+        update_panel_alpha (duration.DEFAULT);
     }
 
     private void window_state_changed (Wnck.Window window,
@@ -123,13 +151,32 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
         if (((changed_mask & Wnck.WindowState.MAXIMIZED_VERTICALLY) != 0
             || (changed_mask & Wnck.WindowState.MINIMIZED) != 0)
             && (window.get_workspace () == wnck_screen.get_active_workspace ()
-            || window.is_sticky ()))
-            update_panel_alpha ();
+            || window.is_sticky ())) {
+            if ((new_state & Wnck.WindowState.MINIMIZED) != 0
+                && (changed_mask & Wnck.WindowState.MINIMIZED) != 0)
+                update_panel_alpha (duration.MINIMIZE);
+            else if ((new_state & Wnck.WindowState.MINIMIZED) == 0
+                && (changed_mask & Wnck.WindowState.MINIMIZED) != 0)
+                update_panel_alpha (duration.OPEN);
+            else if ((new_state & Wnck.WindowState.MAXIMIZED_VERTICALLY) != 0)
+                window.geometry_changed.connect (window_geometry_changed);
+            else
+                update_panel_alpha (duration.SNAP);
+        }
     }
 
     private void window_geometry_changed (Wnck.Window window) {
-        if (window.is_maximized_vertically ())
-            update_panel_alpha ();
+        var monitor_workarea = screen.get_monitor_workarea (monitor_num);
+        int window_x, window_y, window_width, window_height;
+        window.get_geometry (out window_x, out window_y, out window_width, out window_height);
+
+        if (window.is_maximized_vertically () && !window.is_minimized ()
+            && window_y == monitor_workarea.y
+            && (window_x == monitor_workarea.x || window_x == monitor_workarea.x + monitor_workarea.width / 2)
+            && (window_width == monitor_workarea.width || window_width == monitor_workarea.width / 2)) {
+            window.geometry_changed.disconnect (window_geometry_changed);
+            update_panel_alpha (duration.SNAP);
+        }
     }
 
     protected abstract Gtk.StyleContext get_draw_style_context ();
@@ -179,10 +226,10 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
 
     public void update_opacity (double alpha) {
         legible_alpha_value = alpha;
-        update_panel_alpha ();
+        update_panel_alpha (duration.DEFAULT);
     }
 
-    private void update_panel_alpha () {
+    private void update_panel_alpha (int duration_num) {
         panel_alpha = settings.background_alpha;
         if (settings.auto_adjust_alpha) {
             if (active_workspace_has_maximized_window ())
@@ -192,8 +239,10 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
         }
 
         if (panel_current_alpha != panel_alpha) {
+            fade_duration = duration_values[duration_num];
             initial_panel_alpha = panel_current_alpha;
             start_time = 0;
+
             add_tick_callback (draw_timeout);
         }  
     }
