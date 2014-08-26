@@ -1,16 +1,16 @@
-# Amharic translation for wingpanel
-# Copyright (c) 2012 Rosetta Contributors and Canonical Ltd 2012
+# Asturian translation for wingpanel
+# Copyright (c) 2014 Rosetta Contributors and Canonical Ltd 2014
 # This file is distributed under the same license as the wingpanel package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2014.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: wingpanel\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2014-08-06 22:10-0500\n"
-"PO-Revision-Date: 2012-09-22 22:53+0000\n"
-"Last-Translator: samson <Unknown>\n"
-"Language-Team: Amharic <am@li.org>\n"
+"PO-Revision-Date: 2014-03-01 14:31+0000\n"
+"Last-Translator: Xuacu Saturio <xuacusk8@gmail.com>\n"
+"Language-Team: Asturian <ast@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -19,7 +19,7 @@ msgstr ""
 
 #: /home/codygarver/wingpanel/po/../src/Widgets/AppsButton.vala:40
 msgid "Applications"
-msgstr "መተግበሪያዎች"
+msgstr "Aplicaciones"
 
 #: /home/codygarver/wingpanel/po/../src/Services/EndSessionDialog.vala:72
 msgid "Are you sure you want to Log Out?"
