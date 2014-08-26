@@ -35,7 +35,9 @@ public class Wingpanel.App : Granite.Application {
     protected override void startup () {
         base.startup ();
 
+#if !OLD_LIB_IDO
         Ido.init ();
+#endif
         Services.EndSessionDialog.register ();
 
         var settings = new Services.Settings ();

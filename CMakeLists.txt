@@ -5,7 +5,8 @@ cmake_minimum_required (VERSION 2.8)
 cmake_policy (VERSION 2.8)
 
 list (APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
-
+option (NO_INDICATOR_NG "Disable support for Indicators NG" OFF)
+option (OLD_LIB_IDO "Compile for LibIDO version 13.04 or previous" OFF)
 #
 # Base bits
 #
@@ -80,6 +81,14 @@ find_package(Vala REQUIRED)
 include(ValaVersion)
 ensure_vala_version("0.16" MINIMUM)
 
+if (NO_INDICATOR_NG)
+    set(EXTRA_VALA_OPTS ${EXTRA_VALA_OPTS} -D NO_INDICATOR_NG)
+endif()
+
+if (OLD_LIB_IDO)
+    set(EXTRA_VALA_OPTS ${EXTRA_VALA_OPTS} -D OLD_LIB_IDO)
+endif()
+
 include(ValaPrecompile)
 vala_precompile (VALA_C ${EXEC_NAME}
     src/WingpanelApp.vala
@@ -114,6 +123,7 @@ OPTIONS
     -g
 	--thread
     --vapidir=${CMAKE_CURRENT_SOURCE_DIR}/vapi/
+    ${EXTRA_VALA_OPTS}
 )
 
 # Settings Schema
