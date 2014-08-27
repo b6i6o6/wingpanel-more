@@ -142,8 +142,9 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
         update_panel_alpha (duration.WORKSPACE);
     }
 
-    private void window_workspace_switched () {
+    private void window_workspace_switched (Wnck.Window window) {
         update_panel_alpha (duration.DEFAULT);
+        window.geometry_changed.connect (window_geometry_changed);
     }
 
     private void window_state_changed (Wnck.Window window,
