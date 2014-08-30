@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: wingpanel\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2014-08-06 22:10-0500\n"
-"PO-Revision-Date: 2014-08-19 20:44+0000\n"
+"PO-Revision-Date: 2014-08-29 18:36+0000\n"
 "Last-Translator: Иван Благојевић <ivan_blagojevic@mail.com>\n"
 "Language-Team: Serbian <sr@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2014-08-26 06:42+0000\n"
-"X-Generator: Launchpad (build 17163)\n"
+"X-Launchpad-Export-Date: 2014-08-30 07:12+0000\n"
+"X-Generator: Launchpad (build 17176)\n"
 
 #: /home/codygarver/wingpanel/po/../src/Widgets/AppsButton.vala:40
 msgid "Applications"
@@ -23,7 +23,7 @@ msgstr "Апликације"
 
 #: /home/codygarver/wingpanel/po/../src/Services/EndSessionDialog.vala:72
 msgid "Are you sure you want to Log Out?"
-msgstr "Да ли сигурно желиш да се одјавиш?"
+msgstr "Да ли заиста желиш да се одјавиш?"
 
 #: /home/codygarver/wingpanel/po/../src/Services/EndSessionDialog.vala:73
 msgid "This will close all open applications."
@@ -35,7 +35,7 @@ msgstr "Одјави се"
 
 #: /home/codygarver/wingpanel/po/../src/Services/EndSessionDialog.vala:79
 msgid "Are you sure you want to Shut Down?"
-msgstr "Да ли сигурно желиш да угасиш?"
+msgstr "Да ли заиста желиш да угасиш?"
 
 #: /home/codygarver/wingpanel/po/../src/Services/EndSessionDialog.vala:80
 msgid "This will close all open applications and turn off this device."
