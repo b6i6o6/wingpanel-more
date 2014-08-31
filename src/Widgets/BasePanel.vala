@@ -94,7 +94,7 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
             }
 
             if (window.get_window_type () != Wnck.WindowType.DOCK)
-                update_panel_alpha (duration.OPEN);
+                window.geometry_changed.connect (window_geometry_changed_open);
         });
 
         wnck_screen.window_closed.connect ((window) => {
@@ -144,7 +144,7 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
 
     private void window_workspace_switched (Wnck.Window window) {
         update_panel_alpha (duration.DEFAULT);
-        window.geometry_changed.connect (window_geometry_changed);
+        window.geometry_changed.connect (window_geometry_changed_snap);
     }
 
     private void window_state_changed (Wnck.Window window,
@@ -160,13 +160,13 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
                 && (changed_mask & Wnck.WindowState.MINIMIZED) != 0)
                 update_panel_alpha (duration.OPEN);
             else if ((new_state & Wnck.WindowState.MAXIMIZED_VERTICALLY) != 0)
-                window.geometry_changed.connect (window_geometry_changed);
+                window.geometry_changed.connect (window_geometry_changed_snap);
             else
                 update_panel_alpha (duration.SNAP);
         }
     }
 
-    private void window_geometry_changed (Wnck.Window window) {
+    private void window_geometry_changed_open (Wnck.Window window) {
         var monitor_workarea = screen.get_monitor_workarea (monitor_num);
         int window_x, window_y, window_width, window_height;
         window.get_geometry (out window_x, out window_y, out window_width, out window_height);
@@ -175,7 +175,21 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
             && window_y == monitor_workarea.y
             && (window_x == monitor_workarea.x || window_x == monitor_workarea.x + monitor_workarea.width / 2)
             && (window_width == monitor_workarea.width || window_width == monitor_workarea.width / 2)) {
-            window.geometry_changed.disconnect (window_geometry_changed);
+            window.geometry_changed.disconnect (window_geometry_changed_open);
+            update_panel_alpha (duration.OPEN);
+        }
+    }
+
+    private void window_geometry_changed_snap (Wnck.Window window) {
+        var monitor_workarea = screen.get_monitor_workarea (monitor_num);
+        int window_x, window_y, window_width, window_height;
+        window.get_geometry (out window_x, out window_y, out window_width, out window_height);
+
+        if (window.is_maximized_vertically () && !window.is_minimized ()
+            && window_y == monitor_workarea.y
+            && (window_x == monitor_workarea.x || window_x == monitor_workarea.x + monitor_workarea.width / 2)
+            && (window_width == monitor_workarea.width || window_width == monitor_workarea.width / 2)) {
+            window.geometry_changed.disconnect (window_geometry_changed_snap);
             update_panel_alpha (duration.SNAP);
         }
     }
