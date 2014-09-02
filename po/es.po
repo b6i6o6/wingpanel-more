@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: wingpanel\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-08-06 22:10-0500\n"
-"PO-Revision-Date: 2014-08-31 18:47+0000\n"
-"Last-Translator: Champan <xdango.dai@gmail.com>\n"
+"PO-Revision-Date: 2014-09-01 17:34+0000\n"
+"Last-Translator: Julián Unrrein <Unknown>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2014-09-01 07:11+0000\n"
-"X-Generator: Launchpad (build 17176)\n"
+"X-Launchpad-Export-Date: 2014-09-02 06:53+0000\n"
+"X-Generator: Launchpad (build 17192)\n"
 "Language: es\n"
 
 #: /home/codygarver/wingpanel/po/../src/Widgets/AppsButton.vala:40
@@ -28,7 +28,7 @@ msgstr "¿Está seguro de que desea cerrar la sesión?"
 
 #: /home/codygarver/wingpanel/po/../src/Services/EndSessionDialog.vala:73
 msgid "This will close all open applications."
-msgstr "Esto cerrará todas las aplicaciones abiertas"
+msgstr "Esto cerrará todas las aplicaciones abiertas."
 
 #: /home/codygarver/wingpanel/po/../src/Services/EndSessionDialog.vala:74
 msgid "Log Out"
@@ -36,12 +36,12 @@ msgstr "Cerrar Sesión"
 
 #: /home/codygarver/wingpanel/po/../src/Services/EndSessionDialog.vala:79
 msgid "Are you sure you want to Shut Down?"
-msgstr "¿Está seguro de que desea Apagar el Sistema?"
+msgstr "¿Está seguro de que desea apagar el sistema?"
 
 #: /home/codygarver/wingpanel/po/../src/Services/EndSessionDialog.vala:80
 msgid "This will close all open applications and turn off this device."
 msgstr ""
-"Esto cerrará todas las aplicaciones abiertas y apagará este dispositivo"
+"Esto cerrará todas las aplicaciones abiertas y apagará este dispositivo."
 
 #: /home/codygarver/wingpanel/po/../src/Services/EndSessionDialog.vala:81
 msgid "Shut Down"
