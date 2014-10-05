@@ -25,7 +25,7 @@ namespace Wingpanel.Backend {
         private unowned Indicator.Object parent_object;
         private IndicatorIface indicator;
 
-        const int MAX_ICON_SIZE = 22;
+        const int MAX_ICON_SIZE = 24;
 
         // used for drawing
         private Gtk.Window menu;
