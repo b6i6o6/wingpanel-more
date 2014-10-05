@@ -25,6 +25,8 @@ namespace Wingpanel.Backend {
         private unowned Indicator.Object parent_object;
         private IndicatorIface indicator;
 
+        const int MAX_ICON_SIZE = 22;
+
         // used for drawing
         private Gtk.Window menu;
         private Granite.Drawing.BufferSurface buffer;
@@ -53,9 +55,20 @@ namespace Wingpanel.Backend {
             this.indicator = indicator;
             parent_object = obj;
 
-            var image = entry.image;
-            if (image != null && image is Gtk.Image)
+            var image = entry.image as Gtk.Image;
+            if (image != null) {
+                // images holding pixbufs are quite frequently way too large, so we whenever a pixbuf
+                // is assigned to an image we need to check whether this pixbuf is within reasonable size
+                if (image.storage_type == Gtk.ImageType.PIXBUF) {
+                    image.notify["pixbuf"].connect (() => {
+                        ensure_max_size (image);
+                    });
+
+                    ensure_max_size (image);
+                }
+
                 set_widget (WidgetSlot.IMAGE, image);
+            }
 
             var label = entry.label;
             if (label != null && label is Gtk.Label)
@@ -203,6 +216,15 @@ namespace Wingpanel.Backend {
         public override bool scroll_event (Gdk.EventScroll event) {
             parent_object.entry_scrolled (entry, 1, (Indicator.ScrollDirection) event.direction);
             return false;
+        }
+
+        private void ensure_max_size (Gtk.Image image) {
+            var pixbuf = image.pixbuf;
+
+            if (pixbuf.get_height () > MAX_ICON_SIZE) {
+                image.pixbuf = pixbuf.scale_simple ((int) ((double) MAX_ICON_SIZE / pixbuf.get_height () * pixbuf.get_width ()),
+                        MAX_ICON_SIZE, Gdk.InterpType.HYPER);
+            }
         }
     }
 }
