@@ -93,8 +93,10 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
                 window.workspace_changed.connect (window_workspace_switched);
             }
 
-            if (window.get_window_type () != Wnck.WindowType.DOCK)
+            if (window.get_window_type () != Wnck.WindowType.DOCK) {
+                update_panel_alpha (duration.OPEN);
                 window.geometry_changed.connect (window_geometry_changed_open);
+            }
         });
 
         wnck_screen.window_closed.connect ((window) => {
@@ -154,14 +156,15 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
             && (window.get_workspace () == wnck_screen.get_active_workspace ()
             || window.is_sticky ())) {
             if ((new_state & Wnck.WindowState.MINIMIZED) != 0
-                && (changed_mask & Wnck.WindowState.MINIMIZED) != 0)
+                && (changed_mask & Wnck.WindowState.MINIMIZED) != 0) {
                 update_panel_alpha (duration.MINIMIZE);
-            else if ((new_state & Wnck.WindowState.MINIMIZED) == 0
-                && (changed_mask & Wnck.WindowState.MINIMIZED) != 0)
+            } else if ((new_state & Wnck.WindowState.MINIMIZED) == 0
+                && (changed_mask & Wnck.WindowState.MINIMIZED) != 0) {
                 update_panel_alpha (duration.OPEN);
-            else if ((new_state & Wnck.WindowState.MAXIMIZED_VERTICALLY) != 0)
+            } else if ((new_state & Wnck.WindowState.MAXIMIZED_VERTICALLY) != 0) {
+                update_panel_alpha (duration.SNAP);
                 window.geometry_changed.connect (window_geometry_changed_snap);
-            else
+            } else
                 update_panel_alpha (duration.SNAP);
         }
     }
