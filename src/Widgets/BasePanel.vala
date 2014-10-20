@@ -135,13 +135,30 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
         }
     }
 
+    private void window_geometry_changed_open (Wnck.Window window) {
+        if (window_fills_workarea (window)) {
+            update_panel_alpha (Duration.OPEN);
+            window.geometry_changed.disconnect (window_geometry_changed_open);
+        }
+    }
+
     private void active_workspace_changed () {
         update_panel_alpha (Duration.WORKSPACE);
     }
 
     private void window_workspace_switched (Wnck.Window window) {
         update_panel_alpha (Duration.DEFAULT);
-        window.geometry_changed.connect (window_geometry_changed_snap);
+        
+        // Fix panel not updating when windows are moved quickly between displays.
+        if (window.is_maximized () && screen.get_n_monitors () > 1)
+            window.geometry_changed.connect (window_geometry_changed_workspace_switch);
+    }
+
+    private void window_geometry_changed_workspace_switch (Wnck.Window window) {
+        if (window_fills_workarea (window) || !window.is_maximized ()){
+            update_panel_alpha (Duration.SNAP);
+            window.geometry_changed.disconnect (window_geometry_changed_workspace_switch);
+        }
     }
 
     private void window_state_changed (Wnck.Window window,
@@ -159,15 +176,9 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
             } else if ((new_state & Wnck.WindowState.MAXIMIZED_VERTICALLY) != 0) {
                 update_panel_alpha (Duration.SNAP);
                 window.geometry_changed.connect (window_geometry_changed_snap);
-            } else
+            } else {
                 update_panel_alpha (Duration.SNAP);
-        }
-    }
-
-    private void window_geometry_changed_open (Wnck.Window window) {
-        if (window_fills_workarea (window)) {
-            update_panel_alpha (Duration.OPEN);
-            window.geometry_changed.disconnect (window_geometry_changed_open);
+            }
         }
     }
 
@@ -175,21 +186,30 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
         if (window_fills_workarea (window)) {
             update_panel_alpha (Duration.SNAP);
             window.geometry_changed.disconnect (window_geometry_changed_snap);
+        } else if (screen.get_n_monitors () > 1) {
+            int window_x, window_y;
+            window.get_geometry (out window_x, out window_y, null, null);
+
+            if (screen.get_monitor_at_point (window_x, window_y) != monitor_num)
+                window.geometry_changed.disconnect (window_geometry_changed_snap);
         }
     }
 
     private bool window_fills_workarea (Wnck.Window window) {
         int scale_factor = this.get_scale_factor ();
         var monitor_workarea = screen.get_monitor_workarea (monitor_num);
+        int monitor_workarea_x = monitor_workarea.x * scale_factor;
+        int monitor_workarea_y = monitor_workarea.y * scale_factor;
+        int monitor_workarea_width = monitor_workarea.width * scale_factor;
         int window_x, window_y, window_width, window_height;
         window.get_geometry (out window_x, out window_y, out window_width, out window_height);
 
         if (window.is_maximized_vertically () && !window.is_minimized ()
-            && window_y == monitor_workarea.y * scale_factor
-            && (window_x == monitor_workarea.x 
-            || window_x == monitor_workarea.x + monitor_workarea.width * scale_factor/ 2)
-            && (window_width == monitor_workarea.width 
-            || window_width == monitor_workarea.width * scale_factor / 2))
+            && window_y == monitor_workarea_y
+            && (window_x == monitor_workarea_x
+            || window_x == monitor_workarea.x + monitor_workarea_width / 2)
+            && (window_width == monitor_workarea_width
+            || window_width == monitor_workarea_width / 2))
             return true;
 
         return false;
@@ -305,9 +325,12 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
     }
 
     private bool active_workspace_has_maximized_window () {
-        var workspace = wnck_screen.get_active_workspace ();
         int scale_factor = this.get_scale_factor ();
+        var workspace = wnck_screen.get_active_workspace ();
         var monitor_workarea = screen.get_monitor_workarea (monitor_num);
+        int monitor_workarea_x = monitor_workarea.x * scale_factor;
+        int monitor_workarea_y = monitor_workarea.y * scale_factor;
+        int monitor_workarea_width = monitor_workarea.width * scale_factor;
         bool window_left = false, window_right = false;
         
         foreach (var window in wnck_screen.get_windows ()) {
@@ -316,15 +339,15 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
 
             if ((window.is_pinned () || window.get_workspace () == workspace)
                 && window.is_maximized_vertically () && !window.is_minimized ()
-                && window_y == monitor_workarea.y * scale_factor) {
-                    if (window_x == monitor_workarea.x
-                        && window_width == monitor_workarea.width * scale_factor)
+                && window_y == monitor_workarea_y) {
+                    if (window_x == monitor_workarea_x
+                        && window_width == monitor_workarea_width)
                         return true;
-                    else if (window_x == monitor_workarea.x
-                        && window_width == monitor_workarea.width * scale_factor / 2)
+                    else if (window_x == monitor_workarea_x
+                        && window_width == monitor_workarea_width / 2)
                         window_left = true;
-                    else if (window_x == monitor_workarea.x + monitor_workarea.width * scale_factor / 2
-                        && window_width == monitor_workarea.width * scale_factor / 2)
+                    else if (window_x == monitor_workarea_x + monitor_workarea_width / 2
+                        && window_width == monitor_workarea_width / 2)
                         window_right = true;
 
                     if (window_left && window_right)
