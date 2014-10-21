@@ -92,7 +92,7 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
                 window.workspace_changed.connect (window_workspace_switched);
 
                 update_panel_alpha (Duration.OPEN);
-                if (window.is_maximized ())
+                if (window.is_maximized_vertically ())
                     window.geometry_changed.connect (window_geometry_changed_open);
             }
         });
@@ -101,6 +101,8 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
             if (window.get_window_type () == Wnck.WindowType.NORMAL) {
                 window.state_changed.disconnect (window_state_changed);
                 window.workspace_changed.disconnect (window_workspace_switched);
+                window.geometry_changed.disconnect (window_geometry_changed_open);
+                window.geometry_changed.disconnect (window_geometry_changed_snap);
 
                 update_panel_alpha (Duration.CLOSE);
             }
@@ -135,30 +137,12 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
         }
     }
 
-    private void window_geometry_changed_open (Wnck.Window window) {
-        if (window_fills_workarea (window)) {
-            update_panel_alpha (Duration.OPEN);
-            window.geometry_changed.disconnect (window_geometry_changed_open);
-        }
-    }
-
     private void active_workspace_changed () {
         update_panel_alpha (Duration.WORKSPACE);
     }
 
-    private void window_workspace_switched (Wnck.Window window) {
+    private void window_workspace_switched () {
         update_panel_alpha (Duration.DEFAULT);
-        
-        // Fix panel not updating when windows are moved quickly between displays.
-        if (window.is_maximized () && screen.get_n_monitors () > 1)
-            window.geometry_changed.connect (window_geometry_changed_workspace_switch);
-    }
-
-    private void window_geometry_changed_workspace_switch (Wnck.Window window) {
-        if (window_fills_workarea (window) || !window.is_maximized ()){
-            update_panel_alpha (Duration.SNAP);
-            window.geometry_changed.disconnect (window_geometry_changed_workspace_switch);
-        }
     }
 
     private void window_state_changed (Wnck.Window window,
@@ -182,16 +166,33 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
         }
     }
 
-    private void window_geometry_changed_snap (Wnck.Window window) {
+    private void window_geometry_changed_open (Wnck.Window window) {
         if (window_fills_workarea (window)) {
-            update_panel_alpha (Duration.SNAP);
-            window.geometry_changed.disconnect (window_geometry_changed_snap);
-        } else if (screen.get_n_monitors () > 1) {
+            update_panel_alpha (Duration.OPEN);
+
+            // Fix panel not updating when windows are moved quickly between displays.
+            if (screen.get_n_monitors () > 1)
+                window.geometry_changed.connect (window_geometry_changed_snap);
+        } else if (!window.is_maximized_vertically ()) {
+            window.geometry_changed.disconnect (window_geometry_changed_open);
+        } else if (screen.get_n_monitors () > 1 && window.is_maximized_vertically ()) {
             int window_x, window_y;
             window.get_geometry (out window_x, out window_y, null, null);
 
             if (screen.get_monitor_at_point (window_x, window_y) != monitor_num)
+                window.geometry_changed.disconnect (window_geometry_changed_open);
+        }
+    }
+
+    private void window_geometry_changed_snap (Wnck.Window window) {
+        if (window_fills_workarea (window)) {
+            update_panel_alpha (Duration.SNAP);
+
+            // Fix panel not updating when windows are moved quickly between displays.
+            if (screen.get_n_monitors () < 2)
                 window.geometry_changed.disconnect (window_geometry_changed_snap);
+        } else if (!window.is_maximized_vertically ()) {
+            window.geometry_changed.disconnect (window_geometry_changed_snap);
         }
     }
 
