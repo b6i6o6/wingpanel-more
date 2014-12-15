@@ -189,11 +189,16 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
             update_panel_alpha (Duration.SNAP);
 
             // Fix panel not updating when windows are moved quickly between displays.
-            if (screen.get_n_monitors () < 2)
+            if (screen.get_n_monitors () == 1)
                 window.geometry_changed.disconnect (window_geometry_changed_snap);
         } else if (!window.is_maximized_vertically ()) {
             window.geometry_changed.disconnect (window_geometry_changed_snap);
         }
+    }
+
+    private void window_geometry_changed_fullscreen (Wnck.Window window) {
+        update_panel_alpha(Duration.DEFAULT);
+        window.geometry_changed.disconnect (window_geometry_changed_fullscreen);
     }
 
     private bool window_fills_workarea (Wnck.Window window) {
@@ -333,6 +338,9 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
         int monitor_workarea_y = monitor_workarea.y * scale_factor;
         int monitor_workarea_width = monitor_workarea.width * scale_factor;
         bool window_left = false, window_right = false;
+
+        Gdk.Rectangle monitor_geometry;
+        screen.get_monitor_geometry (monitor_num, out monitor_geometry);
         
         foreach (var window in wnck_screen.get_windows ()) {
             int window_x, window_y, window_width, window_height;
@@ -354,6 +362,12 @@ public abstract class Wingpanel.Widgets.BasePanel : Gtk.Window {
                     if (window_left && window_right)
                         return true;
             }
+
+            if (window_x == monitor_geometry.x
+                && window_y == monitor_geometry.y
+                && window_width == monitor_geometry.width
+                && window_height == monitor_geometry.height)
+                window.geometry_changed.connect (window_geometry_changed_fullscreen);
         }
 
         return false;
