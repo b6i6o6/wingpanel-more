@@ -108,8 +108,8 @@ namespace Wingpanel.Backend {
         }
 
         private void setup_margin (Gtk.Widget widget) {
-            widget.margin_left = 10;
-            widget.margin_right = 9;
+            widget.margin_left = 11;
+            widget.margin_right = 10;
         }
 
         private void setup_drawing () {
