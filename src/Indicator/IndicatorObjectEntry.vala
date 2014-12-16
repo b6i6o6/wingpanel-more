@@ -108,8 +108,8 @@ namespace Wingpanel.Backend {
         }
 
         private void setup_margin (Gtk.Widget widget) {
-            widget.margin_left = 10;
-            widget.margin_right = 9;
+            widget.margin_start = 11;
+            widget.margin_end = 10;
         }
 
         private void setup_drawing () {
@@ -117,8 +117,8 @@ namespace Wingpanel.Backend {
 
             buffer = new Granite.Drawing.BufferSurface (100, 100);
 
-            entry.menu.margin_top = 28;
-            entry.menu.margin_bottom = 18;
+            entry.menu.margin_top = 18;
+            entry.menu.margin_bottom = 8;
 
             Granite.Widgets.Utils.set_theming (entry.menu, MENU_STYLESHEET, null,
                                                Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
