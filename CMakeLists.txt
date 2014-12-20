@@ -89,6 +89,11 @@ if (OLD_LIB_IDO)
     set(EXTRA_VALA_OPTS ${EXTRA_VALA_OPTS} -D OLD_LIB_IDO)
 endif()
 
+pkg_check_modules(GTK314_MIN QUIET gtk+-3.0>=3.14.0)
+if (GTK314_MIN_FOUND)
+    set(EXTRA_VALA_OPTS ${EXTRA_VALA_OPTS} -D HAS_GTK314_MIN)
+endif()
+
 include(ValaPrecompile)
 vala_precompile (VALA_C ${EXEC_NAME}
     src/WingpanelApp.vala
