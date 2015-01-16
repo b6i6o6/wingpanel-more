@@ -67,6 +67,8 @@ namespace Wingpanel.Backend {
                     ensure_max_size (image);
                 }
 
+                image.pixel_size = MAX_ICON_SIZE;
+
                 set_widget (WidgetSlot.IMAGE, image);
             }
 
