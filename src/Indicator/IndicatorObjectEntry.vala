@@ -106,7 +106,8 @@ namespace Wingpanel.Backend {
         }
 
         public string get_entry_name () {
-            return entry.name_hint ?? "";
+            unowned string name_hint = entry.name_hint;
+            return name_hint != null ? name_hint.dup () : "";
         }
 
         private void setup_margin (Gtk.Widget widget) {
