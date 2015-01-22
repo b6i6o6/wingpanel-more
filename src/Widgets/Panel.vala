@@ -88,7 +88,11 @@ namespace Wingpanel.Widgets {
 
         private void delete_entry (IndicatorWidget entry) {
             var parent = entry.parent;
-            parent.remove (entry);
+            
+            if (parent != null)
+                parent.remove (entry);
+            else
+                critical ("Indicator entry '%s' has no parent. Not removing from panel.", entry.get_entry_name ());
         }
 
         private void add_defaults (Services.Settings settings) {

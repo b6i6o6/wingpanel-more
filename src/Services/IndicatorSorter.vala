@@ -54,7 +54,7 @@ public class Wingpanel.Services.IndicatorSorter {
         { "com.canonical.indicator.session", null }
     };
 
-    public static int compare_func (IndicatorWidget? a, IndicatorWidget? b) {
+    public int compare_func (IndicatorWidget? a, IndicatorWidget? b) {
         if (a == null)
             return (b == null) ? 0 : -1;
 
