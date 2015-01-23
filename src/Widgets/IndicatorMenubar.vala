@@ -16,20 +16,20 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 public class Wingpanel.Widgets.IndicatorMenubar : MenuBar {
-    private List<IndicatorWidget> sorted_items;
-    private bool update_pending = false;
+    private Gee.List<IndicatorWidget> sorted_items;
+    private Services.IndicatorSorter sorter = new Services.IndicatorSorter ();
 
     public IndicatorMenubar () {
-        sorted_items = new List<IndicatorWidget> ();
+        sorted_items = new Gee.ArrayList<IndicatorWidget> ();
     }
 
     public void insert_sorted (IndicatorWidget item) {
-        if (sorted_items.index (item) >= 0)
+        if (item in sorted_items)
             return; // item already added
 
-        sorted_items.insert_sorted (item, (CompareFunc) Services.IndicatorSorter.compare_func);
-
-        apply_new_order.begin ();
+        sorted_items.add (item);
+        sorted_items.sort (sorter.compare_func);
+        apply_new_order ();
     }
 
     public override void remove (Gtk.Widget widget) {
@@ -40,19 +40,9 @@ public class Wingpanel.Widgets.IndicatorMenubar : MenuBar {
         base.remove (widget);
     }
 
-    private async void apply_new_order () {
-        if (update_pending)
-            return;
-
-        update_pending = true;
-
-        Idle.add (apply_new_order.callback);
-        yield;
-
+    private void apply_new_order () {
         clear ();
         append_all_items ();
-
-        update_pending = false;
     }
 
     private void clear () {

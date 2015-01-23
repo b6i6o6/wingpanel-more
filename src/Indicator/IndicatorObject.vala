@@ -67,6 +67,7 @@ public class Wingpanel.Backend.IndicatorObject : Object, IndicatorIface {
         var entry_widget = entries.get (entry);
         entries.unset (entry);
 
+        assert (entry_widget != null);
         entry_removed (entry_widget);
     }
 

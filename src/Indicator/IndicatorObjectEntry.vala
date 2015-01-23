@@ -24,6 +24,7 @@ namespace Wingpanel.Backend {
         private unowned Indicator.ObjectEntry entry;
         private unowned Indicator.Object parent_object;
         private IndicatorIface indicator;
+        private string entry_name_hint;
 
         const int MAX_ICON_SIZE = 24;
 
@@ -54,6 +55,12 @@ namespace Wingpanel.Backend {
             this.entry = entry;
             this.indicator = indicator;
             parent_object = obj;
+
+            unowned string name_hint = entry.name_hint;
+            if (name_hint == null)
+                warning ("NULL name hint");
+
+            entry_name_hint = name_hint != null ? name_hint.dup () : "";
 
             var image = entry.image as Gtk.Image;
             if (image != null) {
@@ -106,7 +113,7 @@ namespace Wingpanel.Backend {
         }
 
         public string get_entry_name () {
-            return entry.name_hint ?? "";
+            return entry_name_hint;
         }
 
         private void setup_margin (Gtk.Widget widget) {
@@ -233,7 +240,7 @@ namespace Wingpanel.Backend {
         private void ensure_max_size (Gtk.Image image) {
             var pixbuf = image.pixbuf;
 
-            if (pixbuf.get_height () > MAX_ICON_SIZE) {
+            if (pixbuf != null && pixbuf.get_height () > MAX_ICON_SIZE) {
                 image.pixbuf = pixbuf.scale_simple ((int) ((double) MAX_ICON_SIZE / pixbuf.get_height () * pixbuf.get_width ()),
                         MAX_ICON_SIZE, Gdk.InterpType.HYPER);
             }
