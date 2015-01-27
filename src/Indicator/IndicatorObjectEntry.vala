@@ -33,11 +33,13 @@ namespace Wingpanel.Backend {
         private Granite.Drawing.BufferSurface buffer;
         private int w = -1;
         private int h = -1;
-        private int arrow_height = 10;
-        private int arrow_width = 20;
-        private double x = 10.5;
-        private double y = 10.5;
-        private int radius = 5;
+        private int icon_origin_x = -1;
+        private int menu_origin_x = -1;
+        private const int arrow_height = 10;
+        private const int arrow_width = 20;
+        private const double x = 10.5;
+        private const double y = 10.5;
+        private const int radius = 5;
 
         private const string MENU_STYLESHEET = """
             .menu {
@@ -158,12 +160,22 @@ namespace Wingpanel.Backend {
         }
 
         private bool entry_menu_parent_draw_callback (Cairo.Context ctx) {
-            var new_w  = entry.menu.get_parent ().get_allocated_width ();
-            var new_h = entry.menu.get_parent ().get_allocated_height ();
+            Gtk.Allocation alloc;
+            entry.menu.get_parent ().get_allocation (out alloc);
 
-            if (new_w != w || new_h != h) {
-                w = new_w;
-                h = new_h;
+            // Get x coordinate where indicator icon starts in panel
+            int icon_x;
+            this.get_window ().get_origin (out icon_x, null);
+
+            // Get x coordinate where menu starts relative to screen area
+            int menu_x;
+            entry.menu.get_window ().get_origin (out menu_x, null);
+
+            if (alloc.width != w || alloc.height != h || icon_origin_x != icon_x || menu_origin_x != menu_x) {
+                w = alloc.width;
+                h = alloc.height;
+                icon_origin_x = icon_x;
+                menu_origin_x = menu_x;
 
                 buffer = new Granite.Drawing.BufferSurface (w, h);
                 cairo_popover (w, h);
@@ -200,34 +212,31 @@ namespace Wingpanel.Backend {
             return false;
         }
 
-        private void cairo_popover (int w, int h) {
-            w = w - 20;
-            h = h - 20;
+        private void cairo_popover (int menu_width, int menu_height) {
+            menu_width -= 20;
+            menu_height -= 20;
+
+            Gtk.Allocation panel_icon_alloc;
+            get_allocation (out panel_icon_alloc);
 
             // Get some nice pos for the arrow
-            var offs = 30;
-            int p_x;
-            int w_x;
-            Gtk.Allocation alloc;
-            this.get_window ().get_origin (out p_x, null);
-            this.get_allocation (out alloc);
+            int arrow_offset = icon_origin_x + panel_icon_alloc.x;
+            arrow_offset += panel_icon_alloc.width / 4 - menu_origin_x;
 
-            entry.menu.get_window ().get_origin (out w_x, null);
+            if (arrow_offset + 50 > menu_width + 20)
+                arrow_offset = menu_width + 20 - 15 - arrow_width;
 
-            offs = (p_x + alloc.x) - w_x + this.get_allocated_width () / 4;
-            if (offs + 50 > (w + 20))
-                offs = (w + 20) - 15 - arrow_width;
-            if (offs < 17)
-                offs = 17;
+            if (arrow_offset < 17)
+                arrow_offset = 17;
 
             buffer.context.arc (x + radius, y + arrow_height + radius, radius, Math.PI, Math.PI * 1.5);
-            buffer.context.line_to (offs, y + arrow_height);
+            buffer.context.line_to (arrow_offset, y + arrow_height);
             buffer.context.rel_line_to (arrow_width / 2.0, -arrow_height);
             buffer.context.rel_line_to (arrow_width / 2.0, arrow_height);
-            buffer.context.arc (x + w - radius, y + arrow_height + radius, radius, Math.PI * 1.5, Math.PI * 2.0);
+            buffer.context.arc (x + menu_width - radius, y + arrow_height + radius, radius, Math.PI * 1.5, Math.PI * 2.0);
 
-            buffer.context.arc (x + w - radius, y + h - radius, radius, 0, Math.PI * 0.5);
-            buffer.context.arc (x + radius, y + h - radius, radius, Math.PI * 0.5, Math.PI);
+            buffer.context.arc (x + menu_width - radius, y + menu_height - radius, radius, 0, Math.PI * 0.5);
+            buffer.context.arc (x + radius, y + menu_height - radius, radius, Math.PI * 0.5, Math.PI);
 
             buffer.context.close_path ();
         }
