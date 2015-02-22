@@ -57,7 +57,7 @@ namespace Wingpanel.Services {
          *             shutdown/reboot dialog.
          */
         public Dialog (EndSessionDialogType type) {
-            Object (dialog_type: type, title: "", deletable: false);
+            Object (dialog_type: type, title: "", deletable: false, skip_taskbar_hint: true, skip_pager_hint: true, type_hint: Gdk.WindowTypeHint.POPUP_MENU);
         }
 
         construct {
@@ -92,6 +92,8 @@ namespace Wingpanel.Services {
             }
 
             set_position (Gtk.WindowPosition.CENTER_ALWAYS);
+            set_keep_above (true);
+            stick ();
 
             var heading = new Gtk.Label ("<span weight='bold' size='larger'>" +
                 heading_text + "</span>");
