@@ -49,7 +49,8 @@ namespace Wingpanel.Backend {
                 border-width:0;
              }
              .popover_bg {
-               background-color:#fff;
+                background-color: @bg_color;
+                border: 1px solid rgba(0,0,0,0.4);
              }
          """;
 
