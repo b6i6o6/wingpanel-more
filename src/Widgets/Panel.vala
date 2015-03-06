@@ -21,15 +21,11 @@
 namespace Wingpanel.Widgets {
 
     public class Panel : BasePanel {
-        private Gtk.Box container;
-        private Gtk.Box left_wrapper;
-        private Gtk.Box right_wrapper;
-
-        private IndicatorMenubar menubar;
-        private MenuBar clock;
-        private MenuBar apps_menubar;
-
         private IndicatorLoader indicator_loader;
+        private IndicatorMenubar right_menubar;
+        private MenuBar left_menubar;
+        private MenuBar center_menubar;
+        private Gtk.Box container;
 
         public Panel (Gtk.Application app, Services.Settings settings, IndicatorLoader indicator_loader) {
             base (settings);
@@ -38,11 +34,7 @@ namespace Wingpanel.Widgets {
             set_application (app);
 
             container = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
-            left_wrapper = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
-            right_wrapper = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
             container.set_homogeneous (false);
-            left_wrapper.set_homogeneous (false);
-            right_wrapper.set_homogeneous (false);
 
             add (container);
 
@@ -81,9 +73,9 @@ namespace Wingpanel.Widgets {
             string entry_name = entry.get_indicator ().get_name ();
 
             if (entry_name == "libdatetime.so" || entry_name == "com.canonical.indicator.datetime")
-                clock.prepend (entry);
+                center_menubar.prepend (entry);
             else
-                menubar.insert_sorted (entry);
+                right_menubar.insert_sorted (entry);
         }
 
         private void delete_entry (IndicatorWidget entry) {
@@ -96,39 +88,17 @@ namespace Wingpanel.Widgets {
         }
 
         private void add_defaults (Services.Settings settings) {
-            // Add Apps button
-            apps_menubar = new MenuBar ();
-            var apps_button = new Widgets.AppsButton (settings);
-            apps_menubar.append (apps_button);
+            left_menubar = new MenuBar ();
+            center_menubar = new MenuBar ();
+            right_menubar = new IndicatorMenubar ();
 
-            left_wrapper.pack_start (apps_menubar, false, true, 0);
+            right_menubar.halign = Gtk.Align.END;
 
-            container.pack_start (left_wrapper);
+            left_menubar.append (new Widgets.AppsButton (settings));
 
-            clock = new MenuBar ();
-            container.pack_start (clock, false, false, 0);
-
-            // Menubar for storing indicators
-            menubar = new IndicatorMenubar ();
-
-            right_wrapper.pack_end (menubar, false, false, 0);
-            container.pack_end (right_wrapper);
-
-            var gpr = new Gtk.SizeGroup (Gtk.SizeGroupMode.HORIZONTAL);
-            gpr.add_widget (left_wrapper);
-            gpr.add_widget (right_wrapper);
-
-            // make sure those are all transparent when we later adjust the transparency
-            // in the panel's draw callback
-            clock.override_background_color (Gtk.StateFlags.NORMAL, Gdk.RGBA () {
-                red = 0.0, green = 0.0, blue = 0.0, alpha = 0.0
-            });
-            menubar.override_background_color (Gtk.StateFlags.NORMAL, Gdk.RGBA () {
-                red = 0.0, green = 0.0, blue = 0.0, alpha = 0.0
-            });
-            apps_menubar.override_background_color (Gtk.StateFlags.NORMAL, Gdk.RGBA () {
-                red = 0.0, green = 0.0, blue = 0.0, alpha = 0.0
-            });
+            container.pack_start (left_menubar);
+            container.pack_end (right_menubar);
+            container.set_center_widget (center_menubar);
         }
     }
 }
