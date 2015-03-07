@@ -247,6 +247,15 @@ namespace Wingpanel.Backend {
             return false;
         }
 
+        public override bool button_press_event (Gdk.EventButton event) {
+            if (event.button == Gdk.BUTTON_MIDDLE) {
+                parent_object.secondary_activate (entry, event.time);
+                return true;
+            }
+
+            return base.button_press_event (event);
+        }
+
         private void ensure_max_size (Gtk.Image image) {
             var pixbuf = image.pixbuf;
 
