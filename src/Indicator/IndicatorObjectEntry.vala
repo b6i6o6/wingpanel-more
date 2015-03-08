@@ -29,7 +29,7 @@ namespace Wingpanel.Backend {
         const int MAX_ICON_SIZE = 24;
 
         // used for drawing
-        private Gtk.Window menu;
+        private Gtk.Widget menu;
         private Granite.Drawing.BufferSurface buffer;
         private int w = -1;
         private int h = -1;
@@ -48,7 +48,7 @@ namespace Wingpanel.Backend {
                 background-image:none;
                 border-width:0;
              }
-             .popover_bg {
+             .popover {
                 background-color: @bg_color;
                 border: 1px solid rgba(0,0,0,0.4);
              }
@@ -145,10 +145,9 @@ namespace Wingpanel.Backend {
             Granite.Widgets.Utils.set_theming (entry.menu, MENU_STYLESHEET, null,
                                                Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
 
-            menu = new Granite.Widgets.PopOver ();
+            menu = new Gtk.Popover (this);
 
-            Granite.Widgets.Utils.set_theming (menu, MENU_STYLESHEET,
-                                               Granite.StyleClass.POPOVER_BG,
+            Granite.Widgets.Utils.set_theming (menu, MENU_STYLESHEET, null,
                                                Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
         }
 
