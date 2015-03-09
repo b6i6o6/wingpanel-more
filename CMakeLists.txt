@@ -68,6 +68,9 @@ set (INDICATORDIR ${current_indicatordir})
 configure_file (${CMAKE_SOURCE_DIR}/config.h.cmake ${CMAKE_BINARY_DIR}/config.h)
 add_definitions(-DGETTEXT_PACKAGE=\"${GETTEXT_PACKAGE}\")
 
+# Comment this out to enable C compiler warnings
+add_definitions (-w)
+
 # Setup C Libraries
 add_definitions(${DEPS_CFLAGS} ${DEPS_NOVALA_CFLAGS} -include config.h)
 
