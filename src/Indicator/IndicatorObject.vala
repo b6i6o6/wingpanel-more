@@ -65,10 +65,13 @@ public class Wingpanel.Backend.IndicatorObject : Object, IndicatorIface {
         assert (this.object == object);
 
         var entry_widget = entries.get (entry);
-        entries.unset (entry);
 
-        assert (entry_widget != null);
-        entry_removed (entry_widget);
+        if (entry_widget != null) {
+            entries.unset (entry);
+            entry_removed (entry_widget);
+        } else {
+            warning ("Could not remove panel entry for %s (%s). No entry found.", name, entry.name_hint);
+        }
     }
 
     private IndicatorWidget create_entry (Indicator.ObjectEntry entry) {
