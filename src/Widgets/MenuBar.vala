@@ -20,5 +20,9 @@ public class Wingpanel.Widgets.MenuBar : Gtk.MenuBar {
         can_focus = true;
         border_width = 0;
         get_style_context ().add_class (StyleClass.COMPOSITED_INDICATOR);
+
+        // make sure menubars are fully transparent when we later adjust the transparency
+        // in the panel's draw callback
+        override_background_color (Gtk.StateFlags.NORMAL, {0, 0, 0, 0});
     }
 }
