@@ -99,7 +99,7 @@ namespace Wingpanel.Services {
                 heading_text + "</span>");
             heading.get_style_context ().add_class ("larger");
             heading.use_markup = true;
-            heading.xalign = 0;
+            ((Gtk.Misc) heading).xalign = 0.0f;
 
             var grid = new Gtk.Grid ();
             grid.column_spacing = 12;
