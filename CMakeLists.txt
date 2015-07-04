@@ -82,7 +82,7 @@ add_definitions (-DWNCK_I_KNOW_THIS_IS_UNSTABLE)
 # Handle Vala Compilation
 find_package(Vala REQUIRED)
 include(ValaVersion)
-ensure_vala_version("0.16" MINIMUM)
+ensure_vala_version("0.28" MINIMUM)
 
 if (NO_INDICATOR_NG)
     set(EXTRA_VALA_OPTS ${EXTRA_VALA_OPTS} -D NO_INDICATOR_NG)
