@@ -1,12 +1,12 @@
 [Desktop Entry]
-Name=Wingpanel
-Comment=A super sexy space-saving top panel
-Exec=wingpanel
+Name=Wingpanel-more
+Comment=Wingpanel with more features
+Exec=wingpanel-more
 Icon=wingpanel
 Terminal=false
 Type=Application
 Categories=Utility;
 NoDisplay=true
-X-Ubuntu-Gettext-Domain=wingpanel
+X-Ubuntu-Gettext-Domain=wingpanel-more
 X-GNOME-Autostart-Notify=false
 X-GNOME-AutoRestart=true
